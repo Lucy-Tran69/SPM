@@ -1,0 +1,82 @@
+<?php
+include "../include/login.php";
+?>
+
+<!-- <link rel="stylesheet" type="text/css" href="../include/css/styles.css"/> -->
+<?php include "../include/html/hader.inc";?> 
+<title>Login</title>
+<body class="hold-transition login-page">
+<div class="login-box" style="margin-top:8%;">
+<div class="login-logo">
+    <a><b>ログイン</b></a>
+  </div>
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">アカウントとパスワードを入力してください</p>
+
+      <form action="../include/login.php" method="post" id="login_form">
+        <div class="input-group mb-3">
+        <input type="text" id="username" name="username" class="form-control" placeholder="アカウント">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-envelope"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+        <input type="password" id="password" name="password" class="form-control" placeholder="パスワード">
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+          <!-- /.col -->
+          <div class="text-center">
+            <button type="button" class="btn btn-primary" onclick="validate();">ログインする</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+    <!-- /.login-card-body -->
+  </div>
+</div>
+<!-- <section>
+<div class="center_div">
+<form id="login_form" action="../include/login.php" method="post" class="form_style">
+    
+        <h2>ログイン</h2>
+        <label>アカウントとパスウードを入力してください</label><br><br><br>
+        <div class="align_label_input_left">
+            <label class="label_align">アカウント</label><br><input type="text" id="username" name="username" class="input_style" placeholder="アカウント"><br>
+            <label class="label_align">パスウード</label><br><input type="password" id="password" name="password" class="input_style" placeholder="パスウード"><br>
+        </div>
+        <label class="error_message" id="error_text"></label>
+        <input type="button" class="btn_login" value="ログインする" onclick="validate();">
+</form>
+</div>
+</section> -->
+<?php include "../include/html/footer.inc"?>
+<div class="callout callout-danger" style="display:none;" id="error_text">  
+      <h4>Error</h4>
+      <p>ユーザー名かパスワードが間違っています</p>
+  </div>
+<script>
+function validate()
+{
+    var name = document.getElementById("username").value;
+    var pass = document.getElementById("password").value;
+
+    if(name!=null && name!="" && pass!=null && pass!="")
+    {
+        document.getElementById("login_form").submit();
+    }
+    else
+    {
+        document.getElementById("error_text").style.display="";
+    }
+}
+
+</script>
+

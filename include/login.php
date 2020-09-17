@@ -1,0 +1,148 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) 
+{
+    session_start();
+}
+header("content-type: text/html; charset=UTF-8"); 
+include "database/db.inc";
+$err_msg = "";
+$conn  = getConnection();
+if($conn->connect_error)
+{
+    die("Failed to connect to database. ".$conn->connect_error);
+}
+
+$stmt = $conn->prepare("select no as uID,account,password,effective_st_day,effective_en_day,name,role FROM users WHERE account=? AND invalid=0");
+
+try
+{
+    if($_SERVER["REQUEST_METHOD"]=="POST")
+    {
+    if(isset($_POST["username"]) && isset($_POST["password"]))
+    {
+        if(!empty($_POST["username"]) && !empty($_POST["password"]))
+        {
+           if($stmt->bind_param('s',$_POST["username"])==TRUE)
+           {
+                $result = execute($stmt,$conn);
+           }
+           else
+           {
+                throw new Exception($stmt->error);
+           }
+           
+           if($result==TRUE)
+           {
+               $result = $stmt->get_result();
+           }
+           $passwd = "";
+           $st_date;
+           $en_date;
+           $curr_date = date('Y-m-d');
+           if($result->num_rows>0)
+           {
+               while($row = $result->fetch_assoc())
+               {
+                    if($row["account"]==$_POST["username"])
+                    {
+                        $passwd = $row["password"];
+                        $st_date = date('Y-m-d',strtotime($row['effective_st_day']));
+                        $en_date = date('Y-m-d',strtotime($row['effective_en_day']));
+                        if(!password_verify($_POST["password"],$passwd))
+                        {
+                            if($st_date<=$curr_date && ($en_date>$curr_date || $en_date == '1970-01-01'))
+                            {
+                                $_SESSION["loginAccount"] = $row["name"];
+                                $_SESSION["loginUserId"] = $row["uID"];
+                                $_SESSION["loginRole"]=$row["role"];
+                                setMenu($row['uID'],$conn);
+                                header("Location: ../app/login/home.html");
+                            }
+                            else
+                            {
+                                //echo "Account is disabled<br>";
+                                echo "アカウントが無効になっています<br>";
+                            }
+                        }
+                        else
+                        {
+                            //$err_msg = "Username or password is incorrect<br>";
+                            $err_msg = "ユーザー名かパスワードが間違っています<br>";
+                        }
+                    }
+               }
+           }
+           else
+           {
+                //$err_msg = "Account does not exist or is disabled<br>";
+                $err_msg = "アカウントが存在しないか無効になっています<br>";
+           }
+        }
+        else
+        {
+            //$err_msg = "Username and password cannot be blank<br>";
+            $err_msg = "ユーザー名とパスワードを空白にすることはできません<br>";
+        }
+    }
+    else
+    {
+        //$err_msg = "Something went wrong. Please try again<br>";
+        $err_msg = "問題が発生しました。もう一度お試しください<br>";
+    }
+    }
+}
+catch(ErrorException $ex)
+{
+    echo $ex->getMessage();
+}
+finally
+{
+    $stmt->free_result();
+    freeConnection($conn);
+    if(!empty($err_msg))
+    {
+        header("Location: ../app/index.html");
+    }
+}
+
+function setMenu($userid, $conn)
+{
+    $role_list = array();
+    $keys = array();
+    $values = array();
+    $roleStmt = $conn->prepare("SELECT menu.name,menu.url from menu INNER JOIN role_menu ON menu.no=role_menu.menu
+                                                                    INNER JOIN role ON role.no=role_menu.role
+                                                                    INNER JOIN users ON users.role=role.no
+                                                                    WHERE users.no=? ORDER BY menu.sort_order");
+    if (isset($_POST["username"]) && !empty($_POST["username"])) 
+    {
+        if ($roleStmt->bind_param('i', $userid) == TRUE) 
+        {
+            $result = execute($roleStmt, $conn);
+        } else 
+        {
+            throw new Exception($roleStmt->error);
+        }
+
+        if ($result == TRUE) 
+        {
+            $result = $roleStmt->get_result();
+        }
+
+        if ($result->num_rows > 0) 
+        {
+            while ($row = $result->fetch_assoc()) 
+            {
+                $keys[] = $row['name'];
+                $values[] = $row['url'];
+            }
+
+            $role_list = array_combine($keys, $values);
+        }
+
+        $_SESSION['roles'] = $role_list;
+        $roleStmt->free_result();
+    }
+}
+?>
+

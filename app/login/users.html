@@ -1,0 +1,466 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) 
+{
+  session_start();
+}
+include "check_view_permission.php";
+$url = "users";
+check_view_permission($url);
+header("content-type: text/html; charset=UTF-8");
+//Get array of roles from session variable 
+?>
+<style>
+.update_button{
+  width:50%;
+}
+
+.align_button{
+  text-align: center;
+}
+
+.align_form{
+  text-align:-webkit-center;
+}
+</style>
+<?php include "html/sidebar.inc" ?>
+<?php include "users.php" ?>
+<!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
+<?php
+if (isset($_SESSION["loginAccount"])) {
+?>
+  <div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <!-- Default box -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">マスター管理　ユーザ管理</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form">
+                  <div class="form-group">
+                  <div class="row">
+                    <div class="col-xs-5">
+                  <label id="itemLabel">権限</label>
+                    <select name="selectedRole" id="selectedRole" class="form-control" onchange="searchTableByRole();">
+                    <option value="">-</option>
+                        <?php
+                        if ($roleResultSet->num_rows > 0) {
+                          mysqli_data_seek($roleResultSet,0);
+                          while ($row = $roleResultSet->fetch_assoc()) {
+                        ?>
+                            <option value="<?php echo $row["name"]; ?>"><?php echo $row["name"]; ?></option>
+                        <?php
+                          }
+                        }
+                        ?>
+                      </select>
+                  </div>
+                  </div>
+                  </div>
+                    <div class="form-group">
+                    <div class="row">
+                    <div class="col-xs-5">
+                    <label id="nameLabel" class="searchTable_label">氏名</label>
+                    <input type="text" id="searchName" name="searchName" class="form-control" onkeyup="searchTableByName();"/>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <div class="row">
+                    <div class="col-xs-5">
+                    <label id="custLabel" class="searchTable_label">取引先名</label>
+                    <input type="text" name="searchCustomer" id="searchCustomer" class="form-control" onkeyup="searchTableByCustomer();"/>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <div class="row">
+                    <div class="col-xs-5">
+                    <div class="form-check">
+                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="0"/>
+                    <label id="checkLabel" class="form-check-label">ログインできないユーザ</label>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                <input type="submit" value="検索" class="btn btn-primary" style="width: 100px; margin-left: 250px;">
+                <input type="button" value="追加" class="btn btn-primary" style="width: 100px; margin-left: 250px;" data-target="#insert" data-toggle="modal">
+              </form>
+              </div>
+              <table id="details_table" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>no</th>
+                    <th>氏名</th>
+                    <th>アカウント</th>
+                    <th>権限</th>
+                    <th>取引先名</th>
+                    <th>ログイン期限</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  if ($resultSet->num_rows > 0) {
+                    while ($row = $resultSet->fetch_assoc()) {
+                  ?>
+                      <tr style="display: <?php echo $row["invalid"]==0?"":"none;"?>">
+                        <td><?php echo $row["no"] ?></td>
+                        <td><?php echo $row["name"] ?></td>
+                        <td><?php echo $row["account"] ?></td>
+                        <td><?php echo $row["role"] ?></td>
+                        <td><?php echo $row["cname"] ?></td>
+                        <td><?php echo $row["effective_st_day"] ?></td>
+                        <td style="display: none;"><?php echo $row["invalid"] ?></td>
+                        <td class="align_button"><input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" value="変更" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"></td>
+                      </tr>
+                  <?php
+                    }
+                  }
+                  // $resultStmt->free_result();
+                  // freeConnection($conn);
+                  ?>
+                </tbody>
+              </table>
+              <!-- /.card-footer-->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <div class="modal fade" tabindex="-1" role="dialog" id="details">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body align_form">
+          <form action="../../include/user_functions/updateUserDetails.php" method="POST" class="form_style">
+            <input type="hidden" id="inputId" name="inputId" />
+            <table class="popup_table">
+              <tr>
+                <td><label id="nameLabel" class="label_align_table">氏名</label></td>
+                <td><input type="text" id="inputName" name="inputName" /></td>
+              </tr>
+              <tr>
+                <td><label id="accountLabel" class="label_align_table">アカウント</label></td>
+                <td><input type="text" id="inputAccount" name="inputAccount" /></td>
+              </tr>
+              <tr>
+                <td><label id="passwordLabel" class="label_align_table">パスウード</label></td>
+                <td><input type="password" id="inputPass" name="inputPass" /></td>
+              </tr>
+              <tr>
+                <td><label id="roleLabel" class="label_align_table">権限</label></td>
+                <td><select id="inputRole" name="inputRole">
+                    <?php
+                    if ($roleResultSet->num_rows > 0) {
+                      mysqli_data_seek($roleResultSet,0);
+                      while ($row = $roleResultSet->fetch_assoc()) {
+                    ?>
+                        <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
+                    <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="emailLabel" class="label_align_table">Email</label></td>
+                <td><input type="email" id="inputEmail" name="inputEmail" /></td>
+              </tr>
+              <tr>
+                <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
+                <td><input type="date" id="inputExpire" name="inputExpire" /></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">取引先</label></td>
+                <td><select id="inputCustomer" name="inputCustomer">
+                    <?php
+                    if ($custResultSet->num_rows > 0) {
+                      while ($row = $custResultSet->fetch_assoc()) {
+                    ?>
+                        <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
+                    <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="officeLabel" class="label_align_table">所属</label></td>
+                <td><select id="inputOffice" name="inputOffice">
+                    <?php
+                    if ($officeResultSet->num_rows > 0) {
+                      while ($row = $officeResultSet->fetch_assoc()) {
+                    ?>
+                        <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
+                    <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="invalidLabel" class="label_align_table">停止</label></td>
+                <td><input type="checkbox" id="inputInvalid" name="inputInvalid" /></td>
+              </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="Submit" class="btn btn-primary">Save changes</button>
+        </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <!-- Add user modal -->
+  <div class="modal fade" tabindex="-1" role="dialog" id="insert">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body align_form">
+          <form action="../../include/user_functions/insertNewUser.php" method="POST" class="form_style">
+            <table class="popup_table">
+              <tr>
+                <td><label id="nameLabel" class="label_align_table">氏名</label></td>
+                <td><input type="text" id="insertName" name="insertName" /></td>
+              </tr>
+              <tr>
+                <td><label id="accountLabel" class="label_align_table">アカウント</label></td>
+                <td><input type="text" id="insertAccount" name="insertAccount" /></td>
+              </tr>
+              <tr>
+                <td><label id="passwordLabel" class="label_align_table">パスウード</label></td>
+                <td><input type="password" id="insertPass" name="insertPass" /></td>
+              </tr>
+              <tr>
+                <td><label id="roleLabel" class="label_align_table">権限</label></td>
+                <td><select id="insertRole" name="insertRole">
+                    <?php
+                    if ($roleResultSet->num_rows > 0) {
+                      mysqli_data_seek($roleResultSet,0);
+                      while ($row = $roleResultSet->fetch_assoc()) {
+                    ?>
+                        <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
+                    <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="emailLabel" class="label_align_table">Email</label></td>
+                <td><input type="email" id="insertEmail" name="insertEmail" /></td>
+              </tr>
+              <tr>
+                <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
+                <td><input type="date" id="insertExpire" name="insertExpire" /></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">取引先</label></td>
+                <td><select id="insertCustomer" name="insertCustomer">
+                    <?php
+                    if ($custResultSet->num_rows > 0) {
+                      mysqli_data_seek($custResultSet,0);
+                      while ($row = $custResultSet->fetch_assoc()) {
+                    ?>
+                        <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
+                    <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="officeLabel" class="label_align_table">所属</label></td>
+                <td><select id="insertOffice" name="insertOffice">
+                    <?php
+                    if ($officeResultSet->num_rows > 0) {
+                      mysqli_data_seek($officeResultSet,0);
+                      while ($row = $officeResultSet->fetch_assoc()) {
+                    ?>
+                        <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
+                    <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="invalidLabel" class="label_align_table">停止</label></td>
+                <td><input type="checkbox" id="insertInvalid" name="insertInvalid" /></td>
+              </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="Submit" class="btn btn-primary">Save changes</button>
+        </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  </body>
+  <?php include "html/footer.inc" ?>
+
+  </html>
+<?php
+} else {
+  header("Location: ../../include/logout.php");
+}
+?>
+
+<script>
+  var modal = document.getElementById("details");
+  var span = document.getElementsByClassName("close")[0];
+
+  function openModal(userid) {
+    $.ajax({
+      url: "../../include/user_functions/getSelectedUser.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        id: userid
+      },
+      success: function(response) {
+        if (response.status == "success") {
+          $("#inputId").val(userid);
+          $("#inputName").val(response.name);
+          $("#inputAccount").val(response.account);
+          $('#inputRole').val(response.role).change();
+          $("#inputExpire").val(response.expire);
+          $("#inputCustomer").val(response.customer).change();
+          $("#inputOffice").val(response.office).change();
+          $("#inputEmail").val(response.email);
+
+          if (response.invalid == 0)
+            $("#inputInvalid").prop('checked', false);
+          else
+            $("#inputInvalid").prop('checked', true);
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+      }
+    });
+    modal.style.display = "block";
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+  }
+
+function searchTableByName() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchName");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("details_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function searchTableByCustomer() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchCustomer");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("details_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[4];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function searchTableByRole() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("selectedRole");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("details_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[3];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function searchTableByInvalid() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchInvalid").checked;
+  filter = input;
+  table = document.getElementById("details_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[6];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue==1) 
+      {
+        if(filter==true)
+        {
+          tr[i].style.display = "";
+        }
+        else
+        {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+}
+</script>

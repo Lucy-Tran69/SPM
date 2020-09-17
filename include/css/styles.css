@@ -1,0 +1,202 @@
+
+.btn_login {
+    background-color: #003399;
+    border: 2px solid #003399;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+
+  .btn_login:hover{
+    background-color: white;
+    border: 2px solid #003399;
+    color: #003399;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: bold;
+  }
+
+  .btn_update {
+    background-color: #003399;
+    border: 2px solid #003399;
+    color: white;
+    width: 100%;
+    height: 35px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+
+  .btn_update:hover {
+    background-color: white;
+    border: 2px solid #003399;
+    color: #003399;
+    width: 100%;
+    height: 35px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+
+  .form_logout{
+    float: right;
+  }
+
+  .username_display{
+    font-size: 18px;
+    padding-right: 10px;
+  }
+  
+  .center_div{
+      width: 100%;
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+  }
+  
+  .align_label_input_left{
+      text-align: left;
+      margin-left: 40%;
+  }
+  .form_style{
+      width: 100%;
+      text-align: center;
+  }
+  
+  .label_align{
+      padding-right: 225px;
+  }
+
+  .label_align_table{
+    padding-right: 50px;
+    text-align: right;
+}
+  
+  .error_message{
+      color: red;
+  }
+  
+  .input_style{
+    width: 35%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .input_style_full_width{
+    width:auto;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .sidenav {
+    height: 100%; 
+    width: 250px; 
+    position: fixed; 
+    z-index: 1; 
+    top: 0; 
+    left: 0;
+    background-color: #6699ff; 
+    /* overflow-x: hidden;  */
+    margin-top: 80px;
+  }
+  
+  .sidenav button {
+    height: 10%;
+    width: 100%;
+    text-decoration: none;
+    font-size: 16px;
+    background-color: #6699ff;
+    display: block;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    /* border-bottom:0.5px solid black; */
+    border-bottom : none;
+    white-space: nowrap;
+    text-align: left;  
+  }
+  
+  .sidenav button:hover {
+    background-color: #000099;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .main {
+    margin-top: 30px;
+    margin-left: 250px;
+    padding: 0px 10px;
+  }
+
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    text-align: center;
+  }
+  
+  .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .popup_table{
+    padding-left: 15%;
+    padding-bottom: 2%;
+  }
+
