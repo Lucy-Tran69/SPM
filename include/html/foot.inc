@@ -23,7 +23,7 @@
 <script src="../../include/template/plugins/jquery-ui/jquery-ui.min.js"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>
-$.widget.bridge('uibutton', $.ui.button)
+    $.widget.bridge('uibutton', $.ui.button)
 </script>
 <!-- Bootstrap 4 -->
 <script src="../../include/template/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -49,22 +49,67 @@ $.widget.bridge('uibutton', $.ui.button)
 <script src="../../include/template/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
 <script src="https://adminlte.io/themes/AdminLTE/plugins/iCheck/icheck.min.js"></script>
 <script>
-$(function() {
-    $('#example1').DataTable()
-    $('#example2').DataTable({
-        'paging': true,
-        'lengthChange': false,
-        'searching': false,
-        'ordering': true,
-        'info': true,
-        'autoWidth': false
+    $(function () {
+        var table = $('#topicsTable').DataTable({
+            // 'paging': true,
+            // 'lengthChange': false,
+            // 'searching': false,
+            // 'ordering': false,
+            // 'info': true,
+            // 'autoWidth': false,
+            // 'responsive': true,
+
+            'processing': true,
+            'serverSide': true,
+            // 'lengthChange': false,
+            'searching': false,
+            'ordering': false,
+            'info': true,
+            'autoWidth': false,
+            'responsive': true,
+            'serverMethod': 'post',
+            'ajax': {
+                'url': '../../include/topics.php'
+            },
+            'columns': [
+                { data: 'insert_day' },
+                { data: 'open_day' },
+                { data: 'close_day' },
+                { data: 'title' },
+                { defaultContent: '<div class="row justify-content-center"><button type="button" class="btn btn-success" style="margin-right: 5px;">変更</button><button type="button" class="btn btn-danger js-deleteTopic">削除</button></div>' },
+            ],
+        }).ajax.reload(null, false);
+
+        $('#topicsTable tbody').on('click', '.js-deleteTopic', function () {
+            var row = $(this).closest('tr');
+
+            var topicID = table.row(row).data()["no"];
+            console.log(topicID);
+        });
+
+        $('.btn-primary').click(function (e) {
+            e.preventDefault();
+            RequestData();
+        });
+
+        function RequestData() {
+            $.post('../../include/topics.php', $('#searchTopic').serialize(), function (data) {
+                ProcessResponse(data);
+            });
+        }
+
+        function ProcessResponse(data) {
+            table.clear();
+            table.rows.add(data);
+            table.draw();
+        }
+
+        //Flat red color scheme for iCheck
+        $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
+            checkboxClass: 'icheckbox_flat-green',
+            radioClass: 'iradio_flat-green'
+        })
     })
-    //Flat red color scheme for iCheck
-    $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
-        checkboxClass: 'icheckbox_flat-green',
-        radioClass: 'iradio_flat-green'
-    })
-})
 </script>
 </body>
 
