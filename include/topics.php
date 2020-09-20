@@ -55,10 +55,6 @@
     $draw = isset($_POST['draw']) ? $_POST['draw'] : 1;
     $row = isset($_POST['start']) ? $_POST['start'] : 0;
     $rowperpage = isset($_POST['length']) ? $_POST['length'] : 10; // Rows display per page
-    // $columnIndex = $_POST['order'][0]['column']; // Column index
-    // $columnName = $_POST['columns'][$columnIndex]['data']; // Column name
-    // $columnSortOrder = $_POST['order'][0]['dir']; // asc or desc
-    // $searchValue = $_POST['search']['value']; // Search value
 
     ## Search 
     $searchQuery = "";;
@@ -66,6 +62,7 @@
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $title = isset($_POST["title"]) ? $_POST["title"] : '';
         $status = isset($_POST["status"]) ? $_POST["status"] : '';
+        $topicID = isset($_POST["topicID"]) ? $_POST["topicID"] : '';
         
         if(!empty($title) && empty($status)){
             $searchQuery = "and title like '%$title%'";
@@ -76,7 +73,10 @@
         if(!empty($title) && !empty($status)) {
             $searchQuery = "and title like '%$title%' and opday <= '$status'";
         }
-        // echo $searchQuery;
+        if(!empty($topicID)) {
+            $empQuery = "UPDATE topics SET invalid = 1 WHERE no = $topicID";
+            mysqli_query($conn, $empQuery);
+        }
     }
 
     ## Total number of records without filtering
@@ -114,6 +114,8 @@
         "aaData" => $data
     );
 
+    // header('Content-type: application/json');
     echo json_encode($response);
     // die();
+    $conn->close();
 ?>

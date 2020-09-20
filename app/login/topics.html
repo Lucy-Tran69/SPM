@@ -1,5 +1,4 @@
 <?php
-date_default_timezone_set('Asia/Tokyo');
 if (session_status() == PHP_SESSION_NONE) 
 {
   session_start();
@@ -11,7 +10,7 @@ header("content-type: text/html; charset=UTF-8");
 ?>
 <?php include "../../include/html/header.inc" ?>
 <?php include "../../include/html/menu.inc" ?>
-<?php include "../../include/topics.php" ?>
+<?php //include "../../include/topics.php" ?>
 <?php
 if (isset($_SESSION["loginAccount"])) {
 ?>
@@ -32,7 +31,7 @@ if (isset($_SESSION["loginAccount"])) {
                     </div>
                     <div class="form-group">
                         <label class="form-check-label">
-                            <input type="checkbox" name="status" class="flat-red" id="exampleCheck1"
+                            <input type="checkbox" name="status" class="flat-red" id="status"
                                 value="<?php echo date('Y-m-d h:i:s', time()); ?>"
                                 <?php echo isset($_POST["status"]) ? 'checked' : ''; ?>>
                             公開中のみ

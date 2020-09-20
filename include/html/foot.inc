@@ -50,66 +50,104 @@
 <script src="https://adminlte.io/themes/AdminLTE/plugins/iCheck/icheck.min.js"></script>
 <script>
     $(function () {
-        var table = $('#topicsTable').DataTable({
-            // 'paging': true,
-            // 'lengthChange': false,
-            // 'searching': false,
-            // 'ordering': false,
-            // 'info': true,
-            // 'autoWidth': false,
-            // 'responsive': true,
-
+        const topicTable = $('#topicsTable');
+        var table = topicTable.DataTable({
             'processing': true,
             'serverSide': true,
-            // 'lengthChange': false,
             'searching': false,
             'ordering': false,
             'info': true,
             'autoWidth': false,
             'responsive': true,
+            'deferRender': true,
             'serverMethod': 'post',
             'ajax': {
                 'url': '../../include/topics.php'
             },
             'columns': [
-                { data: 'insert_day' },
-                { data: 'open_day' },
-                { data: 'close_day' },
-                { data: 'title' },
-                { defaultContent: '<div class="row justify-content-center"><button type="button" class="btn btn-success" style="margin-right: 5px;">変更</button><button type="button" class="btn btn-danger js-deleteTopic">削除</button></div>' },
+                { data: 'insert_day', "defaultContent": "", "title": '作成日' },
+                { data: 'open_day', "defaultContent": "", "title": '公開日時' },
+                { data: 'close_day', "defaultContent": "", "title": '終了日' },
+                { data: 'title', "defaultContent": "", "title": 'タイトル' },
+                {
+                    data: "no",
+                    render: function (data, type, row) {
+                        return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;">変更</a><button type="button" class="btn btn-danger js-deleteTopic">削除</button></div>';
+                    }
+                },
             ],
-        }).ajax.reload(null, false);
-
-        $('#topicsTable tbody').on('click', '.js-deleteTopic', function () {
-            var row = $(this).closest('tr');
-
-            var topicID = table.row(row).data()["no"];
-            console.log(topicID);
         });
 
-        $('.btn-primary').click(function (e) {
+        $('#searchTopic').on('submit', function (e) {
             e.preventDefault();
             RequestData();
         });
 
         function RequestData() {
-            $.post('../../include/topics.php', $('#searchTopic').serialize(), function (data) {
-                ProcessResponse(data);
+            let title = $('#title').val();
+            let status = '';
+
+            if ($('#status').is(":checked")) {
+                status = $('#status').val();
+            }
+
+            if ($.fn.DataTable.isDataTable(topicTable)) {
+                $(topicTable).DataTable().destroy();
+            }
+
+            $(topicTable).DataTable({
+                'processing': true,
+                'serverSide': true,
+                'searching': false,
+                'ordering': false,
+                'info': true,
+                'autoWidth': false,
+                'responsive': true,
+                'deferRender': true,
+                "ajax": {
+                    type: 'POST',
+                    url: '../../include/topics.php',
+                    data: { 'title': title, 'status': status },
+                },
+                "columns": [
+                    { data: 'insert_day', "defaultContent": "", "title": '作成日' },
+                    { data: 'open_day', "defaultContent": "", "title": '公開日時' },
+                    { data: 'close_day', "defaultContent": "", "title": '終了日' },
+                    { data: 'title', "defaultContent": "", "title": 'タイトル' },
+                    {
+                        data: "no",
+                        render: function (data, type, row) {
+                            return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;">変更</a><button type="button" class="btn btn-danger js-deleteTopic">削除</button></div>';
+                        }
+                    },
+                ],
             });
         }
 
-        function ProcessResponse(data) {
-            table.clear();
-            table.rows.add(data);
-            table.draw();
-        }
+        $('#topicsTable tbody').on('click', '.js-deleteTopic', function () {
+            var row = $(this).closest('tr');
+
+            var topicID = $(topicTable).DataTable().row(row).data()["no"];
+            var topicTitle = $(topicTable).DataTable().row(row).data()["title"];
+
+            let c = confirm('You want to delete "' + topicTitle + '"');
+
+            if (c == true) {
+                $(topicTable).DataTable().row(row).remove().draw(false);
+                console.log(topicID);
+
+                $.post('../../include/topics.php', { 'topicID': topicID }, function (data) {
+                    $(topicTable).DataTable().ajax.reload(null, false);;
+                });
+            }
+        });
 
         //Flat red color scheme for iCheck
         $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
             checkboxClass: 'icheckbox_flat-green',
             radioClass: 'iradio_flat-green'
         })
-    })
+    });
 </script>
 </body>
 
