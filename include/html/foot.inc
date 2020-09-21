@@ -47,7 +47,11 @@
 <script src="../../include/template/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
 <script src="../../include/template/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
 <script src="../../include/template/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-<script src="https://adminlte.io/themes/AdminLTE/plugins/iCheck/icheck.min.js"></script>
+<!-- Toastr -->
+<script src="../../include/template/plugins/toastr/toastr.min.js"></script>
+<!-- jquery-validation -->
+<script src="../../include/template/plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="../../include/template/plugins/jquery-validation/additional-methods.min.js"></script>
 <script>
     $(function () {
         const topicTable = $('#topicsTable');
@@ -72,7 +76,7 @@
                 {
                     data: "no",
                     render: function (data, type, row) {
-                        return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;">変更</a><button type="button" class="btn btn-danger js-deleteTopic">削除</button></div>';
+                        return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
                     }
                 },
             ],
@@ -117,7 +121,7 @@
                     {
                         data: "no",
                         render: function (data, type, row) {
-                            return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;">変更</a><button type="button" class="btn btn-danger js-deleteTopic">削除</button></div>';
+                            return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
                         }
                     },
                 ],
@@ -135,18 +139,76 @@
             if (c == true) {
                 $(topicTable).DataTable().row(row).remove().draw(false);
                 console.log(topicID);
-
                 $.post('../../include/topics.php', { 'topicID': topicID }, function (data) {
-                    $(topicTable).DataTable().ajax.reload(null, false);;
+                    toastr.success('You have successfully deleted "' + topicTitle + '"');
+                    $(topicTable).DataTable().ajax.reload(null, false);
                 });
             }
         });
 
-        //Flat red color scheme for iCheck
-        $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
-            checkboxClass: 'icheckbox_flat-green',
-            radioClass: 'iradio_flat-green'
-        })
+        
+        try {
+            const datepickerBirthday = $('.datetimepicker-input');
+            datepickerBirthday.daterangepicker({
+                singleDatePicker: true,
+                autoUpdateInput: true,
+                minYear: 1901,
+                minDate: moment(),
+                timePicker: true,
+                timePicker24Hour: true,
+                timePickerIncrement: 10,
+                locale: {
+                    format: 'YYYY-MM-DD HH:mm:ss',
+                    daysOfWeek: ['日', '月', '火', '水', '木', '金', '土'],
+                    monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                },
+            });
+            $(datepickerBirthday).on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm:ss'));
+            });
+        } catch (er) {
+            console.log(er);
+        }
+
+        $.validator.setDefaults({
+            submitHandler: function () {
+                alert("Form successful submitted!");
+            }
+        });
+
+        $('#addTopic').validate({
+            rules: {
+                title: {
+                    required: true,
+                },
+                openDay: {
+                    required: true,
+                },
+                body: {
+                    required: true,
+                },
+                imgFile: {
+                    required: true,
+                },
+            },
+            messages: {
+                title: "タイトルを入力して下さい",
+                openDay: "公開日を入力して下さい",
+                body: "本文を入力して下さい",
+                imgFile: "画像を入力して下さい",
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
+        });
     });
 </script>
 </body>

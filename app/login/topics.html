@@ -14,32 +14,27 @@ header("content-type: text/html; charset=UTF-8");
 <?php
 if (isset($_SESSION["loginAccount"])) {
 ?>
-<div class="row justify-content-end" style="margin-bottom: 20px; margin-right: 10px;">
+<div class="row justify-content-end" style="margin-bottom: 20px; margin-right: 10px">
     <button type="submit" class="btn btn-primary button-search">追加</button>
 </div>
 <div class="card card-default">
     <div class="card-body">
         <div class="row justify-content-md-center">
             <div class="col-md-6">
-                <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> id="searchTopic" method="POST"
-                    role="form">
+                <form action="#" id="searchTopic" method="POST" role="form">
                     <div class="form-group">
                         <label>タイトル</label>
-                        <input type="text" class="form-control" id="title" name="title"
-                            value="<?php echo isset($_POST["title"]) ? $_POST["title"] : ''; ?>"
-                            placeholder="Enter title">
+                        <input type="text" class="form-control" id="title" name="title" placeholder="タイトル" />
                     </div>
                     <div class="form-group">
-                        <label class="form-check-label">
-                            <input type="checkbox" name="status" class="flat-red" id="status"
-                                value="<?php echo date('Y-m-d h:i:s', time()); ?>"
-                                <?php echo isset($_POST["status"]) ? 'checked' : ''; ?>>
-                            公開中のみ
-                        </label>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" name="status" class="custom-control-input" id="status" value="<?php echo date('Y-m-d h:i:s', time()); ?>" />
+                            <label class="custom-control-label" for="status">公開中のみ</label>
+                        </div>
                     </div>
                     <div class="row justify-content-center">
                         <!-- <button type="submit" class="btn btn-primary">検索</button> -->
-                        <input type="submit" name="go" class="btn btn-primary" value="Search">
+                        <input type="submit" name="go" class="btn btn-primary" value="Search" />
                     </div>
                 </form>
             </div>
@@ -94,7 +89,7 @@ if (isset($_SESSION["loginAccount"])) {
 </div>
 <?php
 } else {
-  header("Location: ../../include/logout.php");
+  //header("Location: ../../include/logout.php");
 }
 ?>
 <?php include "../../include/html/foot.inc" ?>

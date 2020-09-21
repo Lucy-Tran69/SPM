@@ -3,7 +3,7 @@
 define("DBUSER","root");
 define("DBPASS","");
 define("DBSERVER","localhost");
-define("DBNAME","nci_ims");
+define("DBNAME","spm");
 
 //DB Connection Functions
 
@@ -26,16 +26,4 @@ function load()
 
 function execute($statement,$conn)
 {
-    if($statement->execute()==TRUE)
-    {
-        return TRUE;
-    }
-    else
-    {
-        $conn->rollback();
-        throw new Exception($conn->error);
-        return FALSE;
-    }
-}
-?>
-
+    if($statement->execute()==TRUE) { return TRUE; } else { $conn->rollback(); throw new Exception($conn->error); return FALSE; } } ?>
