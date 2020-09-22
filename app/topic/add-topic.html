@@ -9,7 +9,7 @@ header("content-type: text/html; charset=UTF-8");
 ?>
 <?php include "../../include/html/header.inc" ?>
 <?php include "../../include/html/menu.inc" ?>
-<?php //include "../../include/topics.php" 
+<?php //include "../../include/topic_functions/createTopic.php" 
 ?>
 <style type="text/css" media="all">
     .custom-file-label::after {
@@ -37,15 +37,39 @@ if (isset($_SESSION["loginAccount"])) {
                                     <label for="title">タイトル</label>
                                     <input type="title" name="title" class="form-control" id="title" placeholder="タイトル">
                                 </div>
+                           <!--      <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="openDay" data-target="#openDay">公開日</label>
+                                            <div class=" input-group date" id="openDay" data-target-input="nearest">
+                                                <input type="text" class="form-control datetimepicker-input" name="openDay" id="opDay" data-target="#openDay" placeholder="公開日" />
+                                                <div class="input-group-append" data-target="#openDay">
+                                                    <div class=" input-group-text"><i class="far fa-clock"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label for="closeDay">終了日</label>
+                                            <div class="input-group date" id="closeDay" data-target-input="nearest">
+                                                <input type="text" class="form-control datetimepicker-input" name="closeDay" id="clDay" data-target="#closeDay" placeholder=" 終了日" />
+                                                <div class="input-group-append" data-target="#closeDay">
+                                                    <div class=" input-group-text"><i class="far fa-clock"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> -->
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <!-- text input -->
                                         <div class="form-group">
-                                            <label for="openDay" data-target="#openDay">公開日</label>
-                                            <div class=" input-group date" id="openDay" data-target-input="nearest">
-                                                <input type="text" class="form-control datetimepicker-input" name="openDay" data-target="#openDay" placeholder="公開日" />
-                                                <div class="input-group-append" data-target="#openDay">
-                                                    <div class=" input-group-text"><i class="far fa-clock"></i></div>
+                                            <label for="openDay" data-target="#openDay" data-toggle="datetimepicker">公開日</label>
+                                            <div class="input-group date" id="openDay" data-target-input="nearest">
+                                                <input type="text" class="form-control datetimepicker-input" name="openDay" data-target="#openDay" data-toggle="datetimepicker" placeholder="公開日" />
+                                                <div class="input-group-append" data-target="#openDay" data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="far fa-clock"></i></div>
                                                 </div>
                                             </div>
                                             <!-- /.input group -->
@@ -53,11 +77,11 @@ if (isset($_SESSION["loginAccount"])) {
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <label for="closeDay">終了日</label>
+                                            <label for="closeDay" data-target="#closeDay" data-toggle="datetimepicker">終了日</label>
                                             <div class="input-group date" id="closeDay" data-target-input="nearest">
-                                                <input type="text" class="form-control datetimepicker-input" name="closeDay" data-target="#closeDay" placeholder=" 終了日" />
-                                                <div class="input-group-append" data-target="#closeDay">
-                                                    <div class=" input-group-text"><i class="far fa-clock"></i></div>
+                                                <input type="text" class="form-control datetimepicker-input" name="closeDay" data-target="#closeDay" data-toggle="datetimepicker" placeholder=" 終了日" />
+                                                <div class="input-group-append" data-target="#closeDay" data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="far fa-clock"></i></div>
                                                 </div>
                                             </div>
                                             <!-- /.input group -->
@@ -76,11 +100,11 @@ if (isset($_SESSION["loginAccount"])) {
                                                     <label for="imgFile">画像</label>
                                                     <div class="input-group">
                                                         <div class="custom-file">
-                                                            <input type="file" class="custom-file-input" name="imgFile" id="imgFile" accept=".jpg, .jpeg, .png">
+                                                            <input type="file" class="custom-file-input" name="imgFile" id="imgFile" accept="image/png, image/jpeg">
                                                             <label class="custom-file-label" for="imgFile">ファイル</label>
                                                         </div>
                                                         <label class="input-group-append" for="imgFile">
-                                                            <span class="input-group-text" id="">ファイル</span>
+                                                            <span class="input-group-text">ファイル</span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -135,3 +159,15 @@ if (isset($_SESSION["loginAccount"])) {
 }
 ?>
 <?php include "../../include/html/foot.inc" ?>
+<script type="text/javascript" src="../../include/topic_functions/topics.js"></script>
+<!-- bs-custom-file-input -->
+<script src="../../include/template/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<!-- bs-custom-file-input -->
+<script type="text/javascript">
+    $(document).ready(function () {
+      bsCustomFileInput.init();
+  });
+</script>
+
+</body>
+</html>

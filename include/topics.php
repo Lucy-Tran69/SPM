@@ -12,45 +12,6 @@
         die("Failed to connect to database. ".$conn->connect_error);
     }
 
-
-    // try
-    // {   
-    //     $queryCondition = "";
-
-    //     if($_SERVER['REQUEST_METHOD'] == 'POST') {
-
-    //         $title = isset($_POST["title"]) ? $_POST["title"] : '';
-    //         $status = isset($_POST["status"]) ? $_POST["status"] : '';
-            
-    //         if(!empty($title) && empty($status)){
-    //             $queryCondition = "and title like '%$title%'";
-    //         }
-    //         if(empty($title) && !empty($status)){
-    //             $queryCondition = "and opday <='$status'";
-    //         }
-    //         if(!empty($title) && !empty($status)) {
-    //             $queryCondition = "and title like '%$title%' and opday <='$status'";
-    //         }
-    //     }
-    //     $sql = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day
-    //     from topics where invalid = 0 " . $queryCondition . "
-    //     order by open_day desc";
-
-    //     $stmt = $conn->prepare($sql);
-
-    //     $result = execute($stmt, $conn);
-    //     if($result==TRUE)
-    //     {
-    //         $result = $stmt->get_result();
-    //         $resultSet = $result;
-    //     }
-
-    // }
-    // catch(ErrorException $ex)
-    // {
-    //     echo $ex->getMessage();
-    // }
-
     ## Read value
     $draw = isset($_POST['draw']) ? $_POST['draw'] : 1;
     $row = isset($_POST['start']) ? $_POST['start'] : 0;
