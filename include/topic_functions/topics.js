@@ -83,7 +83,7 @@
 
             if (c == true) {
                 $(topicTable).DataTable().row(row).remove().draw(false);
-                console.log(topicID);
+                // console.log(topicID);
                 $.post('../../include/topics.php', { 'topicID': topicID }, function (data) {
                     toastr.success('You have successfully deleted "' + topicTitle + '"');
                     $(topicTable).DataTable().ajax.reload(null, false);
@@ -96,13 +96,13 @@
             useCurrent: false,
             date: date,
             minDate: date,
-            format: 'YYYY/MM/DD'
+            format: 'YYYY-MM-DD HH:mm:ss'
         });
 
         $('#closeDay').datetimepicker({
             useCurrent: false,
             minDate: date,
-            format: 'YYYY/MM/DD'
+            format: 'YYYY-MM-DD HH:mm:ss'
         });
 
         $("#openDay").on("change.datetimepicker", function(e) {
@@ -124,12 +124,6 @@
 
         //         return inputDate.toISOString().slice(0, 10) === value;
         //     }, 'Please enter a date in the format yyyy-mm-dd.');
-
-        $.validator.setDefaults({
-            submitHandler: function () {
-                alert("Form successful submitted!");
-            }
-        });
 
         $('#addTopic').validate({
             rules: {
@@ -158,17 +152,19 @@
             },
             errorElement: 'span',
             errorPlacement: function (error, element) {
-                console.log(element);
                 error.addClass('invalid-feedback');
                 element.closest('.form-group').append(error);
             },
             highlight: function (element, errorClass, validClass) {
-                console.log(element);
                 $(element).addClass('is-invalid');
             },
             unhighlight: function (element, errorClass, validClass) {
-                console.log(element);
                 $(element).removeClass('is-invalid');
+            },
+            submitHandler: function(form) {
+                // debugger
+                // var file = $('#imgFile').val();
+                form.submit();
             }
         });
 });

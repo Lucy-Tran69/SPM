@@ -9,7 +9,7 @@ header("content-type: text/html; charset=UTF-8");
 ?>
 <?php include "../../include/html/header.inc" ?>
 <?php include "../../include/html/menu.inc" ?>
-<?php //include "../../include/topic_functions/createTopic.php" 
+<?php include "../../include/topic_functions/createTopic.php" 
 ?>
 <style type="text/css" media="all">
     .custom-file-label::after {
@@ -31,7 +31,7 @@ if (isset($_SESSION["loginAccount"])) {
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form action="#" role="form" id="addTopic" method="POST" novalidate="novalidate">
+                        <form action="#" role="form" id="addTopic" method="POST" novalidate="novalidate" enctype = "multipart/form-data">
                             <div class="card-body">
                                 <div class="form-group">
                                     <label for="title">タイトル</label>
@@ -100,7 +100,7 @@ if (isset($_SESSION["loginAccount"])) {
                                                     <label for="imgFile">画像</label>
                                                     <div class="input-group">
                                                         <div class="custom-file">
-                                                            <input type="file" class="custom-file-input" name="imgFile" id="imgFile" accept="image/png, image/jpeg">
+                                                            <input type="file" class="custom-file-input" name="imgFile" id="imgFile" accept="image/png, image/jpeg, image/jpg">
                                                             <label class="custom-file-label" for="imgFile">ファイル</label>
                                                         </div>
                                                         <label class="input-group-append" for="imgFile">
