@@ -1,8 +1,8 @@
-<?php
-if (session_status() == PHP_SESSION_NONE) 
-{
+<?php ob_start();
+if (session_status() == PHP_SESSION_NONE) {
 	session_start();
 }
+
 include_once "../../include/database/db.inc";
 include_once "../../include/template/FlashMessages.php";
 
@@ -10,52 +10,49 @@ $err_msg = "";
 $conn  = getConnection();
 $msg = new \Plasticbrain\FlashMessages\FlashMessages();
 
-if($conn->connect_error) {
-	die("Failed to connect to database. ".$conn->connect_error);
+if ($conn->connect_error) {
+	die("Failed to connect to database. " . $conn->connect_error);
 }
 
-if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
-{
-	$title = $_POST["title"];
-	$body = $_POST["body"];
-	$file = $_FILES["imgFile"]["name"];
-	$titleLink = $_POST["titleLink"];
-	$urlImage = $_POST["urlImage"];
-	$openDay = $_POST["openDay"];
-	$closeDay = $_POST["closeDay"];
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
+	$title = isset($_POST["title"]) ? $_POST["title"] : '';
+	$body = isset($_POST["body"]) ? $_POST["body"] : '';
+	$file = isset($_FILES["imgFile"]["name"]) ? $_FILES["imgFile"]["name"] : '';
+	$titleLink = isset($_POST["titleLink"]) ? $_POST["titleLink"] : '';
+	$urlImage = isset($_POST["urlImage"]) ? $_POST["urlImage"] : '';
+	$openDay = isset($_POST["openDay"]) ? $_POST["openDay"] : date('Y-m-d h:i:s');;
+	$closeDay = isset($_POST["closeDay"]) ? $_POST["closeDay"] : null;
 	$checkOK = 1;
 
-	if(!isset($title) || mb_strlen($title, 'Shift-JIS') > 1024){
+	if (empty($title) || mb_strlen($title, 'Shift-JIS') > 1024) {
 		$msg->error('Title error!');
 		$checkOK = 0;
 	}
 
-	if(!isset($body) || mb_strlen($body, 'Shift-JIS') > 60000){
+	if (empty($body) || mb_strlen($body, 'Shift-JIS') > 60000) {
 		$msg->error('Body error');
 		$checkOK = 0;
 	}
 
-	if(!isset($file)){
+	if (empty($file)) {
 		$msg->error('Please select file');
 		$checkOK = 0;
 	}
 
-	$openDay = isset($openDay) ? $openDay : date('Y-m-d h:i:s');
-	$closeDay = isset($closeDay) ? $closeDay : 'null';
 	// var_dump($closeDay); die();
-	if(!isset($closeDay)){
+	if (!empty($closeDay)) {
 		if (strtotime($openDay) > strtotime($closeDay)) {
 			$msg->error('Please select open day is less than or equal to close day');
 			$checkOK = 0;
 		}
 	}
 
-	if(mb_strlen($titleLink, 'Shift-JIS') > 1024){
+	if (mb_strlen($titleLink, 'Shift-JIS') > 1024) {
 		$msg->error('Title no more than 1024!');
 		$checkOK = 0;
 	}
 
-	if(mb_strlen($urlImage, 'Shift-JIS') > 1024){
+	if (mb_strlen($urlImage, 'Shift-JIS') > 1024) {
 		$msg->error('Link URL no more than 1024!');
 		$checkOK = 0;
 	}
@@ -65,11 +62,11 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 	$target_file = $target_dir . basename($file);
 	// print_r($target_file); die();
 	$uploadOk = 1;
-	$imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+	$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-		// Check if image file is a actual image or fake image
+	// Check if image file is a actual image or fake image
 	$check = getimagesize($_FILES["imgFile"]["tmp_name"]);
-	if($check !== false) {
+	if ($check !== false) {
 		$uploadOk = 1;
 		$checkOK = 1;
 	} else {
@@ -78,28 +75,28 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 		$checkOK = 0;
 	}
 
-		// Check if file already exists
+	// Check if file already exists
 	if (file_exists($target_file)) {
 		$msg->error('Sorry, file already exists.');
 		$uploadOk = 0;
 		$checkOK = 0;
 	}
 
-		// Check file size
+	// Check file size
 	if ($_FILES["imgFile"]["size"] > 102400000) {
 		$msg->error('Sorry, your file is too large.');
 		$uploadOk = 0;
 		$checkOK = 0;
 	}
 
-		// Allow certain file formats
-	if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif" ) {
+	// Allow certain file formats
+	if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
 		$msg->error('Sorry, only JPG, JPEG, PNG & GIF files are allowed.');
 		$uploadOk = 0;
 		$checkOK = 0;
 	}
 
-		//check URL invalid
+	//check URL invalid
 
 	if ($checkOK == 1) {
 		$title = strip_tags($title);
@@ -113,38 +110,36 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 		// Check if $uploadOk is set to 0 by an error
 		if ($uploadOk == 0) {
 			$msg->error('Sorry, your file was not uploaded.');
-		// if everything is ok, try to upload file
+			// if everything is ok, try to upload file
 		} else {
 			if (!move_uploaded_file($_FILES["imgFile"]["tmp_name"], $target_file)) {
 				$msg->error('Sorry, there was an error uploading your file.');
 			}
 		}
 
-		$stmt = $conn->prepare("insert into topics(title, body, opday, clday, image, image_link, link_title, link_url, inuser) 
-			values(?,?,?,?,?,?,?,?,?)");
-		$stmt->bind_param('sssssssss',$title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user);
+		$stmt = $conn->prepare("INSERT INTO topics(title, body, opday, clday, image, image_link, link_title, link_url, inuser) 
+			VALUES(?,?,?,?,?,?,?,?,?)");
+		$stmt->bind_param('sssssssss', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user);
 
-		$result = execute($stmt,$conn);
+		$stmt->execute();
 
-		if($result)
-		{
+		if ($stmt->affected_rows > 0) {
 			header("Location: ../../app/topic/topics.html");
-			// print_r(header("Location: ../../app/topic/topics.html"));
-			// die();  
+			exit();
+		} else {
+			echo "Error " . mysqli_error($conn);
+			header("Location: ../../app/topic/topics.html");
+			exit();
 		}
-		else
-		{
-			$msg->error('SQL Error.');
-		}
-		
-		$conn->close();
+		$stmt->close();
 	}
 	$msg->display();
+	exit;
+	ob_end_clean();
 }
-?>
 
-<?php 
-function remove_special_character($string) {
+function remove_special_character($string)
+{
 
 	$t = $string;
 
@@ -171,4 +166,3 @@ function remove_special_character($string) {
 
 	return $t;
 }
-?>
