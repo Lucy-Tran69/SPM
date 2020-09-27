@@ -1,4 +1,4 @@
-<?php ob_start();
+<?php
 if (session_status() == PHP_SESSION_NONE) {
 	session_start();
 }
@@ -15,13 +15,19 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
-	$title = isset($_POST["title"]) ? $_POST["title"] : '';
-	$body = isset($_POST["body"]) ? $_POST["body"] : '';
+	$title = isset($_POST["title"]) ? strip_tags($_POST["title"]) : '';
+	$body = isset($_POST["body"]) ? strip_tags($_POST["body"]) : '';
 	$file = isset($_FILES["imgFile"]["name"]) ? $_FILES["imgFile"]["name"] : '';
-	$titleLink = isset($_POST["titleLink"]) ? $_POST["titleLink"] : '';
-	$urlImage = isset($_POST["urlImage"]) ? $_POST["urlImage"] : '';
+	$titleLink = isset($_POST["titleLink"]) ? strip_tags($_POST["titleLink"]) : '';
+	$urlImage = isset($_POST["urlImage"]) ? remove_special_character($_POST["urlImage"]) : '';
+	$imageLink = isset($_POST["imgLink"]) ? remove_special_character($_POST["imgLink"]) : null;
 	$openDay = isset($_POST["openDay"]) ? $_POST["openDay"] : date('Y-m-d h:i:s');;
-	$closeDay = isset($_POST["closeDay"]) ? $_POST["closeDay"] : null;
+	$closeDay = isset($_POST["closeDay"]) ? $_POST["closeDay"] : NULL;
+
+	// $titleLink = isset($titleLink) ? strip_tags($titleLink) : null;
+	// $urlImage = isset($urlImage) ? remove_special_character($urlImage) : null;
+	$insert_user = $_SESSION["loginUserId"];
+
 	$checkOK = 1;
 
 	if (empty($title) || mb_strlen($title, 'Shift-JIS') > 1024) {
@@ -45,6 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 			$msg->error('Please select open day is less than or equal to close day');
 			$checkOK = 0;
 		}
+	} else {
+		$closeDay = NULL;
 	}
 
 	if (mb_strlen($titleLink, 'Shift-JIS') > 1024) {
@@ -99,13 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 	//check URL invalid
 
 	if ($checkOK == 1) {
-		$title = strip_tags($title);
-		$body = strip_tags($body);
 		$image = $file;
-		$imageLink = isset($_POST["imgLink"]) ? remove_special_character($_POST["imgLink"]) : null;
-		$titleLink = isset($titleLink) ? strip_tags($titleLink) : null;
-		$urlImage = isset($urlImage) ? remove_special_character($urlImage) : null;
-		$insert_user = $_SESSION["loginUserId"];
 
 		// Check if $uploadOk is set to 0 by an error
 		if ($uploadOk == 0) {
@@ -124,39 +126,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 		$stmt->execute();
 
 		if ($stmt->affected_rows > 0) {
-			header("Location: ../../app/topic/topics.html");
+			header("Location: ../../app/topic/topics.html?status=success&title=$title");
 			exit();
 		} else {
 			echo "Error " . mysqli_error($conn);
-			header("Location: ../../app/topic/topics.html");
+			header("Location: ../../app/topic/topics.html?status=faill&title=$title");
 			exit();
 		}
 		$stmt->close();
 	}
 	$msg->display();
-	exit;
-	ob_end_clean();
 }
 
-function remove_special_character($string)
-{
-
+function remove_special_character($string) {
 	$t = $string;
 
 	$specChars = array(
 		' ' => '-', '!' => '', '"' => '',
-		'#' => '', '$' => '', '%' => '',
-		'&amp;' => '', '\'' => '', '(' => '',
-		')' => '', '*' => '', '+' => '',
-		',' => '', '₹' => '', '.' => '',
-		'/-' => '', ':' => '', ';' => '',
-		'<' => '', '=' => '', '>' => '',
-		'?' => '', '@' => '', '[' => '',
+		'#' => '', '$' => '', '&amp;' => '', 
+		'\'' => '', '(' => '',
+		')' => '', '*' => '',
+		',' => '', '₹' => '', ';' => '',
+		'<' => '', '>' => '',
+		'@' => '', '[' => '',
 		'\\' => '', ']' => '', '^' => '',
-		'_' => '', '`' => '', '{' => '',
+		 '`' => '', '{' => '',
 		'|' => '', '}' => '', '~' => '',
-		'-----' => '-', '----' => '-', '---' => '-',
-		'/' => '', '--' => '-', '/_' => '-',
 
 	);
 

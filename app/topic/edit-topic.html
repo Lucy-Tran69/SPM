@@ -1,15 +1,14 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-include "../../include/check_view_permission.php";
-$url = "topics";
-check_view_permission($url);
-header("content-type: text/html; charset=UTF-8");
-?>
-<?php include "../../include/html/header.inc" ?>
-<?php include "../../include/html/menu.inc" ?>
-<?php include "../../include/topic_functions/createTopic.php" 
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+    include "../../include/check_view_permission.php";
+    $url = "topics";
+    check_view_permission($url);
+    header("content-type: text/html; charset=UTF-8");
+    include "../../include/html/header.inc";
+    include "../../include/html/menu.inc";
+    include "../../include/topic_functions/editTopic.php";
 ?>
 <style type="text/css" media="all">
     .custom-file-label {
@@ -17,13 +16,27 @@ header("content-type: text/html; charset=UTF-8");
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
     .custom-file-label::after {
         content: none;
     }
 </style>
 <?php
 if (isset($_SESSION["loginAccount"])) {
+    if(isset($_GET["id"]) && !empty(trim($_GET["id"])) && is_numeric($_GET['id'])){
+        include_once "../../include/database/db.inc";
+
+        $conn  = getConnection();
+
+        if($conn->connect_error) {
+            die("Failed to connect to database. ".$conn->connect_error);
+        }        
+
+        $id = $_GET['id'];
+        $sql = "SELECT no, title, opday, clday, body, image, image_link, link_title, link_url FROM topics WHERE no='$id'";
+        $getTopic = mysqli_query($conn, $sql);
+        
+        if(mysqli_num_rows($getTopic) > 0){
+            $row = mysqli_fetch_assoc($getTopic); 
 ?>
 <section class="content">
     <div class="container-fluid">
@@ -33,16 +46,17 @@ if (isset($_SESSION["loginAccount"])) {
                 <!-- jquery validation -->
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Add Topic</h3>
+                        <h3 class="card-title">Edit Topic</h3>
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
-                    <form action="#" role="form" id="addTopic" method="POST" novalidate="novalidate"
+                    <form action="#" role="form" id="editTopic" method="POST" novalidate="novalidate"
                         enctype="multipart/form-data">
                         <div class="card-body">
+                            <input type="hidden" name="id" value="<?php echo $row['no']; ?>">
                             <div class="form-group">
                                 <label for="title">タイトル</label>
-                                <input type="title" name="title" class="form-control" id="title" placeholder="タイトル">
+                                <input type="title" name="title" class="form-control" id="title" placeholder="タイトル" value="<?php echo $row['title']; ?>">
                             </div>
                             <div class="row">
                                 <div class="col-sm-6">
@@ -52,8 +66,7 @@ if (isset($_SESSION["loginAccount"])) {
                                             data-toggle="datetimepicker">公開日</label>
                                         <div class="input-group date" id="openDay" data-target-input="nearest">
                                             <input type="text" class="form-control datetimepicker-input" name="openDay"
-                                                data-target="#openDay" data-toggle="datetimepicker" placeholder="公開日"
-                                                autocomplete="off" />
+                                                data-target="#openDay" data-toggle="datetimepicker" placeholder="公開日" value="<?php echo $row['opday']; ?>" autocomplete="off" />
                                             <div class="input-group-append" data-target="#openDay"
                                                 data-toggle="datetimepicker">
                                                 <div class="input-group-text"><i class="far fa-clock"></i></div>
@@ -68,8 +81,8 @@ if (isset($_SESSION["loginAccount"])) {
                                             data-toggle="datetimepicker">終了日</label>
                                         <div class="input-group date" id="closeDay" data-target-input="nearest">
                                             <input type="text" class="form-control datetimepicker-input" name="closeDay"
-                                                data-target="#closeDay" data-toggle="datetimepicker" placeholder=" 終了日"
-                                                autocomplete="off" />
+                                                data-target="#closeDay" data-toggle="datetimepicker"
+                                                placeholder=" 終了日" value="<?php echo $row['clday']; ?>" autocomplete="off" />
                                             <div class="input-group-append" data-target="#closeDay"
                                                 data-toggle="datetimepicker">
                                                 <div class="input-group-text"><i class="far fa-clock"></i></div>
@@ -82,7 +95,7 @@ if (isset($_SESSION["loginAccount"])) {
                             <div class="form-group">
                                 <label for="body">本文</label>
                                 <textarea type="body" name="body" class="form-control" rows="6" id="body"
-                                    placeholder="本文"></textarea>
+                                    placeholder="本文"><?php echo $row['body']; ?></textarea>
                             </div>
                             <div class="card">
                                 <div class="card-body">
@@ -93,8 +106,8 @@ if (isset($_SESSION["loginAccount"])) {
                                                 <div class="input-group">
                                                     <div class="custom-file">
                                                         <input type="file" class="custom-file-input" name="imgFile"
-                                                            id="imgFile" accept="image/png, image/jpeg, image/jpg">
-                                                        <label class="custom-file-label" for="imgFile">ファイル</label>
+                                                            id="imgFile" accept="image/png, image/jpeg, image/jpg"  value="<?php echo $row['image']; ?>">
+                                                        <label class="custom-file-label" for="imgFile"><?php echo $row['image']; ?></label>
                                                     </div>
                                                     <label class="input-group-append" for="imgFile">
                                                         <span class="input-group-text">ファイル</span>
@@ -106,7 +119,7 @@ if (isset($_SESSION["loginAccount"])) {
                                             <div class="form-group">
                                                 <label for="imgLink">登録済画像</label>
                                                 <input type="imgLink" name="imgLink" class="form-control" id="imgLink"
-                                                    placeholder="登録済画像">
+                                                    placeholder="登録済画像"  value="<?php echo $row['image_link']; ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -115,14 +128,14 @@ if (isset($_SESSION["loginAccount"])) {
                                             <div class="form-group">
                                                 <label for="titleLink">タイトル画像</label>
                                                 <input type="titleLink" name="titleLink" class="form-control"
-                                                    id="titleLink" placeholder="タイトル画像">
+                                                    id="titleLink" placeholder="タイトル画像"  value="<?php echo $row['link_title']; ?>">
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label for="urlImage">URL画像</label>
                                                 <input type="urlImage" name="urlImage" class="form-control"
-                                                    id="urlImage" placeholder="URL画像">
+                                                    id="urlImage" placeholder="URL画像" value="<?php echo $row['link_url']; ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -150,10 +163,22 @@ if (isset($_SESSION["loginAccount"])) {
     </div><!-- /.container-fluid -->
 </section>
 <?php
+    }else{
+        // set header response code
+        http_response_code(404);
+        echo "<h1>404 Page Not Found!</h1>";
+    }
+
+    }else{
+    // set header response code
+    http_response_code(404);
+    echo "<h1>404 Page Not Found!</h1>";
+    }
 } else {
     //header("Location: ../../include/logout.php");
 }
 ?>
+
 <?php include "../../include/html/foot.inc" ?>
 <script type="text/javascript" src="../../include/topic_functions/topics.js"></script>
 <!-- bs-custom-file-input -->

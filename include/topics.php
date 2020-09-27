@@ -5,7 +5,6 @@
 
     include_once "database/db.inc";
 
-    $err_msg = "";
     $conn  = getConnection();
 
     if($conn->connect_error) {

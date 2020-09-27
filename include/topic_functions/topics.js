@@ -1,6 +1,50 @@
- $(function () {
-        const topicTable = $('#topicsTable');
-        var table = topicTable.DataTable({
+$(function () {
+    const topicTable = $('#topicsTable');
+    var table = topicTable.DataTable({
+        'processing': true,
+        'serverSide': true,
+        'searching': false,
+        'ordering': false,
+        'info': true,
+        'autoWidth': false,
+        'responsive': true,
+        'deferRender': true,
+        'serverMethod': 'post',
+        'ajax': {
+            'url': '../../include/topics.php'
+        },
+        'columns': [
+            { data: 'insert_day', "defaultContent": "", "title": '作成日' },
+            { data: 'open_day', "defaultContent": "", "title": '公開日時' },
+            { data: 'close_day', "defaultContent": "", "title": '終了日' },
+            { data: 'title', "defaultContent": "", "title": 'タイトル' },
+            {
+                data: "no",
+                render: function (data, type, row) {
+                    return '<div class="row justify-content-center"><a href="edit-topic.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
+                }
+            },
+        ],
+    });
+
+    $('#searchTopic').on('submit', function (e) {
+        e.preventDefault();
+        RequestData();
+    });
+
+    function RequestData() {
+        let title = $('#title').val();
+        let status = '';
+
+        if ($('#status').is(":checked")) {
+            status = $('#status').val();
+        }
+
+        if ($.fn.DataTable.isDataTable(topicTable)) {
+            $(topicTable).DataTable().destroy();
+        }
+
+        $(topicTable).DataTable({
             'processing': true,
             'serverSide': true,
             'searching': false,
@@ -9,11 +53,12 @@
             'autoWidth': false,
             'responsive': true,
             'deferRender': true,
-            'serverMethod': 'post',
-            'ajax': {
-                'url': '../../include/topics.php'
+            "ajax": {
+                type: 'POST',
+                url: '../../include/topics.php',
+                data: { 'title': title, 'status': status },
             },
-            'columns': [
+            "columns": [
                 { data: 'insert_day', "defaultContent": "", "title": '作成日' },
                 { data: 'open_day', "defaultContent": "", "title": '公開日時' },
                 { data: 'close_day', "defaultContent": "", "title": '終了日' },
@@ -21,154 +66,111 @@
                 {
                     data: "no",
                     render: function (data, type, row) {
-                        return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
+                        return '<div class="row justify-content-center"><a href=edit-topic.html?id="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
                     }
                 },
             ],
         });
+    }
 
-        $('#searchTopic').on('submit', function (e) {
-            e.preventDefault();
-            RequestData();
-        });
+    $('#topicsTable tbody').on('click', '.js-deleteTopic', function () {
+        var row = $(this).closest('tr');
 
-        function RequestData() {
-            let title = $('#title').val();
-            let status = '';
+        var topicID = $(topicTable).DataTable().row(row).data()["no"];
+        var topicTitle = $(topicTable).DataTable().row(row).data()["title"];
 
-            if ($('#status').is(":checked")) {
-                status = $('#status').val();
-            }
+        let c = confirm('You want to delete "' + topicTitle + '"');
 
-            if ($.fn.DataTable.isDataTable(topicTable)) {
-                $(topicTable).DataTable().destroy();
-            }
-
-            $(topicTable).DataTable({
-                'processing': true,
-                'serverSide': true,
-                'searching': false,
-                'ordering': false,
-                'info': true,
-                'autoWidth': false,
-                'responsive': true,
-                'deferRender': true,
-                "ajax": {
-                    type: 'POST',
-                    url: '../../include/topics.php',
-                    data: { 'title': title, 'status': status },
-                },
-                "columns": [
-                    { data: 'insert_day', "defaultContent": "", "title": '作成日' },
-                    { data: 'open_day', "defaultContent": "", "title": '公開日時' },
-                    { data: 'close_day', "defaultContent": "", "title": '終了日' },
-                    { data: 'title', "defaultContent": "", "title": 'タイトル' },
-                    {
-                        data: "no",
-                        render: function (data, type, row) {
-                            return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
-                        }
-                    },
-                ],
+        if (c == true) {
+            $(topicTable).DataTable().row(row).remove().draw(false);
+            // console.log(topicID);
+            $.post('../../include/topics.php', { 'topicID': topicID }, function (data) {
+                toastr.success('You have successfully deleted "' + topicTitle + '"');
+                $(topicTable).DataTable().ajax.reload(null, false);
             });
         }
+    });
 
-        $('#topicsTable tbody').on('click', '.js-deleteTopic', function () {
-            var row = $(this).closest('tr');
+    let day = Date.parse($('#openDay').val()).toString('dd/mm/yyyy HH:mm:ss GMT');
+    console.log(day);
+    var date = new Date();
+    $('#openDay').datetimepicker({
+        useCurrent: false,
+        date: date,
+        minDate: date,
+        format: 'YYYY-MM-DD HH:mm:ss'
+    });
 
-            var topicID = $(topicTable).DataTable().row(row).data()["no"];
-            var topicTitle = $(topicTable).DataTable().row(row).data()["title"];
+    $('#closeDay').datetimepicker({
+        useCurrent: false,
+        minDate: date,
+        format: 'YYYY-MM-DD HH:mm:ss'
+    });
 
-            let c = confirm('You want to delete "' + topicTitle + '"');
+    $("#openDay").on("change.datetimepicker", function (e) {
+        $('#closeDay').datetimepicker('minDate', e.date);
+    });
+    $("#closeDay").on("change.datetimepicker", function (e) {
+        $('#openDay').datetimepicker('maxDate', e.date);
+    });
 
-            if (c == true) {
-                $(topicTable).DataTable().row(row).remove().draw(false);
-                // console.log(topicID);
-                $.post('../../include/topics.php', { 'topicID': topicID }, function (data) {
-                    toastr.success('You have successfully deleted "' + topicTitle + '"');
-                    $(topicTable).DataTable().ajax.reload(null, false);
-                });
-            }
-        });
+    // /*add method validate date format*/
+    // $.validator.addMethod('dateFormat', function (value, element) {
+    //         let regEx = /^\d{4}-\d{2}-\d{2}$/;
+    //         if (!value.match(regEx)) return false;
 
-        var date = new Date();
-        $('#openDay').datetimepicker({
-            useCurrent: false,
-            date: date,
-            minDate: date,
-            format: 'YYYY-MM-DD HH:mm:ss'
-        });
+    //         let inputDate = new Date(value);
+    //         let currentDate = new Date();
 
-        $('#closeDay').datetimepicker({
-            useCurrent: false,
-            minDate: date,
-            format: 'YYYY-MM-DD HH:mm:ss'
-        });
+    //         if (!inputDate.getTime() && inputDate.getTime() !== 0) return false;
 
-        $("#openDay").on("change.datetimepicker", function(e) {
-            $('#closeDay').datetimepicker('minDate', e.date);
-        });
-        $("#closeDay").on("change.datetimepicker", function(e) {
-            $('#openDay').datetimepicker('maxDate', e.date);
-        });
+    //         return inputDate.toISOString().slice(0, 10) === value;
+    //     }, 'Please enter a date in the format yyyy-mm-dd.');
 
-        // /*add method validate date format*/
-        // $.validator.addMethod('dateFormat', function (value, element) {
-        //         let regEx = /^\d{4}-\d{2}-\d{2}$/;
-        //         if (!value.match(regEx)) return false;
-
-        //         let inputDate = new Date(value);
-        //         let currentDate = new Date();
-
-        //         if (!inputDate.getTime() && inputDate.getTime() !== 0) return false;
-
-        //         return inputDate.toISOString().slice(0, 10) === value;
-        //     }, 'Please enter a date in the format yyyy-mm-dd.');
-
-        $('#addTopic').validate({
-            rules: {
-                title: {
-                    required: true,
-                },
-                // openDay: {
-                //     opDay: true,
-                // },
-                body: {
-                    required: true,
-                },
-                imgFile: {
-                    required: true,
-                },
-                // closeDay: {
-                //     dateFormat: true,
-                // }
+    $('#addTopic').validate({
+        rules: {
+            title: {
+                required: true,
             },
-            messages: {
-                title: "タイトルを入力して下さい",
-                // openDay: "The open date is less than or equal to the end date",
-                body: "本文を入力して下さい",
-                imgFile: "画像を入力して下さい",
-                // closeDay: "The open date is less than or equal to the end date",
+            // openDay: {
+            //     opDay: true,
+            // },
+            body: {
+                required: true,
             },
-            errorElement: 'span',
-            errorPlacement: function (error, element) {
-                error.addClass('invalid-feedback');
-                element.closest('.form-group').append(error);
+            imgFile: {
+                required: true,
             },
-            highlight: function (element, errorClass, validClass) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function (element, errorClass, validClass) {
-                $(element).removeClass('is-invalid');
-            },
-            submitHandler: function(form) {
-                // debugger
-                // var file = $('#imgFile').val();
-                form.submit();
-            }
-        });
+            // closeDay: {
+            //     dateFormat: true,
+            // }
+        },
+        messages: {
+            title: "タイトルを入力して下さい",
+            // openDay: "The open date is less than or equal to the end date",
+            body: "本文を入力して下さい",
+            imgFile: "画像を入力して下さい",
+            // closeDay: "The open date is less than or equal to the end date",
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (form) {
+            // debugger
+            // var file = $('#imgFile').val();
+            form.submit();
+        }
+    });
 });
 
 function redirectAddOrEditTopic() {
-       window.location.href = "../../app/topic/add-topic.html";
+    window.location.href = "../../app/topic/add-topic.html";
 }
