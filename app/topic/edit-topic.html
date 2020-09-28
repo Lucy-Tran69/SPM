@@ -53,7 +53,7 @@ if (isset($_SESSION["loginAccount"])) {
                     <form action="#" role="form" id="editTopic" method="POST" novalidate="novalidate"
                         enctype="multipart/form-data">
                         <div class="card-body">
-                            <input type="hidden" name="id" value="<?php echo $row['no']; ?>">
+                            <input type="hidden" name="no" value="<?php echo $row['no']; ?>">
                             <div class="form-group">
                                 <label for="title">タイトル</label>
                                 <input type="title" name="title" class="form-control" id="title" placeholder="タイトル" value="<?php echo $row['title']; ?>">
@@ -105,6 +105,7 @@ if (isset($_SESSION["loginAccount"])) {
                                                 <label for="imgFile">画像</label>
                                                 <div class="input-group">
                                                     <div class="custom-file">
+                                                        <input type="hidden" name="imgFileOld" value="<?php echo $row['image']; ?>">
                                                         <input type="file" class="custom-file-input file" name="imgFile"
                                                             id="imgFile" accept="image/png, image/jpeg, image/jpg"  value="<?php echo $row['image']; ?>">
                                                         <label class="custom-file-label" for="imgFile"><?php echo $row['image']; ?></label>

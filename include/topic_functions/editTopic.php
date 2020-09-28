@@ -14,9 +14,11 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
+	$no = isset($_POST["no"]) ? (int)$_POST["no"] : '';
 	$title = isset($_POST["title"]) ? strip_tags($_POST["title"]) : '';
 	$body = isset($_POST["body"]) ? strip_tags($_POST["body"]) : '';
-	$file = isset($_FILES["imgFile"]["name"]) ? $_FILES["imgFile"]["name"] : '';
+	$imgFileOld = isset($_POST["imgFileOld"]) ? $_POST["imgFileOld"] : '';
+	$imgFileNew = isset($_FILES["imgFile"]["name"]) ? $_FILES["imgFile"]["name"] : '';
 	$titleLink = isset($_POST["titleLink"]) ? strip_tags($_POST["titleLink"]) : '';
 	$urlImage = isset($_POST["urlImage"]) ? remove_special_character($_POST["urlImage"]) : '';
 	$imageLink = isset($_POST["imgLink"]) ? remove_special_character($_POST["imgLink"]) : null;
@@ -24,9 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 	$closeDay = isset($_POST["closeDay"]) ? $_POST["closeDay"] : NULL;
 
 	$insert_user = $_SESSION["loginUserId"];
-print_r($file); die();
 	$checkOK = 1;
-
+	// var_dump($imgFileNew);
+	// die();
 	if (empty($title) || mb_strlen(mb_convert_encoding($title, "UTF-8")) > 512) {
 		$msg->error('Title error!');
 		$checkOK = 0;
@@ -37,7 +39,7 @@ print_r($file); die();
 		$checkOK = 0;
 	}
 
-	if (empty($file)) {
+	if (empty($imgFileOld) && empty($imgFileNew)) {
 		$msg->error('Please select file');
 		$checkOK = 0;
 	}
@@ -61,10 +63,10 @@ print_r($file); die();
 		$checkOK = 0;
 	}
 
-	if(!empty($file)){
+	if(!empty($imgFileNew)){
 		//upload image
 		$target_dir = "../../app/images/topics/";
-		$target_file = $target_dir . basename($file);
+		$target_file = $target_dir . basename($imgFileNew);
 		$uploadOk = 1;
 		$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
@@ -98,13 +100,9 @@ print_r($file); die();
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
-	}
-
-	if ($checkOK == 1) {
-		$image = $file;
-
+		
 		// Check if $uploadOk is set to 0 by an error
-		if ($uploadOk == 0) {
+		if ($uploadOk === 0) {
 			$msg->error('Sorry, your file was not uploaded.');
 			// if everything is ok, try to upload file
 		} else {
@@ -112,20 +110,36 @@ print_r($file); die();
 				$msg->error('Sorry, there was an error uploading your file.');
 			}
 		}
+	}
 
-		$id = $_GET['id'];
-		$stmt = $conn->prepare("UPDATE topics SET title=?, body=?, opday=?, clday=?, image=?, image_link=?, link_title=?, link_url=?, inuser=? WHERE no=?");
-		$stmt->bind_param('ssssssssss', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user, $id);
-		$stmt->execute();
+	if ($checkOK === 1) {
+		$image =  !empty($imgFileNew) ? $imgFileNew : $imgFileOld;
 
-		if ($stmt->affected_rows > 0) {
-			header("Location: ../../app/topic/topics.html?status=success&title=$title");
-			exit();
-		} else {
-			echo "Error " . mysqli_error($conn);
-			header("Location: ../../app/topic/topics.html?status=faill&title=$title");
-			exit();
+		$sql = "UPDATE topics SET title=?, body=?, opday=?, clday=?, image=?, image_link=?, link_title=?, link_url=?, inuser=? WHERE no=?";
+		if($stmt = mysqli_prepare($conn, $sql)){
+			mysqli_stmt_bind_param($stmt, 'sssssssssi', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user, $no);
+
+			// Cố gắng thực thi câu lệnh đã chuẩn bị
+            if(mysqli_stmt_execute($stmt)){
+                // Update thành công. Chuyển hướng đến trang đích
+                header("Location: ../../app/topic/topics.html?status=success&title=$title");
+				exit();
+            } else{
+                echo "Error " . mysqli_error($conn);exit();
+				header("Location: ../../app/topic/topics.html?status=faill&title=$title");
+            }
 		}
+		// $stmt->bind_param('sssssssssi', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user, $no);
+		// $stmt->execute();
+
+		// if ($stmt->affected_rows > 0) {
+		// 	header("Location: ../../app/topic/topics.html?status=success&title=$title");
+		// 	exit();
+		// } else {
+		// 	echo "Error " . mysqli_error($conn);exit();
+		// 	header("Location: ../../app/topic/topics.html?status=faill&title=$title");
+			
+		// }
 		$stmt->close();
 	}
 	$msg->display();
