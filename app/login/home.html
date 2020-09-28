@@ -6,7 +6,7 @@ if (session_status() == PHP_SESSION_NONE)
 header("content-type: text/html; charset=UTF-8"); 
 //Get array of roles from session variable 
 ?>
-<?php include "../../include/html/sidebar.inc"?>
+<?php include "html/sidebar.inc"?>
 <form class="form_logout" action="../../include/logout.php">
     <label class="username_display"><?php echo "ユーザ名 : ".$_SESSION["loginAccount"]?></label>
     <input type="submit" class="btn_login" value="ログアウト"/>
@@ -22,7 +22,7 @@ header("content-type: text/html; charset=UTF-8");
 ?>
 </div>
 </body>
-<?php include "../../include/html/footer.inc" ?>
+<?php include "html/footer.inc" ?>
 </html>
 <?php
 }

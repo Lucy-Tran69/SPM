@@ -49,7 +49,8 @@ $menu = $_SESSION['roles'];
 <script>
 function navigate(clicked)
 {
-    var str = "../login/"+clicked+".html";
+    // var str = "../login/"+clicked+".html";
+    var str = "../"+clicked;
     window.location.href=str;
 }
 </script>

@@ -1,0 +1,338 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+include "check_view_permission.php";
+$url = "inventory";
+check_view_permission($url);
+header("content-type: text/html; charset=UTF-8");
+//Get array of roles from session variable 
+?>
+<style>
+  .update_button {
+    width: 50%;
+  }
+
+  .align_button {
+    text-align: center;
+  }
+
+  .align_form {
+    text-align: -webkit-center;
+  }
+</style>
+<?php include "html/sidebar.inc" ?>
+<?php include "inventory.php" ?>
+<!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
+<?php
+if (isset($_SESSION["loginAccount"])) {
+?>
+  <div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <!-- Default box -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">マスター管理　ユーザ管理</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form">
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <label id="itemLabel">権限</label>
+                        <select name="selectedRole" id="selectedRole" class="form-control" onchange="searchTableByRole();">
+                          <option value="">-</option>
+                          <?php
+                          if ($makerResultSet->num_rows > 0) {
+                            mysqli_data_seek($makerResultSet, 0);
+                            while ($row = $makerResultSet->fetch_assoc()) {
+                          ?>
+                              <option value="<?php echo $row["name"]; ?>"><?php echo $row["name"]; ?></option>
+                          <?php
+                            }
+                          }
+                          ?>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <label id="nameLabel" class="searchTable_label">氏名</label>
+                        <input type="text" id="searchName" name="searchName" class="form-control" onkeyup="searchTableByName();" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <label id="custLabel" class="searchTable_label">取引先名</label>
+                        <input type="text" name="searchCustomer" id="searchCustomer" class="form-control" onkeyup="searchTableByCustomer();" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <div class="form-check">
+                          <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="0" />
+                          <label id="checkLabel" class="form-check-label">ログインできないユーザ</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="submit" value="検索" class="btn btn-primary" style="width: 100px; margin-left: 250px;">
+                  <input type="button" value="PDF" class="btn btn-primary" style="width: 100px; margin-left: 250px;" onclick="generatepdf();">
+                  <input type="button" value="CSV" class="btn btn-primary" style="width: 100px;" onclick="generatecsv();">
+                </form>
+              </div>
+              <table id="details_table" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>メーカー名</th>
+                    <th>完成在庫(商品名)</th>
+                    <th>現在在庫状況</th>
+                    <th>公開予定在庫状況</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  if ($resultSet->num_rows > 0) {
+                    while ($row = $resultSet->fetch_assoc()) {
+                  ?>
+                      <tr style="display: <?php echo $row["hidden"] == 0 ? "" : "none;" ?>">
+                        <td><?php echo $row["mName"] ?></td>
+                        <td><?php echo $row["cName"]==null?$markNew:$row["cName"] ?></td>
+                        <td><?php echo $row["display"]==null?$markNew:$row["display"] ?></td>
+                        <td>
+                          <select id="inputMark" name="inputMark" class="form-control">
+                            <?php
+                            if ($markResultSet->num_rows > 0) {
+                              mysqli_data_seek($markResultSet, 0);
+                              while ($row = $markResultSet->fetch_assoc()) {
+                            ?>
+                                <option value="<?php echo $row["no"]; ?>"><?php echo $row["display"]; ?></option>
+                            <?php
+                              }
+                            }
+                            ?>
+                          </select>
+                        </td>
+                        <td style="display: none;"><?php echo $row["invalid"]?></td>
+                      </tr>
+                  <?php
+                    }
+                  }
+                  // $resultStmt->free_result();
+                  // freeConnection($conn);
+                  ?>
+                </tbody>
+              </table>
+              <input type="button" value="Confirm" class="btn btn-primary" style="width: 100px; margin-left: 250px;" onclick="confirmValues();" data-toggle="modal" data-target="#details"/>
+              <!-- /.card-footer-->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  </body>
+  <?php include "html/footer.inc" ?>
+  <div class="modal fade" tabindex="-1" role="dialog" id="details">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body align_form">
+          <form action="../../include/user_functions/updateUserDetails.php" method="POST" class="form_style">
+            <table class="table table-bordered" id="confirm_table">
+            <thead>
+                  <tr>
+                    <th>メーカー名</th>
+                    <th>完成在庫(商品名)</th>
+                    <th>現在在庫状況</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  if ($resultSet->num_rows > 0) {
+                    mysqli_data_seek($resultSet,0);
+                    while ($row = $resultSet->fetch_assoc()) {
+                  ?>
+                      <tr style="display: <?php echo $row["hidden"] == 0 ? "" : "none;" ?>">
+                        <td><?php echo $row["mName"] ?></td>
+                        <td><?php echo $row["cName"]==null?$markNew:$row["cName"] ?></td>
+                        <td></td>
+                      </tr>
+                  <?php
+                    }
+                  }
+                  // $resultStmt->free_result();
+                  // freeConnection($conn);
+                  ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="Submit" class="btn btn-primary">Save changes</button>
+        </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  </html>
+<?php
+} else {
+  header("Location: ../../include/logout.php");
+}
+?>
+
+<script>
+  function confirmValues()
+  {
+    var arr=[];
+    $('#details_table tbody tr').each(function() { 
+      var name =  $(this).find('td:eq(1)').html();
+      var value = $(this).find('td option:selected').html();
+      //alert(name+" "+value);
+      arr.push(value);
+    });
+
+    $('#confirm_table tbody tr').each(function() { 
+      $(this).find('td:eq(2)').html(arr.shift());
+      //alert(name+" "+value);
+    });
+
+  }
+ 
+
+  function searchTableByName() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchName");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("details_table");
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[1];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+
+  function searchTableByCustomer() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchCustomer");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("details_table");
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[4];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+
+  function searchTableByRole() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("selectedRole");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("details_table");
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[3];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+
+  function searchTableByInvalid() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInvalid").checked;
+    filter = input;
+    table = document.getElementById("details_table");
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[4];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue == 1) {
+          if (filter == true) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+  }
+
+  function generatepdf() {
+    // $.ajax({
+    //     url: "../../include/inventory_functions/generatePDF.php",
+    //     type: "POST",
+    //     success: function(response) {
+
+    //     },
+    //     error: function(jqXHR, textStatus, errorThrown) {
+    //       console.log(textStatus, errorThrown);
+    //     }
+    //   });
+
+    window.location.href = "../../include/inventory_functions/pdf/pdf.php";
+  }
+
+  function generatecsv() {
+    // $.ajax({
+    //     url: "../../include/inventory_functions/generatePDF.php",
+    //     type: "POST",
+    //     success: function(response) {
+
+    //     },
+    //     error: function(jqXHR, textStatus, errorThrown) {
+    //       console.log(textStatus, errorThrown);
+    //     }
+    //   });
+
+    window.location.href = "../../include/inventory_functions/csv/generateCSV.php";
+  }
+</script>

@@ -6,7 +6,6 @@ if (session_status() == PHP_SESSION_NONE) {
 include_once "../../include/database/db.inc";
 include_once "../../include/template/FlashMessages.php";
 
-$err_msg = "";
 $conn  = getConnection();
 $msg = new \Plasticbrain\FlashMessages\FlashMessages();
 
@@ -24,18 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 	$openDay = isset($_POST["openDay"]) ? $_POST["openDay"] : date('Y-m-d h:i:s');;
 	$closeDay = isset($_POST["closeDay"]) ? $_POST["closeDay"] : NULL;
 
-	// $titleLink = isset($titleLink) ? strip_tags($titleLink) : null;
-	// $urlImage = isset($urlImage) ? remove_special_character($urlImage) : null;
 	$insert_user = $_SESSION["loginUserId"];
 
 	$checkOK = 1;
 
-	if (empty($title) || mb_strlen($title, 'Shift-JIS') > 1024) {
+	if (empty($title) || mb_strlen(mb_convert_encoding($title, "UTF-8")) > 512) {
 		$msg->error('Title error!');
 		$checkOK = 0;
 	}
 
-	if (empty($body) || mb_strlen($body, 'Shift-JIS') > 60000) {
+	if (empty($body) || mb_strlen(mb_convert_encoding($body, "UTF-8")) > 30000) {
 		$msg->error('Body error');
 		$checkOK = 0;
 	}
@@ -45,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 		$checkOK = 0;
 	}
 
-	// var_dump($closeDay); die();
 	if (!empty($closeDay)) {
 		if (strtotime($openDay) > strtotime($closeDay)) {
 			$msg->error('Please select open day is less than or equal to close day');
@@ -55,12 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 		$closeDay = NULL;
 	}
 
-	if (mb_strlen($titleLink, 'Shift-JIS') > 1024) {
+	if (mb_strlen(mb_convert_encoding($titleLink, "UTF-8")) > 512) {
 		$msg->error('Title no more than 1024!');
 		$checkOK = 0;
 	}
 
-	if (mb_strlen($urlImage, 'Shift-JIS') > 1024) {
+	if (mb_strlen(mb_convert_encoding($urlImage, "UTF-8")) > 512) {
 		$msg->error('Link URL no more than 1024!');
 		$checkOK = 0;
 	}
@@ -68,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 	//upload image
 	$target_dir = "../../app/images/topics/";
 	$target_file = $target_dir . basename($file);
-	// print_r($target_file); die();
 	$uploadOk = 1;
 	$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
@@ -76,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 	$check = getimagesize($_FILES["imgFile"]["tmp_name"]);
 	if ($check !== false) {
 		$uploadOk = 1;
-		$checkOK = 1;
 	} else {
 		$msg->error('File is not an image.');
 		$uploadOk = 0;
@@ -103,8 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 		$uploadOk = 0;
 		$checkOK = 0;
 	}
-
-	//check URL invalid
 
 	if ($checkOK == 1) {
 		$image = $file;

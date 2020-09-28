@@ -83,7 +83,6 @@ $(function () {
 
         if (c == true) {
             $(topicTable).DataTable().row(row).remove().draw(false);
-            // console.log(topicID);
             $.post('../../include/topics.php', { 'topicID': topicID }, function (data) {
                 toastr.success('You have successfully deleted "' + topicTitle + '"');
                 $(topicTable).DataTable().ajax.reload(null, false);
@@ -91,9 +90,6 @@ $(function () {
         }
     });
 
-    let day = Date.parse($('#openDay').val()).toString('dd/mm/yyyy HH:mm:ss GMT');
-    console.log(day);
-    var date = new Date();
     $('#openDay').datetimepicker({
         useCurrent: false,
         date: date,
@@ -132,25 +128,17 @@ $(function () {
             title: {
                 required: true,
             },
-            // openDay: {
-            //     opDay: true,
-            // },
             body: {
                 required: true,
             },
             imgFile: {
                 required: true,
             },
-            // closeDay: {
-            //     dateFormat: true,
-            // }
         },
         messages: {
             title: "タイトルを入力して下さい",
-            // openDay: "The open date is less than or equal to the end date",
             body: "本文を入力して下さい",
             imgFile: "画像を入力して下さい",
-            // closeDay: "The open date is less than or equal to the end date",
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -164,8 +152,6 @@ $(function () {
             $(element).removeClass('is-invalid');
         },
         submitHandler: function (form) {
-            // debugger
-            // var file = $('#imgFile').val();
             form.submit();
         }
     });

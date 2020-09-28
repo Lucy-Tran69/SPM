@@ -1,0 +1,179 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+include "../../include/check_view_permission.php";
+$url = "topics";
+check_view_permission($url);
+header("content-type: text/html; charset=UTF-8");
+?>
+<?php include "../../include/html/header.inc" ?>
+<?php include "../../include/html/menu.inc" ?>
+<?php include "../../include/Cusomer_functions/CreateCustomer.php" 
+?>
+<style type="text/css" media="all">
+    .custom-file-label::after {
+        content: none;
+    }
+
+    .center {
+      margin-left: 430px;
+      width: 60%;
+      padding: 10px;
+    }
+
+    .required:after {
+  content:"*";color:red;
+}
+
+</style>
+<?php
+if (isset($_SESSION["loginAccount"])) {
+?>
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- left column -->
+
+                <div class="col-md-12">
+                    <!-- jquery validation -->
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Add Customer</h3>
+                        </div>
+                        <!-- /.card-header -->
+                        <!-- form start -->
+                        <form action="#" role="form" id="addCustomer" method="POST" novalidate="novalidate" enctype = "multipart/form-data">
+                            <div class="card-body center">
+                                <div class="form-group row">
+                                    <label for="cd" class="col-md-2 col-sm-3 col-form-label-sm text-right required">Code Customer</label>
+                                    <div class="col-md-6 col-sm-8">
+                                        <input type="cd" name="cd" class="form-control" id="cd" placeholder="Code Customer">
+                                    </div>
+                                    
+                                </div>
+                                <div class="form-group row">
+                                    <label for="name" class="col-md-2 col-sm-3 col-form-label-sm text-right required">Customer</label>
+                                    <div class="col-md-6 col-sm-8">
+                                        <input type="name" name="name" class="form-control " id="name" placeholder="Name">
+                                    </div>
+                                    
+                                </div>
+                                <div class="form-group row">
+                                    <label for="tel" class="col-md-2 col-sm-3 col-form-label-sm text-right required">Telephone Number</label>
+                                    <div class="col-md-6 col-sm-8">
+                                        <input type="tel" name="tel" class="form-control" id="tel" placeholder="Telephone Number">
+                                    </div>
+                                    
+                                </div>
+                                <div class="form-group row">
+                                    <label for="zip" class="col-md-2 col-sm-3 col-form-label-sm text-right required">Zip</label>
+                                    <div class="col-md-6 col-sm-8">
+                                        <input type="zip" name="zip" class="form-control" id="zip" placeholder="Zip">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="address" class="col-md-2 col-sm-3 col-form-label-sm text-right required">Address</label>
+                                    <div class="col-md-6 col-sm-8">
+                                        <input type="address" name="address" class="form-control" id="address" placeholder="Address">
+                                    </div>
+                                    
+                                </div>
+                                <div class="form-group row">
+                                    <label for="charge" class="col-md-2 col-sm-3 col-form-label-sm text-right required">Charge</label>
+                                    <div class="col-md-6 col-sm-8">
+                                        <input type="charge" name="charge" class="form-control" id="charge" placeholder="Charge">
+                                    </div>
+                                    
+                                </div>
+                                <div class="form-group row">
+                                    <label for="sale" class="col-md-2 col-sm-3 col-form-label-sm text-right required">Sale</label>
+                                    <div class="col-md-6 col-sm-8">
+                                        <td><select id="sale" name="sale" class="form-control">
+                                        <?php
+                                        if ($saleUserResultSet->num_rows > 0) {
+                                          mysqli_data_seek($saleUserResultSet,0);
+                                          while ($row = $saleUserResultSet->fetch_assoc()) {
+                                        ?>
+                                            <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?></option>
+                                        <?php
+                                          }
+                                        }
+                                        ?>
+                                      </select>
+                                    </td>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="supervisor" class="col-md-2 col-sm-3 col-form-label-sm text-right required">Supervisor</label>
+                                    <div class="col-md-6 col-sm-8">
+                                        <td><select id="sale" name="sale" class="form-control">
+                                        <?php
+                                        if ($approveUserResultSet->num_rows > 0) {
+                                          mysqli_data_seek($approveUserResultSet,0);
+                                          while ($row = $approveUserResultSet->fetch_assoc()) {
+                                        ?>
+                                            <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?></option>
+                                        <?php
+                                          }
+                                        }
+                                        ?>
+                                      </select>
+                                    </td>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-2 col-sm-3 text-right">
+                                        <label id="invalidLabel" class="label_align_table ">停止</label>
+                                    </div>
+                                    <div class="col-md-2 col-sm-8 text-left">
+                                        <input type="checkbox" id="copyInvalid" name="copyInvalid"/>
+                                    </div> 
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-2 col-sm-3 text-right">
+                                       
+                                    </div>
+                                    <div class="col-md-6 col-sm-8 text-center">
+                                         <button type="submit" class="btn btn-primary">登録</button>
+                                    </div> 
+                                </div>
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <div class="row justify-content-md-center">
+                                   
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <!--/.col (left) -->
+                <!-- right column -->
+                <div class="col-md-6">
+
+                </div>
+                <!--/.col (right) -->
+            </div>
+            <!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </section>
+<?php
+} else {
+    //header("Location: ../../include/logout.php");
+}
+?>
+<?php include "../../include/html/foot.inc" ?>
+<!-- <script type="text/javascript" src="../../include/topic_functions/topics.js"></script> -->
+<!-- bs-custom-file-input -->
+<script src="../../include/template/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<!-- bs-custom-file-input -->
+<script type="text/javascript">
+    $(document).ready(function () {
+      bsCustomFileInput.init();
+  });
+</script>
+
+</body>
+</html>

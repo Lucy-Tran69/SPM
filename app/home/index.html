@@ -1,9 +1,9 @@
 <?php
-include "../include/login.php";
+include "login.php";
 ?>
 
 <!-- <link rel="stylesheet" type="text/css" href="../include/css/styles.css"/> -->
-<?php include "../include/html/hader.inc";?> 
+<?php include "html/hader.inc";?> 
 <title>Login</title>
 <body class="hold-transition login-page">
 <div class="login-box" style="margin-top:8%;">
@@ -15,7 +15,7 @@ include "../include/login.php";
     <div class="card-body login-card-body">
       <p class="login-box-msg">アカウントとパスワードを入力してください</p>
 
-      <form action="../include/login.php" method="post" id="login_form">
+      <form action="../../include/login.php" method="post" id="login_form">
         <div class="input-group mb-3">
         <input type="text" id="username" name="username" class="form-control" placeholder="アカウント">
           <div class="input-group-append">
@@ -57,7 +57,7 @@ include "../include/login.php";
 </form>
 </div>
 </section> -->
-<?php include "../include/html/footer.inc"?>
+<?php include "html/footer.inc"?>
 <div class="callout callout-danger" style="display:none;" id="error_text">  
       <p id="err_message"></p>
   </div>
@@ -70,7 +70,7 @@ function validate()
     // if(name!=null && name!="" && pass!=null && pass!="")
     // {
       $.ajax({
-      url: "../include/login.php",
+      url: "../../include/login.php",
       type: "POST",
       dataType: "json",
       data: 
@@ -87,7 +87,7 @@ function validate()
         }
         else
         {
-          window.location.href="login/home.html";
+          window.location.href="../login/home.html";
         }
       },
       error: function(jqXHR, textStatus, errorThrown) 

@@ -1,0 +1,174 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) 
+{
+  session_start();
+}
+include "../../include/check_view_permission.php";
+$url = "users";
+check_view_permission($url);
+header("content-type: text/html; charset=UTF-8");
+//Get array of roles from session variable 
+?>
+
+<style>
+  .align_button{
+  text-align: center;
+}
+</style>
+
+<?php include "../../include/html/header.inc";?> 
+<?php include "../../include/html/menu.inc";?>
+
+<?php
+if (isset($_SESSION["loginAccount"])) {
+?>
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Customer Management</h3>
+      </div>
+      <div class="card card-default">
+        <div class="card-body">
+            <div class="row justify-content-md-center">
+                <div class="col-md-6">
+                    <form action="#" id="searchCustomer" method="POST" role="form">
+                        <div class="form-group">
+                            <label>取引先コード</label>
+                            <input type="text" class="form-control" id="cd" name="cd" placeholder="取引先コード" />
+                        </div>
+                        <div class="form-group">
+                          <label>取引先名</label>
+                          <input type="text" class="form-control" id="name" name="name" placeholder="取引先名" />
+                      </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" name="status" class="custom-control-input" id="status"  />
+                                <label class="custom-control-label" for="status">無効を含む</label>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <button type="submit" class="btn btn-primary btn-lg">検索</button>
+                        </div>
+                        <div class="row justify-content-end" style="margin-right: 1px">
+                            <button type="button" class="btn btn-primary" onclick="redirectAddOrEditCustomer()">追加</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+       <!-- /.card-header -->
+      <div class="card-body">
+        <table id="customerTable" class="table table-bordered table-hover">
+          <thead>
+          <tr>
+            <th>取引先コード</th>
+            <th>取引先名</th>
+            <th>在庫閲覧ユーザ数</th>
+            <th>在庫・価格表閲覧ユーザ数</th>
+            <th>ステータス</th>
+            <th></th>
+          </tr>
+          </thead>
+        </table>
+      </div>
+      <!-- /.card-body -->
+     </div>
+    <!-- /.card -->
+   </div>
+  <!-- /.col -->
+</div> 
+<?php
+} else {
+  //header("Location: ../../include/logout.php");
+}
+?>
+<?php include "../../include/html/foot.inc";?>
+
+<script type="text/javascript">
+  $(function(){
+  const customerTable = $('#customerTable');
+   var table = customerTable.DataTable({
+      'start': 0,
+      'processing': true,
+      'searching': false,
+      'ordering': false,
+      'responsive': true,
+      'serverSide': true,
+      'deferRender': true,
+      'info': false,
+      'autoWidth': false,
+      'serverMethod': 'post',
+      'ajax':{
+        'url': '../../include/customer.php',
+      },
+      'columns': [
+        { data: 'cd', "defaultContent": "", "title": '取引先コード' },
+        { data: 'name', "defaultContent": "", "title": '取引先名' },
+        { data: 'NumberCustomerRole5', "defaultContent": "", "title": '在庫閲覧ユーザ数' },
+        { data: 'NumberCustomerRole6', "defaultContent": "", "title": '在庫・価格表閲覧ユーザ数' },
+        { data: 'invalid', "defaultContent": "", "title": 'ステータス'},
+        {
+          data: 'no',
+          render: function (data, type, row) {
+          return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i>変更</a></div>';
+          }
+        },
+      ],
+    });
+
+   $('#searchCustomer').on('submit', function (e) {
+            e.preventDefault();
+            RequestData();
+        });
+
+        function RequestData() {
+            let cd = $('#cd').val();
+            let name = $('#name').val();
+            let status = 0;
+            if (document.getElementById("status").checked) {
+                  status = 1;
+            }
+
+            $('#customerTable').DataTable().destroy();
+
+            $(customerTable).DataTable({
+                'processing': true,
+                'serverSide': true,
+                'searching': false,
+                'ordering': false,
+                'info': false,
+                'autoWidth': false,
+                'responsive': true,
+                'deferRender': true,
+                'ajax': {
+                    type: 'POST',
+                    url: '../../include/customer.php',
+                    data: { 'cd': cd, 'name': name, 'status': status},
+                },
+                'start': 0,
+                'columns': [
+                    { data: 'cd', "defaultContent": "", "title": '取引先コード' },
+                    { data: 'name', "defaultContent": "", "title": '取引先名' },
+                    { data: 'NumberCustomerRole5', "defaultContent": "", "title": '在庫閲覧ユーザ数' },
+                    { data: 'NumberCustomerRole6', "defaultContent": "", "title": '在庫・価格表閲覧ユーザ数' },
+                    { data: 'invalid', "defaultContent": "", "title": 'ステータス'},
+                    {
+                      data: 'no',
+                      render: function (data, type, row) {
+                      return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i>変更</a></div>';
+                      }
+                    },
+                ],
+            });
+        }
+  });
+
+function redirectAddOrEditCustomer() {
+       window.location.href = "../../app/customer/add-customer.html";
+}
+</script>
+
+</body>
+</html>
