@@ -13,7 +13,7 @@ if (session_status() == PHP_SESSION_NONE)
         {
             echo "<script>
                 alert('Session not found');
-                window.location.href='../app/home/index.html';
+                window.location.href='../../app/';
                 </script>";
         }
     }
@@ -24,6 +24,6 @@ if (session_status() == PHP_SESSION_NONE)
     finally
     {
         session_destroy();
-        header("Location: ../app/home/index.html");
+        header("Location: ../../app/");
     }
 ?> -->

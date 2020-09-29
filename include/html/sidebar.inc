@@ -36,7 +36,7 @@ $menu = $_SESSION['roles'];
                 <li class="nav-item" id='<?php echo $value?>' onclick="navigate(this.id)"><a class="nav-link"><?php echo $key?></a></li>
             <?php endforeach; ?>
         </ul>
-        <form class="logout_button" action="../../include/logout.php"> 
+        <form class="logout_button" action="../../include/common/logout.php"> 
         <input type="submit" class="btn btn-success" value="ログアウト" />
         <?php include "footer.inc";?> 
         </form>

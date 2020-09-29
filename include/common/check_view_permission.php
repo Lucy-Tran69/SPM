@@ -5,7 +5,7 @@ if (session_status() == PHP_SESSION_NONE)
 {
     session_start();
 }
-include_once "database/db.inc";
+include_once "../../include/database/db.inc";
 
 function check_view_permission($target_url)
 {

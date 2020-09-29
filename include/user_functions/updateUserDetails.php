@@ -33,7 +33,7 @@ $stmt->bind_param('ssissiiisii',$name,$account,$role,$email,$expire,$customer,$o
 $result = execute($stmt,$conn);
 if($result)
 {
-    header("Location: ../../app/login/users.html");  
+    header("Location: ../../app/users/");  
 }
 else
 {

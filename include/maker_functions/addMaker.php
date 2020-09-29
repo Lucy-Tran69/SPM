@@ -23,7 +23,7 @@ $stmt->bind_param('ssisi',$name,$upday,$upuser,$upday,$upuser);
 $result = execute($stmt,$conn);
 if($result)
 {
-    header("Location: ../../app/login/maker.html");  
+    header("Location: ../../app/maker/");  
 }
 else
 {

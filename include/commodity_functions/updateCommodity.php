@@ -36,7 +36,7 @@ $stmt->bind_param('ssiiisisssisii',$name,$code,$print_type,$num,$price,$maker,$g
 $result = execute($stmt,$conn);
 if($result)
 {
-    header("Location: ../../app/login/commodity.html");  
+    header("Location: ../../app/commodity/");  
 }
 else
 {

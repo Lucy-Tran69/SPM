@@ -7,7 +7,8 @@ include_once "database/db.inc";
 
 if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 {
-    $id = $_POST["inputId"];
+    $no = $_POST["no"];
+    $val = $_POST["val"];
     $upday = date('Y-m-d H:i:s');
     $upuser = $_SESSION["loginUserId"];
 }
@@ -17,14 +18,14 @@ if ($conn->connect_error)
 {
     die("Failed to connect to database. " . $conn->connect_error);
 }
-
-$stmt = $conn->prepare("update maker set invalid=1,upday=?,upuser=? where no=?");
-$stmt->bind_param('sii',$upday,$upuser,$id);
+$stmt = $conn->prepare("insert into inventory(commodity,inventory_mark,inday,inuser) values(?,?,?,?) 
+                        ON DUPLICATE KEY update inventory_mark=?,upday=?,upuser=?");
+$stmt->bind_param('iisiisi',$no,$val,$upday,$upuser,$val,$upday,$upuser);
 
 $result = execute($stmt,$conn);
 if($result)
 {
-    header("Location: ../../app/maker/");  
+   // header("Location: ../../app/login/inventory.html");  
 }
 else
 {

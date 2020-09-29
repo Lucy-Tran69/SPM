@@ -27,26 +27,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
 	$insert_user = $_SESSION["loginUserId"];
 	$checkOK = 1;
-	// var_dump($imgFileNew);
-	// die();
+
 	if (empty($title) || mb_strlen(mb_convert_encoding($title, "UTF-8")) > 512) {
 		$msg->error('Title error!');
 		$checkOK = 0;
 	}
 
 	if (empty($body) || mb_strlen(mb_convert_encoding($body, "UTF-8")) > 512) {
-		$msg->error('Body error');
+		$msg->error('Body error!');
 		$checkOK = 0;
 	}
 
 	if (empty($imgFileOld) && empty($imgFileNew)) {
-		$msg->error('Please select file');
+		$msg->error('Please select file!');
 		$checkOK = 0;
 	}
 
 	if (!empty($closeDay)) {
 		if (strtotime($openDay) > strtotime($closeDay)) {
-			$msg->error('Please select open day is less than or equal to close day');
+			$msg->error('Please select open day is less than or equal to close day!');
 			$checkOK = 0;
 		}
 	} else {
@@ -100,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
-		
+
 		// Check if $uploadOk is set to 0 by an error
 		if ($uploadOk === 0) {
 			$msg->error('Sorry, your file was not uploaded.');
@@ -119,27 +118,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 		if($stmt = mysqli_prepare($conn, $sql)){
 			mysqli_stmt_bind_param($stmt, 'sssssssssi', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user, $no);
 
-			// Cố gắng thực thi câu lệnh đã chuẩn bị
             if(mysqli_stmt_execute($stmt)){
-                // Update thành công. Chuyển hướng đến trang đích
-                header("Location: ../../app/topic/topics.html?status=success&title=$title");
+                header("Location: ../../app/topic/topics.html?status=success&title=$title&id=$no");
 				exit();
             } else{
                 echo "Error " . mysqli_error($conn);exit();
-				header("Location: ../../app/topic/topics.html?status=faill&title=$title");
+				header("Location: ../../app/topic/topics.html?status=faill&title=$title&id=$no");
             }
 		}
-		// $stmt->bind_param('sssssssssi', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user, $no);
-		// $stmt->execute();
-
-		// if ($stmt->affected_rows > 0) {
-		// 	header("Location: ../../app/topic/topics.html?status=success&title=$title");
-		// 	exit();
-		// } else {
-		// 	echo "Error " . mysqli_error($conn);exit();
-		// 	header("Location: ../../app/topic/topics.html?status=faill&title=$title");
-			
-		// }
+	
 		$stmt->close();
 	}
 	$msg->display();

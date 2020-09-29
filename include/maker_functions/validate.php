@@ -24,7 +24,7 @@ $stmt->bind_param('sii',$upday,$upuser,$id);
 $result = execute($stmt,$conn);
 if($result)
 {
-    header("Location: ../../app/login/maker.html");  
+    header("Location: ../../app/maker/");  
 }
 else
 {

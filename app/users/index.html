@@ -3,7 +3,7 @@ if (session_status() == PHP_SESSION_NONE)
 {
   session_start();
 }
-include "check_view_permission.php";
+include "common/check_view_permission.php";
 $url = "users";
 check_view_permission($url);
 header("content-type: text/html; charset=UTF-8");
@@ -23,7 +23,7 @@ header("content-type: text/html; charset=UTF-8");
 }
 </style>
 <?php include "html/sidebar.inc" ?>
-<?php include "users.php" ?>
+<?php include "user_functions/users.php" ?>
 <!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
 <?php
 if (isset($_SESSION["loginAccount"])) {
@@ -326,7 +326,7 @@ if (isset($_SESSION["loginAccount"])) {
   </html>
 <?php
 } else {
-  header("Location: ../../include/logout.php");
+  header("Location: ../../include/common/logout.php");
 }
 ?>
 

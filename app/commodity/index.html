@@ -1,0 +1,600 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) 
+{
+  session_start();
+}
+include "common/check_view_permission.php";
+$url = "commodity";
+check_view_permission($url);
+header("content-type: text/html; charset=UTF-8");
+//Get array of roles from session variable 
+?>
+<style>
+.update_button{
+  width:50%;
+}
+
+.align_button{
+  text-align: center;
+}
+
+.align_form{
+  text-align:-webkit-center;
+}
+</style>
+<?php include "html/sidebar.inc" ?>
+<?php include "commodity_functions/commodity.php" ?>
+<!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
+<?php
+if (isset($_SESSION["loginAccount"])) {
+?>
+  <div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <!-- Default box -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">マスター管理　ユーザ管理</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form">
+                  <div class="form-group">
+                  <div class="row">
+                    <div class="col-xs-5">
+                  <label id="itemLabel">権限</label>
+                  <select name="selectedRole" id="selectedRole" class="form-control" onchange="searchTableByRole();">
+                    <option value="">-</option>
+                        <?php
+                        if ($makerResultSet->num_rows > 0) {
+                          mysqli_data_seek($makerResultSet,0);
+                          while ($row = $makerResultSet->fetch_assoc()) {
+                        ?>
+                            <option value="<?php echo $row["name"]; ?>"><?php echo $row["name"]; ?></option>
+                        <?php
+                          }
+                        }
+                        ?>
+                      </select>
+                  </div>
+                  </div>
+                  </div>
+                    <div class="form-group">
+                    <div class="row">
+                    <div class="col-xs-5">
+                    <label id="nameLabel" class="searchTable_label">氏名</label>
+                    <input type="text" id="searchName" name="searchName" class="form-control" onkeyup="searchTableByName();"/>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <div class="row">
+                    <div class="col-xs-5">
+                    <label id="custLabel" class="searchTable_label">取引先名</label>
+                    <input type="text" name="searchCustomer" id="searchCustomer" class="form-control" onkeyup="searchTableByCustomer();"/>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="form-group">
+                    <div class="row">
+                    <div class="col-xs-5">
+                    <div class="form-check">
+                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="0"/>
+                    <label id="checkLabel" class="form-check-label">ログインできないユーザ</label>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                <input type="submit" value="検索" class="btn btn-primary" style="width: 100px; margin-left: 250px;">
+                <input type="button" value="追加" class="btn btn-primary" style="width: 100px; margin-left: 250px;" data-target="#insert" data-toggle="modal">
+              </form>
+              </div>
+              <table id="details_table" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>商品コード</th>
+                    <th>商品名</th>
+                    <th>メーカー</th>
+                    <th>メモ</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  if ($resultSet->num_rows > 0) {
+                    while ($row = $resultSet->fetch_assoc()) {
+                  ?>
+                      <tr style="display: <?php echo $row["invalid"]==0?"":"none;"?>">
+                        <td><?php echo $row["code"] ?></td>
+                        <td><?php echo $row["name"] ?></td>
+                        <td><?php echo $row["maker"] ?></td>
+                        <td><?php echo $row["memo"] ?></td>
+                        <td style="display: none;"><?php echo $row["invalid"] ?></td>
+                        <td class="align_button">
+                            <input class="btn btn-primary" type="button" id="<?php echo $row["no"]; ?>" value="変更" onclick="openModal(this.id);" data-toggle="modal" data-target="#details">
+                            <input class="btn btn-primary" type="button" id="<?php echo $row["no"]; ?>" value="コーピ" onclick="openModalCopy(this.id);" data-toggle="modal" data-target="#copy">
+                        </td>
+                      </tr>
+                  <?php
+                    }
+                  }
+                  // $resultStmt->free_result();
+                  // freeConnection($conn);
+                  ?>
+                </tbody>
+              </table>
+              <!-- /.card-footer-->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <div class="modal fade" tabindex="-1" role="dialog" id="details">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body align_form">
+          <form action="../../include/commodity_functions/updateCommodity.php" method="POST" class="form_style">
+            <input type="hidden" id="inputId" name="inputId" />
+            <table class="popup_table">
+              <tr>
+                <td><label id="nameLabel" class="label_align_table">メーカ名</label></td>
+                <td><select id="inputMaker" name="inputMaker">
+                    <?php
+                    if ($makerResultSet->num_rows > 0) {
+                      mysqli_data_seek($makerResultSet,0);
+                      while ($row = $makerResultSet->fetch_assoc()) {
+                    ?>
+                        <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
+                    <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="typeLabel" class="label_align_table">タイプ</label></td>
+                <td><div class="icheck-primary d-inline">
+                        <input type="radio" id="inputType1" name="inputType" value="1" checked/>
+                        <label style="font-weight: normal;" for="inputType1">
+                        モノクロ
+                        </label>
+                      </div>
+                      <div class="icheck-primary d-inline" style="padding-left: 15px;">
+                        <input type="radio" id="inputType2" name="inputType" value="2"/>
+                        <label style="font-weight: normal;"  for="inputType2">
+                        カラー
+                        </label>
+                      </div>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="codeLabel" class="label_align_table">商品コード</label></td>
+                <td><input type="text" id="inputCode" name="inputCode" /></td>
+              </tr>
+              <tr>
+                <td><label id="codeLabel" class="label_align_table">商品名</label></td>
+                <td><input type="text" id="inputName" name="inputName" /></td>
+              </tr>
+              <tr>
+                <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
+                <td><input type="text" id="inputPrice" name="inputPrice" /></td>
+              </tr>
+              <tr>
+                <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
+                <td><input type="number" id="inputPaid" name="inputPaid" /></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">対応プリンタ</label></td>
+                <td><input type="text" id="inputPrinters" name="inputPrinters"/></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">備考欄</label></td>
+                <td><input type="text" id="inputNote" name="inputNote"/></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">-</label></td>
+                <td><textarea id="inputMemo" name="inputMemo"></textarea></td>
+              </tr>
+              <tr>
+                <td><label id="invalidLabel" class="label_align_table">グリーン購入法</label></td>
+                <td><input type="checkbox" id="inputGreen" name="inputGreen" /></td>
+              </tr>
+              <tr>
+                <td><label id="invalidLabel" class="label_align_table">停止</label></td>
+                <td><input type="checkbox" id="inputInvalid" name="inputInvalid" /></td>
+              </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="Submit" class="btn btn-primary">Save changes</button>
+        </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <!-- Copy modal -->
+  <div class="modal fade" tabindex="-1" role="dialog" id="copy">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body align_form">
+          <form action="../../include/commodity_functions/copyCommodity.php" method="POST" class="form_style">
+            <table class="popup_table">
+              <tr>
+                <td><label id="nameLabel" class="label_align_table">メーカ名</label></td>
+                <td><select id="copyMaker" name="copyMaker">
+                    <?php
+                    if ($makerResultSet->num_rows > 0) {
+                      mysqli_data_seek($makerResultSet,0);
+                      while ($row = $makerResultSet->fetch_assoc()) {
+                    ?>
+                        <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
+                    <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="typeLabel" class="label_align_table">タイプ</label></td>
+                <td><div class="icheck-primary d-inline">
+                        <input type="radio" id="copyType1" name="copyType" value="1" checked/>
+                        <label style="font-weight: normal;" for="copyType1">
+                        モノクロ
+                        </label>
+                      </div>
+                      <div class="icheck-primary d-inline" style="padding-left: 15px;">
+                        <input type="radio" id="copyType2" name="copyType" value="2"/>
+                        <label style="font-weight: normal;"  for="copyType2">
+                        カラー
+                        </label>
+                      </div>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="codeLabel" class="label_align_table">商品コード</label></td>
+                <td><input type="text" id="copyCode" name="copyCode" /></td>
+              </tr>
+              <tr>
+                <td><label id="codeLabel" class="label_align_table">商品名</label></td>
+                <td><input type="text" id="copyName" name="copyName" /></td>
+              </tr>
+              <tr>
+                <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
+                <td><input type="text" id="copyPrice" name="copyPrice" /></td>
+              </tr>
+              <tr>
+                <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
+                <td><input type="number" id="copyPaid" name="copyPaid" /></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">対応プリンタ</label></td>
+                <td><input type="text" id="copyPrinters" name="copyPrinters"/></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">備考欄</label></td>
+                <td><input type="text" id="copyNote" name="copyNote"/></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">-</label></td>
+                <td><textarea id="copyMemo" name="copyMemo"></textarea></td>
+              </tr>
+              <tr>
+                <td><label id="invalidLabel" class="label_align_table">グリーン購入法</label></td>
+                <td><input type="checkbox" id="copyGreen" name="copyGreen" /></td>
+              </tr>
+              <tr>
+                <td><label id="invalidLabel" class="label_align_table">停止</label></td>
+                <td><input type="checkbox" id="copyInvalid" name="copyInvalid" /></td>
+              </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="Submit" class="btn btn-primary">Save changes</button>
+        </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <!-- Add user modal -->
+  <div class="modal fade" tabindex="-1" role="dialog" id="insert">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body align_form">
+          <form action="../../include/commodity_functions/insertCommodity.php" method="POST" class="form_style">
+          <table class="popup_table">
+              <tr>
+                <td><label id="nameLabel" class="label_align_table">メーカ名</label></td>
+                <td><select id="insertMaker" name="insertMaker">
+                    <?php
+                    if ($makerResultSet->num_rows > 0) {
+                      mysqli_data_seek($makerResultSet,0);
+                      while ($row = $makerResultSet->fetch_assoc()) {
+                    ?>
+                        <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
+                    <?php
+                      }
+                    }
+                    ?>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="typeLabel" class="label_align_table">タイプ</label></td>
+                <td><div class="icheck-primary d-inline">
+                        <input type="radio" id="insertType1" name="insertType" value="1" checked/>
+                        <label style="font-weight: normal;" for="insertType1">
+                        モノクロ
+                        </label>
+                      </div>
+                      <div class="icheck-primary d-inline" style="padding-left: 15px;">
+                        <input type="radio" id="insertType2" name="insertType" value="2"/>
+                        <label style="font-weight: normal;"  for="insertType2">
+                        カラー
+                        </label>
+                      </div>
+                </td>
+              </tr>
+              <tr>
+                <td><label id="codeLabel" class="label_align_table">商品コード</label></td>
+                <td><input type="text" id="insertCode" name="insertCode" /></td>
+              </tr>
+              <tr>
+                <td><label id="codeLabel" class="label_align_table">商品名</label></td>
+                <td><input type="text" id="insertName" name="insertName" /></td>
+              </tr>
+              <tr>
+                <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
+                <td><input type="text" id="insertPrice" name="insertPrice" /></td>
+              </tr>
+              <tr>
+                <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
+                <td><input type="number" id="insertPaid" name="insertPaid" /></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">対応プリンタ</label></td>
+                <td><input type="text" id="insertPrinters" name="insertPrinters"/></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">備考欄</label></td>
+                <td><input type="text" id="insertNote" name="insertNote"></td>
+              </tr>
+              <tr>
+                <td><label id="customerLabel" class="label_align_table">-</label></td>
+                <td><textarea type="text" id="insertMemo" name="insertMemo"></textarea></td>
+              </tr>
+              <tr>
+                <td><label id="invalidLabel" class="label_align_table">グリーン購入法</label></td>
+                <td><input type="checkbox" id="insertGreen" name="insertGreen" /></td>
+              </tr>
+              <tr>
+                <td><label id="invalidLabel" class="label_align_table">停止</label></td>
+                <td><input type="checkbox" id="insertInvalid" name="insertInvalid" /></td>
+              </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="Submit" class="btn btn-primary">Save changes</button>
+        </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  </body>
+  <?php include "html/footer.inc" ?>
+
+  </html>
+<?php
+} else {
+  header("Location: ../../include/common/logout.php");
+}
+?>
+
+<script>
+  // var modal = document.getElementById("details");
+  // var span = document.getElementsByClassName("close")[0];
+
+  function openModal(cartid) {
+    $.ajax({
+      url: "../../include/commodity_functions/getSelectedCommodity.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        id: cartid
+      },
+      success: function(response) {
+        if (response.status == "success") {
+          $("#inputId").val(cartid);
+          $("#inputMaker").val(response.maker).change();
+
+          if(response.print_type==1)
+            $("#inputType1").prop('checked', true);
+          
+          if(response.print_type==2)
+            $("#inputType2").prop('checked', true);
+
+          $('#inputCode').val(response.cd);
+          $("#inputName").val(response.name);
+          $("#inputPrice").val(response.price);
+          $("#inputPaid").val(response.num);
+          $("#inputPrinters").val(response.printer_support);
+          $("#inputNote").val(response.note);
+          $("#inputMemo").val(response.memo);
+          $("#inputInvalid").val(response.email);
+
+          if (response.invalid == 0)
+            $("#inputInvalid").prop('checked', false);
+          else
+            $("#inputInvalid").prop('checked', true);
+
+        if (response.green == 0)
+            $("#inputGreen").prop('checked', false);
+        else
+            $("#inputGreen").prop('checked', true);
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+      }
+    });
+    // modal.style.display = "block";
+  }
+
+  function openModalCopy(cartid) {
+    $.ajax({
+      url: "../../include/commodity_functions/getSelectedCommodity.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        id: cartid
+      },
+      success: function(response) {
+        if (response.status == "success") {
+          $("#copyMaker").val(response.maker).change();
+          $("#copyType").val(response.print_type);
+          $("#copyName").val(response.name);
+          $("#copyPrice").val(response.price);
+          $("#copyPaid").val(response.num);
+          $("#copyPrinters").val(response.printer_support);
+          $("#copyNote").val(response.note);
+          $("#copyMemo").val(response.memo);
+          $("#copyInvalid").val(response.email);
+
+          if (response.invalid == 0)
+            $("#copyInvalid").prop('checked', false);
+          else
+            $("#copyInvalid").prop('checked', true);
+
+        if (response.green == 0)
+            $("#copyGreen").prop('checked', false);
+        else
+            $("#copyGreen").prop('checked', true);
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+      }
+    });
+    // modal.style.display = "block";
+  }
+
+  // function closeModal() {
+  //   modal.style.display = "none";
+  // }
+
+function searchTableByName() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchName");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("details_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[1];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function searchTableByCustomer() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchCustomer");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("details_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[4];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function searchTableByRole() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("selectedRole");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("details_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[3];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function searchTableByInvalid() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchInvalid").checked;
+  filter = input;
+  table = document.getElementById("details_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[4];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue==1) 
+      {
+        if(filter==true)
+        {
+          tr[i].style.display = "";
+        }
+        else
+        {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+}
+</script>

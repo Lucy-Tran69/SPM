@@ -61,45 +61,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 		$checkOK = 0;
 	}
 
-	//upload image
-	$target_dir = "../../app/images/topics/";
-	$target_file = $target_dir . basename($file);
-	$uploadOk = 1;
-	$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+	if (!empty($file)) {
+		//upload image
+		$target_dir = "../../app/images/topics/";
+		$target_file = $target_dir . basename($file);
+		$uploadOk = 1;
+		$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
 	// Check if image file is a actual image or fake image
-	$check = getimagesize($_FILES["imgFile"]["tmp_name"]);
-	if ($check !== false) {
-		$uploadOk = 1;
-	} else {
-		$msg->error('File is not an image.');
-		$uploadOk = 0;
-		$checkOK = 0;
-	}
+		$check = getimagesize($_FILES["imgFile"]["tmp_name"]);
+		if ($check !== false) {
+			$uploadOk = 1;
+		} else {
+			$msg->error('File is not an image.');
+			$uploadOk = 0;
+			$checkOK = 0;
+		}
 
 	// Check if file already exists
-	if (file_exists($target_file)) {
-		$msg->error('Sorry, file already exists.');
-		$uploadOk = 0;
-		$checkOK = 0;
-	}
+		if (file_exists($target_file)) {
+			$msg->error('Sorry, file already exists.');
+			$uploadOk = 0;
+			$checkOK = 0;
+		}
 
 	// Check file size
-	if ($_FILES["imgFile"]["size"] > 102400000) {
-		$msg->error('Sorry, your file is too large.');
-		$uploadOk = 0;
-		$checkOK = 0;
-	}
+		if ($_FILES["imgFile"]["size"] > 102400000) {
+			$msg->error('Sorry, your file is too large.');
+			$uploadOk = 0;
+			$checkOK = 0;
+		}
 
 	// Allow certain file formats
-	if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-		$msg->error('Sorry, only JPG, JPEG, PNG & GIF files are allowed.');
-		$uploadOk = 0;
-		$checkOK = 0;
-	}
-
-	if ($checkOK == 1) {
-		$image = $file;
+		if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
+			$msg->error('Sorry, only JPG, JPEG, PNG & GIF files are allowed.');
+			$uploadOk = 0;
+			$checkOK = 0;
+		}
 
 		// Check if $uploadOk is set to 0 by an error
 		if ($uploadOk == 0) {
@@ -110,6 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 				$msg->error('Sorry, there was an error uploading your file.');
 			}
 		}
+	}
+	
+	if ($checkOK == 1) {
+		$image = $file;
 
 		$stmt = $conn->prepare("INSERT INTO topics(title, body, opday, clday, image, image_link, link_title, link_url, inuser) 
 			VALUES(?,?,?,?,?,?,?,?,?)");
@@ -118,11 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 		$stmt->execute();
 
 		if ($stmt->affected_rows > 0) {
-			header("Location: ../../app/topic/topics.html?status=success&title=$title");
+			header("Location: ../../app/topic/topics.html?status=success&title=$title&id");
 			exit();
 		} else {
 			echo "Error " . mysqli_error($conn);
-			header("Location: ../../app/topic/topics.html?status=faill&title=$title");
+			header("Location: ../../app/topic/topics.html?status=faill&title=$title&id");
 			exit();
 		}
 		$stmt->close();

@@ -3,13 +3,13 @@
     {
     session_start();
     }
-    include "../../include/check_view_permission.php";
+    include "../../include/common/check_view_permission.php";
     $url = "topics";
     check_view_permission($url);
     header("content-type: text/html; charset=UTF-8");
     include "../../include/html/header.inc";
     include "../../include/html/menu.inc";
-    include "../../include/template/showMessages.php";
+    include "../../app/refer/template/showMessages.php";
     //include "../../include/topics.php;
     if (isset($_SESSION["loginAccount"])) {
 ?>
