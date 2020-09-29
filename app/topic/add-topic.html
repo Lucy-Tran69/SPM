@@ -19,25 +19,26 @@ header("content-type: text/html; charset=UTF-8");
 <?php
 if (isset($_SESSION["loginAccount"])) {
 ?>
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- left column -->
-                <div class="col-md-12">
-                    <!-- jquery validation -->
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Add Topic</h3>
-                        </div>
-                        <!-- /.card-header -->
-                        <!-- form start -->
-                        <form action="#" role="form" id="addTopic" method="POST" novalidate="novalidate" enctype = "multipart/form-data">
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label for="title">タイトル</label>
-                                    <input type="title" name="title" class="form-control" id="title" placeholder="タイトル">
-                                </div>
-                           <!--      <div class="row">
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <!-- jquery validation -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Topic</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form action="#" role="form" id="addTopic" method="POST" novalidate="novalidate"
+                        enctype="multipart/form-data">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="title">タイトル</label>
+                                <input type="title" name="title" class="form-control" id="title" placeholder="タイトル">
+                            </div>
+                            <!--      <div class="row">
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label for="openDay" data-target="#openDay">公開日</label>
@@ -61,151 +62,157 @@ if (isset($_SESSION["loginAccount"])) {
                                         </div>
                                     </div>
                                 </div> -->
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <!-- text input -->
-                                        <div class="form-group">
-                                            <label for="openDay" data-target="#openDay" data-toggle="datetimepicker">公開日</label>
-                                            <div class="input-group date" id="openDay" data-target-input="nearest">
-                                                <input type="text" class="form-control datetimepicker-input openDay" name="openDay" data-target="#openDay" data-toggle="datetimepicker" placeholder="公開日" />
-                                                <div class="input-group-append" data-target="#openDay" data-toggle="datetimepicker">
-                                                    <div class="input-group-text"><i class="far fa-clock"></i></div>
-                                                </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <!-- text input -->
+                                    <div class="form-group">
+                                        <label for="openDay" data-target="#openDay"
+                                            data-toggle="datetimepicker">公開日</label>
+                                        <div class="input-group date" id="openDay" data-target-input="nearest">
+                                            <input type="text" class="form-control datetimepicker-input openDay"
+                                                name="openDay" data-target="#openDay" data-toggle="datetimepicker"
+                                                placeholder="公開日" />
+                                            <div class="input-group-append" data-target="#openDay"
+                                                data-toggle="datetimepicker">
+                                                <div class="input-group-text"><i class="far fa-clock"></i></div>
                                             </div>
-                                            <!-- /.input group -->
                                         </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label for="closeDay" data-target="#closeDay" data-toggle="datetimepicker">終了日</label>
-                                            <div class="input-group date" id="closeDay" data-target-input="nearest">
-                                                <input type="text" class="form-control datetimepicker-input closeDay" name="closeDay" data-target="#closeDay" data-toggle="datetimepicker" placeholder=" 終了日" />
-                                                <div class="input-group-append" data-target="#closeDay" data-toggle="datetimepicker">
-                                                    <div class="input-group-text"><i class="far fa-clock"></i></div>
-                                                </div>
-                                            </div>
-                                            <!-- /.input group -->
-                                        </div>
+                                        <!-- /.input group -->
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="body">本文</label>
-                                    <textarea type="body" name="body" class="form-control" rows="6" id="body" placeholder="本文"></textarea>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="closeDay" data-target="#closeDay"
+                                            data-toggle="datetimepicker">終了日</label>
+                                        <div class="input-group date" id="closeDay" data-target-input="nearest">
+                                            <input type="text" class="form-control datetimepicker-input closeDay"
+                                                name="closeDay" data-target="#closeDay" data-toggle="datetimepicker"
+                                                placeholder=" 終了日" />
+                                            <div class="input-group-append" data-target="#closeDay"
+                                                data-toggle="datetimepicker">
+                                                <div class="input-group-text"><i class="far fa-clock"></i></div>
+                                            </div>
+                                        </div>
+                                        <!-- /.input group -->
+                                    </div>
                                 </div>
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label for="imgFile">画像</label>
-                                                    <div class="input-group">
-                                                        <div class="custom-file">
-                                                            <input type="file" class="custom-file-input" name="imgFile" id="imgFile" accept="image/png, image/jpeg, image/jpg" onchange="preview_image(event)">
-                                                            <label class="custom-file-label" for="imgFile">ファイル</label>
-                                                        </div>
-                                                        <label class="input-group-append" for="imgFile">
-                                                            <span class="input-group-text">ファイル</span>
-                                                        </label>
+                            </div>
+                            <div class="form-group">
+                                <label for="body">本文</label>
+                                <textarea type="body" name="body" class="form-control" rows="6" id="body"
+                                    placeholder="本文"></textarea>
+                            </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="imgFile">画像</label>
+                                                <div class="input-group">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" name="imgFile"
+                                                            id="imgFile" accept="image/png, image/jpeg, image/jpg"
+                                                            onchange="preview_image(event)">
+                                                        <label class="custom-file-label" for="imgFile">ファイル</label>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label for="imgLink">登録済画像</label>
-                                                    <input type="imgLink" name="imgLink" class="form-control" id="imgLink" placeholder="登録済画像">
+                                                    <label class="input-group-append" for="imgFile">
+                                                        <span class="input-group-text">ファイル</span>
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label for="titleLink">タイトル画像</label>
-                                                    <input type="titleLink" name="titleLink" class="form-control" id="titleLink" placeholder="タイトル画像">
-                                                </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="imgLink">登録済画像</label>
+                                                <input type="imgLink" name="imgLink" class="form-control" id="imgLink"
+                                                    placeholder="登録済画像">
                                             </div>
-                                            <div class="col-sm-6">
-                                                <div class="form-group">
-                                                    <label for="urlImage">URL画像</label>
-                                                    <input type="urlImage" name="urlImage" class="form-control" id="urlImage" placeholder="URL画像">
-                                                </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="titleLink">タイトル画像</label>
+                                                <input type="titleLink" name="titleLink" class="form-control"
+                                                    id="titleLink" placeholder="タイトル画像">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="urlImage">URL画像</label>
+                                                <input type="urlImage" name="urlImage" class="form-control"
+                                                    id="urlImage" placeholder="URL画像">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- /.card-body -->
-                            <div class="card-footer">
-                                <div class="row justify-content-md-center">
-                                    <button type="submit" class="btn btn-primary">登録</button>
-                                    <button type="button" class="btn bg-gradient-info" style="margin-left: 20px;" onclick="onBtnclick()">プレビュー</button>
-                                </div>
+                        </div>
+                        <!-- /.card-body -->
+                        <div class="card-footer">
+                            <div class="row justify-content-md-center">
+                                <button type="submit" class="btn btn-primary">登録</button>
+                                <button type="button" class="btn btn-secondary" style="margin-left: 20px;"
+                                    onclick="onBtnclick()">プレビュー</button>
                             </div>
-                        </form>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+            </div>
+            <!--/.col (left) -->
+            <!-- right column -->
+            <div class="col-md-6">
+
+            </div>
+            <!--/.col (right) -->
+        </div>
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+
+<div class="modal fade bd-example-modal-lg" id="previewTopic" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <b style="color: red;" id="newTitle"></b>
+                    <b id="preTitle"></b>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row justify-content-end" style="margin-bottom: 10px;">
+                        <span class="ju" id="preOpenday"></span>
                     </div>
-                    <!-- /.card -->
-                </div>
-                <!--/.col (left) -->
-                <!-- right column -->
-                <div class="col-md-6">
+                    <div class="row mb-2 justify-content-center" id="img" style="margin-bottom: 10px;">
+                        <a target="_blank" rel="noopener noreferrer" id="preImgLink">
+                            <img class="image-pre" id="output_image" style="height: 250px; width: 250px;" />
+                        </a>
+                    </div>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <p id="preBody"></p>
+                    </div>
+                    <div class="row">
+                        <u>
+                            <a target="_blank" rel="noopener noreferrer" id="preLink">
+                                <span id="preLinkTitle"></span>
+                            </a>
+                        </u>
 
+                    </div>
                 </div>
-                <!--/.col (right) -->
             </div>
-            <!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </section>
-
-<div class="modal fade bd-example-modal-lg" id="previewTopic" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <form action="#" role="form" id="addTopic" method="POST" novalidate="novalidate" enctype = "multipart/form-data">
-         <input type="hidden" name="title" class="pre-title">
-         <input type="hidden" name="title" class="pre-open-day">
-         <input type="hidden" name="title" class="pre-close-day">
-         <input type="hidden" name="title" class="pre-body">
-         <input type="hidden" name="title" class="pre-img">
-         <input type="hidden" name="title" class="pre-img-link">
-         <input type="hidden" name="title" class="pre-link-title">
-         <input type="hidden" name="title" class="pre-link-url">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-            <b style="color: red;" id="newTitle"></b>
-            <b id="preTitle"></b>
-        </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-      </button>
-  </div>
-  <div class="modal-body">
-    <div class="container-fluid">
-        <div class="row justify-content-end" style="margin-bottom: 10px;">
-            <span class="ju" id="preOpenday"></span>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                <button type="submit" class="btn btn-primary btn-modal-submit">登録</button>
+            </div>
         </div>
-        <div class="row mb-2 justify-content-center" id="img" style="margin-bottom: 10px;">
-            <a target="_blank" rel="noopener noreferrer" id="preImgLink">
-                <img class="image-pre" id="output_image" style="height: 250px; width: 250px;" />
-            </a>
-        </div>
-        <div class="row" style="margin-bottom: 10px;">
-            <p id="preBody"></p>
-        </div>
-        <div class="row">
-            <u>
-               <a target="_blank" rel="noopener noreferrer" id="preLink">
-                <span id="preLinkTitle"></span>
-            </a>
-        </u>
-
     </div>
-</div>
-</div>  
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-    <button type="submit" class="btn btn-primary">登録</button>
-</div>
-            </div>
-        </div>
-    </form>
 </div>
 
 <?php
@@ -216,13 +223,14 @@ if (isset($_SESSION["loginAccount"])) {
 <?php include "../../include/html/foot.inc" ?>
 <script type="text/javascript" src="../../include/topic_functions/topics.js"></script>
 <!-- bs-custom-file-input -->
-<script src="../app/refer/template/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<script src="../refer/template/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 <!-- bs-custom-file-input -->
 <script type="text/javascript">
     $(document).ready(function () {
-      bsCustomFileInput.init();
-  });
+        bsCustomFileInput.init();
+    });
 </script>
 
 </body>
+
 </html>

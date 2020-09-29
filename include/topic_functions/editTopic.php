@@ -3,8 +3,8 @@ if (session_status() == PHP_SESSION_NONE) {
 	session_start();
 }
 
-include_once "../../include/database/db.inc";
-include_once "../../include/template/FlashMessages.php";
+include_once(__DIR__ . "/../database/db.inc");
+include_once("../../app/refer/template/FlashMessages.php");
 
 $conn  = getConnection();
 $msg = new \Plasticbrain\FlashMessages\FlashMessages();
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
 	if(!empty($imgFileNew)){
 		//upload image
-		$target_dir = "../../app/images/topics/";
+		$target_dir = "../../app/refer/images/topics/";
 		$target_file = $target_dir . basename($imgFileNew);
 		$uploadOk = 1;
 		$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -99,20 +99,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
-
-		// Check if $uploadOk is set to 0 by an error
-		if ($uploadOk === 0) {
-			$msg->error('Sorry, your file was not uploaded.');
-			// if everything is ok, try to upload file
-		} else {
-			if (!move_uploaded_file($_FILES["imgFile"]["tmp_name"], $target_file)) {
-				$msg->error('Sorry, there was an error uploading your file.');
-			}
-		}
 	}
 
 	if ($checkOK === 1) {
-		$image =  !empty($imgFileNew) ? $imgFileNew : $imgFileOld;
+		$image = $imgFileOld;
+		
+		if(!empty($imgFileNew)) {
+			$image = $imgFileNew;
+			// Check if $uploadOk is set to 0 by an error
+			if ($uploadOk === 0) {
+				$msg->error('Sorry, your file was not uploaded.');
+				// if everything is ok, try to upload file
+			} else {
+				if (!move_uploaded_file($_FILES["imgFile"]["tmp_name"], $target_file)) {
+					$msg->error('Sorry, there was an error uploading your file.');
+				}
+			}
+		}
 
 		$sql = "UPDATE topics SET title=?, body=?, opday=?, clday=?, image=?, image_link=?, link_title=?, link_url=?, inuser=? WHERE no=?";
 		if($stmt = mysqli_prepare($conn, $sql)){

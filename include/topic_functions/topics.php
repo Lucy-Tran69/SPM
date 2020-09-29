@@ -3,7 +3,7 @@
         session_start();
     }
 
-    include_once "database/db.inc";
+    include_once(__DIR__ . "/../database/db.inc");
 
     $err_msg = "";
     $conn  = getConnection();

@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
 	if (!empty($file)) {
 		//upload image
-		$target_dir = "../../app/images/topics/";
+		$target_dir = "../../app/refer/images/topics/";
 		$target_file = $target_dir . basename($file);
 		$uploadOk = 1;
 		$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -98,6 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
+	}
+	
+	if ($checkOK == 1) {
+		$image = $file;
 
 		// Check if $uploadOk is set to 0 by an error
 		if ($uploadOk == 0) {
@@ -108,10 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 				$msg->error('Sorry, there was an error uploading your file.');
 			}
 		}
-	}
-	
-	if ($checkOK == 1) {
-		$image = $file;
 
 		$stmt = $conn->prepare("INSERT INTO topics(title, body, opday, clday, image, image_link, link_title, link_url, inuser) 
 			VALUES(?,?,?,?,?,?,?,?,?)");

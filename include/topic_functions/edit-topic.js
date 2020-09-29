@@ -61,5 +61,58 @@ $(function () {
             form.submit();
         }
     });
+
+    $('.btn-modal-submit').click(function () {
+        formAddTopic.submit();
+        $("#previewTopic").modal('hide');
+    });
 });
+
+function onBtnclick() {
+    // debugger
+    var preTitle = $("#title").val();
+    var preOpenDay = $(".openDay").val();
+    var preBody = $("#body").val();
+    var preImgLink = $("#imgLink").val();
+    var preLinkTitle = $("#titleLink").val();
+    var preLink = $("#urlImage").val();
+
+    var opday = new Date(preOpenDay);
+    var currentDate = new Date();
+    if (opday.setDate(opday.getDate() + 7) >= currentDate) {
+        $("#newTitle").text("New!");
+    }
+
+    $("#preTitle").text(preTitle);
+    $("#preOpenday").text(preOpenDay);
+    $("#preBody").text(preBody);
+    $("#preImgLink").attr("href", preImgLink);
+    $("#preLinkTitle").text(preLinkTitle);
+    $("#preLink").attr("href", preLink);
+
+    $('.pre-title').val(preTitle);
+    $('.pre-open-day').val(preOpenDay);
+    $('.pre-close-day').val($('.closeDay').val());
+    $('.pre-body').val(preBody);
+    $('.pre-img').val($('#imgFile').val());
+    $('.pre-img-link').val(preImgLink);
+    $('.pre-link-title').val(preLinkTitle);
+    $('.pre-link-url').val(preLink);
+
+    var img = $('#imgFile').val();
+    if (img == '') {
+        $('#img').hide();
+    }
+
+    $("#previewTopic").modal('show');
+}
+
+function preview_image(event) {
+    var reader = new FileReader();
+    reader.onload = function () {
+        var output = document.getElementById('output_image');
+        output.src = reader.result;
+    }
+    reader.readAsDataURL(event.target.files[0]);
+}
 

@@ -11,7 +11,7 @@ $(function () {
         'deferRender': true,
         'serverMethod': 'post',
         'ajax': {
-            'url': '../../include/topics.php'
+            'url': '../../include/topic_functions/topics.php'
         },
         'columns': [
             { data: 'insert_day', "defaultContent": "", "title": '作成日' },
@@ -55,7 +55,7 @@ $(function () {
             'deferRender': true,
             "ajax": {
                 type: 'POST',
-                url: '../../include/topics.php',
+                url: 'topics.php',
                 data: { 'title': title, 'status': status },
             },
             "columns": [
@@ -83,7 +83,7 @@ $(function () {
 
         if (c == true) {
             $(topicTable).DataTable().row(row).remove().draw(false);
-            $.post('../../include/topics.php', { 'topicID': topicID }, function (data) {
+            $.post('../../include/topic_functions/topics.php', { 'topicID': topicID }, function (data) {
                 toastr.success('You have successfully deleted "' + topicTitle + '"');
                 $(topicTable).DataTable().ajax.reload(null, false);
             });
@@ -124,7 +124,8 @@ $(function () {
     //         return inputDate.toISOString().slice(0, 10) === value;
     //     }, 'Please enter a date in the format yyyy-mm-dd.');
 
-    $('#addTopic').validate({
+    var formAddTopic = $('#addTopic');
+    formAddTopic.validate({
         rules: {
             title: {
                 required: true,
@@ -156,6 +157,12 @@ $(function () {
             form.submit();
         }
     });
+
+    $('.btn-modal-submit').click(function () {
+        formAddTopic.submit();
+        $("#previewTopic").modal('hide');
+    });
+
 });
 
 function redirectAddOrEditTopic() {
@@ -164,50 +171,48 @@ function redirectAddOrEditTopic() {
 
 function onBtnclick() {
     // debugger
-        var preTitle = $("#title").val();
-        var preOpenDay = $(".openDay").val();
-        var preBody = $("#body").val();
-        var preImgLink = $("#imgLink").val();
-        var preLinkTitle = $("#titleLink").val();
-        var preLink = $("#urlImage").val();
+    var preTitle = $("#title").val();
+    var preOpenDay = $(".openDay").val();
+    var preBody = $("#body").val();
+    var preImgLink = $("#imgLink").val();
+    var preLinkTitle = $("#titleLink").val();
+    var preLink = $("#urlImage").val();
 
-        var opday = new Date(preOpenDay);
-        var currentDate = new Date();
-        if(opday.setDate(opday.getDate() + 7) >= currentDate){
-            $("#newTitle").text("New!");
-        }
+    var opday = new Date(preOpenDay);
+    var currentDate = new Date();
+    if (opday.setDate(opday.getDate() + 7) >= currentDate) {
+        $("#newTitle").text("New!");
+    }
 
-        $("#preTitle").text(preTitle);
-        $("#preOpenday").text(preOpenDay);
-        $("#preBody").text(preBody);
-        $("#preImgLink").attr("href", preImgLink);
-        $("#preLinkTitle").text(preLinkTitle);
-        $("#preLink").attr("href", preLink);
+    $("#preTitle").text(preTitle);
+    $("#preOpenday").text(preOpenDay);
+    $("#preBody").text(preBody);
+    $("#preImgLink").attr("href", preImgLink);
+    $("#preLinkTitle").text(preLinkTitle);
+    $("#preLink").attr("href", preLink);
 
-        $('.pre-title').val(preTitle);
-        $('.pre-open-day').val(preOpenDay);
-        $('.pre-close-day').val($('.closeDay').val());
-        $('.pre-body').val(preBody);
-        $('.pre-img').val($('#imgFile').val());
-        $('.pre-img-link').val(preImgLink);
-        $('.pre-link-title').val(preLinkTitle);
-        $('.pre-link-url').val(preLink);
+    $('.pre-title').val(preTitle);
+    $('.pre-open-day').val(preOpenDay);
+    $('.pre-close-day').val($('.closeDay').val());
+    $('.pre-body').val(preBody);
+    $('.pre-img').val($('#imgFile').val());
+    $('.pre-img-link').val(preImgLink);
+    $('.pre-link-title').val(preLinkTitle);
+    $('.pre-link-url').val(preLink);
 
-        var img = $('#imgFile').val();
-        if(img == ''){
-            $('#img').hide();
-        }
+    var img = $('#imgFile').val();
+    if (img == '') {
+        $('#img').hide();
+    }
 
-        $("#previewTopic").modal('show');
+    $("#previewTopic").modal('show');
 }
 
-function preview_image(event) 
-{
+function preview_image(event) {
     var reader = new FileReader();
-    reader.onload = function()
-    {
-       var output = document.getElementById('output_image');
-       output.src = reader.result;
-   }
-   reader.readAsDataURL(event.target.files[0]);
+    reader.onload = function () {
+        var output = document.getElementById('output_image');
+        output.src = reader.result;
+    }
+    reader.readAsDataURL(event.target.files[0]);
 }
