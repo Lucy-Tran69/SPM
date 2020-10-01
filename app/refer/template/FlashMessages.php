@@ -2,7 +2,7 @@
 namespace Plasticbrain\FlashMessages;
 
 class FlashMessages {
-
+    
     // Message types and shortcuts
     const INFO    = 'i';
     const SUCCESS = 's';
@@ -68,7 +68,6 @@ class FlashMessages {
      */
     public function __construct() 
     {
-
         // Generate a unique ID for this user and session
         $this->msgId = sha1(uniqid());
 

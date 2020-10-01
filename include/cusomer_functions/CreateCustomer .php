@@ -1,8 +1,4 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) 
-{
-	session_start();
-}
 include_once "../../include/database/db.inc";
 include_once "../../include/template/FlashMessages.php";
 
@@ -106,14 +102,13 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
   		if (mysqli_query($conn, $sql)) {
   			//header("Location: ../../app/customer/customer.html");
   		  	$msg->success("New record created successfully");
-  		  	header("Location: ../../app/customer/customer.html");
-    			exit;
+  		  	// header("Location: ../../app/customer/customer.html");
+    			// exit;
   		    //header('Location:customer.html');
   		} else {
   		  $msg->error(mysqli_error($conn));
   		  $checkOK = 0;
   		}
-  		$conn->close();
   	}
 
   	$msg->display();
@@ -134,6 +129,8 @@ if($userResult==TRUE)
     $userResult=$userStmt->get_result();
     $approveUserResultSet = $userResult;
 }
+
+$conn->close();
 
 function test_input($data) {
   $data = trim($data);

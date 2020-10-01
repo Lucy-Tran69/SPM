@@ -13,10 +13,10 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     $role = $_POST["insertRole"];
     $email = $_POST["insertEmail"];
     $expire = $_POST["insertExpire"];
-    $customer = $_POST["insertCustomer"];
-    $office = $_POST["insertOffice"];
+    $customer = $_POST["insertCustomer"]==""?NULL:$_POST["insertCustomer"];
+    $office = $_POST["insertOffice"]==""?NULL:$_POST["insertOffice"];
     $invalid = $_POST["insertInvalid"]==null? 0:1;
-    $password = password_hash($_POST["inputPass"],PASSWORD_DEFAULT);
+    $password = password_hash($_POST["insertPass"],PASSWORD_DEFAULT);
     $start = date('Y-m-d');
     $insert_user = $_SESSION["loginUserId"];
 }
@@ -30,6 +30,7 @@ if ($conn->connect_error)
 $stmt = $conn->prepare("insert into users(name,account,role,email,effective_en_day,customer,office,invalid,password,effective_st_day,inuser) 
                         values(?,?,?,?,?,?,?,?,?,?,?)");
 $stmt->bind_param('ssissiiissi',$name,$account,$role,$email,$expire,$customer,$office,$invalid,$password,$start,$insert_user);
+
 
 $result = execute($stmt,$conn);
 if($result)

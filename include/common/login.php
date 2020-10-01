@@ -1,10 +1,12 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) 
-{
-    session_start();
-}
+// if (session_status() == PHP_SESSION_NONE) 
+// {
+//     session_start();
+// }
 header("content-type: text/html; charset=UTF-8"); 
 include "database/db.inc";
+include_once "const/system.inc";
+include_once "common/session.php"; 
 $err_msg = "";
 $conn  = getConnection();
 if($conn->connect_error)
@@ -19,8 +21,8 @@ $stmt = $conn->prepare("select users.no as uID,
                         users.effective_en_day,
                         users.name,
                         users.role,
-                        customer.invalid as cInvalid 
-                        FROM users inner join customer on users.customer=customer.no 
+                        COALESCE(customer.invalid,0) as cInvalid 
+                        FROM users left join customer on users.customer=customer.no 
                         WHERE account=? AND users.invalid=0");
 
 try
@@ -64,6 +66,7 @@ try
                                 $_SESSION["loginAccount"] = $row["name"];
                                 $_SESSION["loginUserId"] = $row["uID"];
                                 $_SESSION["loginRole"]=$row["role"];
+                                $_SESSION[AUTH]=$row["uID"];
                                 setMenu($row['uID'],$conn);
                                 // header("Location: ../app/login/home.html");
                             }

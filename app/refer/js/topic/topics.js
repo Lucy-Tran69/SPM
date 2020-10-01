@@ -5,11 +5,18 @@ $(function () {
         'serverSide': true,
         'searching': false,
         'ordering': false,
-        'info': true,
+        'info': false,
         'autoWidth': false,
         'responsive': true,
         'deferRender': true,
+        "lengthChange": false,
         'serverMethod': 'post',
+        'language': {
+            "paginate": {
+              "previous": "前へ",
+              "next" : "次へ"
+            }
+        },
         'ajax': {
             'url': '../../include/topic_functions/topics.php'
         },
@@ -53,9 +60,15 @@ $(function () {
             'autoWidth': false,
             'responsive': true,
             'deferRender': true,
+            'language': {
+                "paginate": {
+                  "previous": "前へ",
+                  "next" : "次へ"
+                }
+            },
             "ajax": {
                 type: 'POST',
-                url: 'topics.php',
+                url: '../../include/topic_functions/topics.php',
                 data: { 'title': title, 'status': status },
             },
             "columns": [
@@ -66,7 +79,7 @@ $(function () {
                 {
                     data: "no",
                     render: function (data, type, row) {
-                        return '<div class="row justify-content-center"><a href=edit-topic.html?id="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
+                        return '<div class="row justify-content-center"><a href=edit-topic.html?id=' + data + ' class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
                     }
                 },
             ],
@@ -84,7 +97,9 @@ $(function () {
         if (c == true) {
             $(topicTable).DataTable().row(row).remove().draw(false);
             $.post('../../include/topic_functions/topics.php', { 'topicID': topicID }, function (data) {
-                toastr.success('You have successfully deleted "' + topicTitle + '"');
+                // toastr.success('"' + topicTitle + '"トピックスの削除に成功しました。');
+                $("#messageDelete").text('"' + topicTitle + '"トピックスの削除に成功しました。');
+                $('#deleteSuccess').show();
                 $(topicTable).DataTable().ajax.reload(null, false);
             });
         }
@@ -95,13 +110,13 @@ $(function () {
         useCurrent: false,
         date: date,
         minDate: date,
-        format: 'YYYY-MM-DD HH:mm:ss'
+        format: 'YYYY/MM/DD'
     });
 
     $('#closeDay').datetimepicker({
         useCurrent: false,
         minDate: date,
-        format: 'YYYY-MM-DD HH:mm:ss'
+        format: 'YYYY/MM/DD'
     });
 
     $("#openDay").on("change.datetimepicker", function (e) {
@@ -166,11 +181,10 @@ $(function () {
 });
 
 function redirectAddOrEditTopic() {
-    window.location.href = "../../app/topic/add-topic.html";
+    window.location.href = "add-topic.html";
 }
 
 function onBtnclick() {
-    // debugger
     var preTitle = $("#title").val();
     var preOpenDay = $(".openDay").val();
     var preBody = $("#body").val();
@@ -183,26 +197,32 @@ function onBtnclick() {
     if (opday.setDate(opday.getDate() + 7) >= currentDate) {
         $("#newTitle").text("New!");
     }
+    preBody = preBody.replace(/\n/g, '<br>');
 
     $("#preTitle").text(preTitle);
     $("#preOpenday").text(preOpenDay);
-    $("#preBody").text(preBody);
+    $("#preBody").empty();
+    $("#preBody").append(preBody);
     $("#preImgLink").attr("href", preImgLink);
     $("#preLinkTitle").text(preLinkTitle);
     $("#preLink").attr("href", preLink);
 
-    $('.pre-title').val(preTitle);
-    $('.pre-open-day').val(preOpenDay);
-    $('.pre-close-day').val($('.closeDay').val());
-    $('.pre-body').val(preBody);
-    $('.pre-img').val($('#imgFile').val());
-    $('.pre-img-link').val(preImgLink);
-    $('.pre-link-title').val(preLinkTitle);
-    $('.pre-link-url').val(preLink);
-
     var img = $('#imgFile').val();
     if (img == '') {
         $('#img').hide();
+    }
+
+    if(preLinkTitle == ''){
+        $('#bothTitle').hide();
+        $("#preELink").attr("href", preLink);
+        $("#preELink").text(preLink);
+        $('#exceptTitle').show();
+    }
+    else {
+        $('#exceptTitle').hide();
+        $("#preBLinkTitle").text(preLinkTitle);
+        $("#preBLink").attr("href", preLink);
+        $('#bothTitle').show();
     }
 
     $("#previewTopic").modal('show');
@@ -215,4 +235,8 @@ function preview_image(event) {
         output.src = reader.result;
     }
     reader.readAsDataURL(event.target.files[0]);
+}
+
+function redirectListTopic() {
+    window.location.href = "index.html";
 }

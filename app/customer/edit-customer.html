@@ -1,14 +1,11 @@
 <?php
-include "../../include/common/check_view_permission.php";
-$url = "customer";
-check_view_permission($url);
-header("content-type: text/html; charset=UTF-8");
+    include "../../include/common/check_view_permission.php";
+    $url = "customer";
+    check_view_permission($url);
+    include "../../include/html/header.inc";
+    include "../../include/html/menu.inc";
+    include "../../include/cusomer_functions/editCustomer.php";
 ?>
-<?php include "../../include/html/header.inc" ?>
-<?php include "../../include/html/menu.inc" ?>
-<?php include "getItem.php" ?>
-
-
 <style type="text/css" media="all">
     .custom-file-label::after {
         content: none;
@@ -27,73 +24,90 @@ header("content-type: text/html; charset=UTF-8");
     color:red;
     }
 </style>
+
 <?php
 if (isset($_SESSION["loginAccount"])) {
+    if(isset($_GET["id"]) && !empty(trim($_GET["id"])) && is_numeric($_GET['id'])){
+        include_once "../../include/database/db.inc";
 
+        $conn  = getConnection();
+
+        if($conn->connect_error) {
+            die("Failed to connect to database. ".$conn->connect_error);
+        }        
+
+        $id = $_GET['id'];
+        $sql = "SELECT no, cd, name, tel, zip, address, charge, sales, supervisor, invalid FROM customer WHERE no='$id'";
+        $getCustomer = mysqli_query($conn, $sql);
+        //print_r($getCustomer); die();
+        if(mysqli_num_rows($getCustomer) > 0){
+            $row = mysqli_fetch_assoc($getCustomer); 
+            // print_r($row);die();
 ?>
-    <section class="content">
+<section class="content">
         <div class="container-fluid">
             <div class="row">
                 <!-- left column -->
+
                 <div class="col-md-12">
                     <!-- jquery validation -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">取引先追加</h3>
+                            <h3 class="card-title">取引先編集</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form action="CreateCustomer.php" role="form" id="addCustomer" method="POST" novalidate="novalidate" enctype = "multipart/form-data">
+                        <form action="#" role="form" id="editCustomer" method="POST" novalidate="novalidate" enctype = "multipart/form-data">
                             <div class="card-body center">
+                                <input type="hidden" name="id" id="id" value="<?php echo $row['no']; ?>">
                                 <div class="form-group row">
                                     <label for="cd" class="col-md-2 col-sm-3 col-form-label-sm text-right required">取引先コード</label>
                                     <div class="col-md-6 col-sm-8">
-                                        <input type="text" name="cd" class="form-control" id="cd" placeholder="取引先コード">
+                                        <input type="text" name="cd" class="form-control" id="cd" placeholder="取引先コード" value="<?php echo $row['cd']; ?>">
                                     </div>    
                                 </div>
                                 <div class="form-group row">
                                     <label for="name" class="col-md-2 col-sm-3 col-form-label-sm text-right required">取引先名</label>
                                     <div class="col-md-6 col-sm-8">
-                                        <input type="text" name="name" class="form-control " id="name" placeholder="取引先名">
+                                        <input type="text" name="name" class="form-control " id="name" placeholder="取引先名" value="<?php echo $row['name']; ?>">
                                     </div>
                                     
                                 </div>
                                 <div class="form-group row">
                                     <label for="tel" class="col-md-2 col-sm-3 col-form-label-sm text-right required">TEL</label>
                                     <div class="col-md-6 col-sm-8">
-                                        <input type="text" name="tel" class="form-control" id="tel" placeholder="TEL">
+                                        <input type="text" name="tel" class="form-control" id="tel" placeholder="TEL" value="<?php echo $row['tel']; ?>">
                                     </div>
                                     
                                 </div>
                                 <div class="form-group row">
                                     <label for="zip" class="col-md-2 col-sm-3 col-form-label-sm text-right required">郵便番号</label>
                                     <div class="col-md-6 col-sm-8">
-                                        <input type="text" name="zip" class="form-control" id="zip" placeholder="郵便番号">
+                                        <input type="text" name="zip" class="form-control" id="zip" placeholder="郵便番号" value="<?php echo $row['zip']; ?>">
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="address" class="col-md-2 col-sm-3 col-form-label-sm text-right required">住所</label>
                                     <div class="col-md-6 col-sm-8">
-                                        <textarea type="text" name="address" class="form-control" rows="2" id="address" placeholder="住所"></textarea>
+                                        <textarea type="text" name="address" class="form-control" rows="2" id="address" placeholder="住所"><?php echo $row['address']; ?></textarea>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="charge" class="col-md-2 col-sm-3 col-form-label-sm text-right required">担当者名</label>
                                     <div class="col-md-6 col-sm-8">
-                                        <textarea type="text" name="charge" class="form-control" rows="2" id="charge" placeholder="担当者名"></textarea>
+                                        <textarea type="text" name="charge" class="form-control" rows="2" id="charge" placeholder="担当者名"><?php echo $row['charge']; ?></textarea>
                                     </div>                                 
                                 </div>
                                 <div class="form-group row">
                                     <label for="sale" class="col-md-2 col-sm-3 col-form-label-sm text-right required">営業担当</label>
                                     <div class="col-md-6 col-sm-8">
                                         <td><select id="sale" name="sale" class="form-control">
-                                             <option value=""></option>
                                         <?php
                                         if ($saleUserResultSet->num_rows > 0) {
                                           mysqli_data_seek($saleUserResultSet,0);
-                                          while ($row = $saleUserResultSet->fetch_assoc()) {
+                                          while ($row1 = $saleUserResultSet->fetch_assoc()) {
                                         ?>
-                                            <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?></option>
+                                            <option value="<?php echo $row1['no']; ?>" <?php if ($row['sales'] == $row1['no']) {echo 'selected';} ?>><?php echo $row1['name']; ?></option>
                                         <?php
                                           }
                                         }
@@ -106,13 +120,12 @@ if (isset($_SESSION["loginAccount"])) {
                                     <label for="supervisor" class="col-md-2 col-sm-3 col-form-label-sm text-right required">承認者</label>
                                     <div class="col-md-6 col-sm-8">
                                         <td><select id="supervisor" name="supervisor" class="form-control">
-                                            <option value=""></option>
                                         <?php
                                         if ($approveUserResultSet->num_rows > 0) {
                                           mysqli_data_seek($approveUserResultSet,0);
-                                          while ($row = $approveUserResultSet->fetch_assoc()) {
+                                          while ($row1 = $approveUserResultSet->fetch_assoc()) {
                                         ?>
-                                            <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?></option>
+                                            <option value="<?php echo $row1['no']; ?>" <?php if ($row['supervisor'] == $row1['no']) {echo 'selected';} ?>><?php echo $row1['name']; ?></option>
                                         <?php
                                           }
                                         }
@@ -126,7 +139,7 @@ if (isset($_SESSION["loginAccount"])) {
                                         <label id="invalidLabel" class="label_align_table ">停止</label>
                                     </div>
                                     <div class="col-md-2 col-sm-8 text-left">
-                                        <input type="checkbox" id="invalid" name="invalid"/>
+                                        <input type="checkbox" id="invalid" name="invalid" <?php if ($row['invalid'] == 1) {echo 'checked';} ?>>
                                     </div> 
                                 </div>
                                 <div class="form-group row">
@@ -134,10 +147,6 @@ if (isset($_SESSION["loginAccount"])) {
                                     <div class="col-md-6 col-sm-8 mx-auto">
                                         <button type="submit" class="btn btn-primary mr-2">登録</button>
                                         <button type="button" class="btn btn-primary mr-2" onclick="redirectCustomerList()">Back</button>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-md-6 col-sm-8">
                                     </div>
                                 </div>
                             </div>
@@ -162,25 +171,35 @@ if (isset($_SESSION["loginAccount"])) {
         </div><!-- /.container-fluid -->
     </section>
 <?php
+    }else{
+        // set header response code
+        http_response_code(404);
+        echo "<h1>404 Page Not Found!</h1>";
+    }
+
+    }else{
+    // set header response code
+    http_response_code(404);
+    echo "<h1>404 Page Not Found!</h1>";
+    }
 } else {
     //header("Location: ../../include/logout.php");
 }
+
+include "../../include/html/foot.inc"
 ?>
-<?php include "../../include/html/foot.inc" ?>
 
 <!-- bs-custom-file-input -->
 <script src="../../include/template/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
-
 <!-- bs-custom-file-input -->
 <script type="text/javascript">
     $(document).ready(function () {
-      // bsCustomFileInput.init();
+      bsCustomFileInput.init();
      // validate From
-         $("#addCustomer").validate({
+         $("#editCustomer").validate({
             rules: {
                 cd: { required: true,
-                      checkAlphabetAndNumber : true
-       
+                      checkAlphabetAndNumber : true,
                     },
                 name: { required: true
                     },
@@ -201,26 +220,28 @@ if (isset($_SESSION["loginAccount"])) {
             },
             messages: {
                 cd: {
-                    required: "取引先コードを入力してください。",
-                    checkAlphabetAndNumber: "数字・文字のみ（特殊文字を含めない）を入力してください。",
+                    required: "Please enter Code Customer.",
+                    checkAlphabetAndNumber: "Please enter charecter haftSize.",
                 },
-                name: "取引先名を入力してください。",
+                name: "Please enter Name Customer.",
                 tel: {
-                    required: "電話番号を入力してください。",
-                    checkNumber: "数字のみ（特殊文字を含めない）入力してください。"
+                    required: "Please enter Telephone.",
+                    checkNumber: "Please enter number."
                 },
                 zip: {
-                    required: "郵便番号を入力してください。",
-                    checkNumber: "数字のみ（特殊文字を含めない）入力してください。"
+                    required: "Please enter Zip.",
+                    checkNumber: "Please enter number."
                 },
-                address: "住所を入力してください。",
-                charge: "担当者名を入力してください。",
-                sale: "営業担当を選択してください。",
-                supervisor: "承認者を選択してください。",
+                sale: {
+                    required: "Please enter Zip."
+                },
+                address: "Please enter Address.",
+                charge: "Please enter Charge.",
+                sale: "Please enter Sale.",
+                supervisor: "Please enter Supervisor.",
             }
         });
     });
-
     // checkAlphabetAndNumber haftsize
     jQuery.validator.addMethod("checkAlphabetAndNumber", function (str) {
             if (str) {
@@ -238,14 +259,11 @@ if (isset($_SESSION["loginAccount"])) {
             }
         });
 
-    
-
-    
-
-    function redirectCustomerList() {
+     function redirectCustomerList() {
        window.location.href = "../../app/customer/index.html";
     }
 </script>
 
 </body>
+
 </html>

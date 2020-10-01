@@ -4,6 +4,7 @@ if (session_status() == PHP_SESSION_NONE)
     session_start();
 }
 include_once "database/db.inc";
+$invalid = isset($_POST["searchInvalid"])?$_POST["searchInvalid"]:null;
 $err_msg = "";
 $conn  = getConnection();
 if($conn->connect_error)
@@ -11,7 +12,15 @@ if($conn->connect_error)
     die("Failed to connect to database. ".$conn->connect_error);
 }
 
-$stmt = $conn->prepare("select no,name,invalid from maker");
+$stmt;
+if($invalid==null)
+{
+    $stmt = $conn->prepare("select no,name,invalid from maker where invalid=0");
+}
+else
+{
+    $stmt = $conn->prepare("select no,name,invalid from maker");
+}
 $result = execute($stmt,$conn);
 if($result==TRUE)
 {

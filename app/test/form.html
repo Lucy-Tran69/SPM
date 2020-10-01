@@ -1,0 +1,74 @@
+
+<?php  include_once "html/header.inc"; ?>
+<?php  include_once "html/menu.inc"; ?>
+
+<div class="row justify-content-center">
+    <div class="">
+        <div id="d-message">
+
+        </div>
+        <!-- general form elements -->
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Quick Example</h3>
+            </div>
+            <!-- /.card-header -->
+            
+            <!-- form start -->
+            <form role="form" action="" method="post" id="formid">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input id="email" name="email" type="text" class="form-control" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="pass">Password</label>
+                        <input name="pass"  type="password" class="form-control" id="pass" placeholder="Password">
+                    </div>
+                    
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+
+<?php  include_once "html/foot.inc"; ?>
+
+<script>
+    $( "#formid" ).submit(function( event ) {
+
+        $.ajax({
+            url: "action.php",
+            type: "POST",
+            dataType: "html",
+            data: {
+                email: $("#email").val(),
+                pass:$("#pass").val()
+            },
+            success: function(response)  {
+                $("#d-message").empty();
+                $("#d-message").html(response);
+            },
+            error: function(jqXHR, textStatus, errorThrown)  {
+                alert( "error" );
+
+            }
+        });
+        event.preventDefault();
+    });
+
+</script>
+
+</body>
+</html>

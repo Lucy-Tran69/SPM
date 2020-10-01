@@ -1,23 +1,23 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) 
-{
+if (session_status() == PHP_SESSION_NONE) {
 	session_start();
 }
+
 include_once "../../include/database/db.inc";
 include_once "../../include/template/FlashMessages.php";
 
-$err_msg = "";
 $conn  = getConnection();
 $msg = new \Plasticbrain\FlashMessages\FlashMessages();
 
-if($conn->connect_error) {
-	die("Failed to connect to database. ".$conn->connect_error);
+if ($conn->connect_error) {
+	die("Failed to connect to database. " . $conn->connect_error);
 }
 
-if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
-{
-    $insert_user = $_SESSION["loginUserId"];
-   	$cd = $_POST["cd"];
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
+	$insert_user = $_SESSION["loginUserId"];
+    $upday = date('Y-m-d H:i:s');
+	$id = $_POST["id"];
+	$cd = $_POST["cd"];
    	$checkOK = 1;
    	//echo $cd;
    	if (empty($cd)) {
@@ -95,28 +95,26 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 
   	$invalid = isset($_POST["invalid"]) ? 1 : 0;
 
-  	//echo $invalid;
-  	//print_r($checkOK);die();
-
   	if ($checkOK == 1) {
-  		//save db
-  		$sql = "insert into customer (cd, name, tel, zip, address, charge, sales, supervisor, invalid, inuser)
-                values ('$cd','$name','$tel','$zip','$address','$charge',$sale,$supervisor,$invalid, $insert_user)";
-								//print_r($sql);die();
-  		if (mysqli_query($conn, $sql)) {
-  			//header("Location: ../../app/customer/customer.html");
-  		  	$msg->success("New record created successfully");
-  		  	header("Location: ../../app/customer/customer.html");
-    			exit;
-  		    //header('Location:customer.html');
-  		} else {
-  		  $msg->error(mysqli_error($conn));
-  		  $checkOK = 0;
-  		}
-  		$conn->close();
-  	}
+	    $sql = "update customer set cd = '$cd', name = '$name', tel = '$tel', zip = '$zip', address = '$address', charge = '$charge', sales = $sale, supervisor = $supervisor, invalid= $invalid, 
+	    			upday =  '$upday' , upuser = $insert_user 
+	      			where no = $id";
+	                // print_r($sql);die();
+	    if (mysqli_query($conn, $sql)) {
+	      //header("Location: ../../app/customer/customer.html");
+	        $msg->success("Update record successfully");
+	        // header("Location: ../../app/customer/customer.html");
+	        // exit;
+	        //header('Location:customer.html');
+	    } else {
+	      $msg->error(mysqli_error($conn));
+	      $checkOK = 0;
+	    }
+	    // }
 
-  	$msg->display();
+  	}
+   $msg->display();
+	
 }
 
 $userStmt = $conn->prepare("select no,name from users where invalid=0 and role = 3 order by name ");
@@ -135,10 +133,11 @@ if($userResult==TRUE)
     $approveUserResultSet = $userResult;
 }
 
+$conn->close();
+
 function test_input($data) {
   $data = trim($data);
   $data = stripslashes($data);
   $data = htmlspecialchars($data);
   return $data;
 }
-?>

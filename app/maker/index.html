@@ -1,6 +1,5 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) 
-{
+if (session_status() == PHP_SESSION_NONE) {
   session_start();
 }
 include "common/check_view_permission.php";
@@ -10,19 +9,20 @@ header("content-type: text/html; charset=UTF-8");
 //Get array of roles from session variable 
 ?>
 <style>
-.update_button{
-  width:50%;
-}
+  .update_button {
+    width: 50%;
+  }
 
-.align_button{
-  text-align: center;
-}
+  .align_button {
+    text-align: center;
+  }
 
-.align_form{
-  text-align:-webkit-center;
-}
+  .align_form {
+    text-align: -webkit-center;
+  }
 </style>
 <?php include "html/sidebar.inc" ?>
+<?php include "html/alerts.inc" ?>
 <?php include "maker_functions/maker.php" ?>
 <!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
 <?php
@@ -41,23 +41,23 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form">
+                <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
                   <div class="form-group">
-                  <div class="row">
-                    <div class="col-xs-5">
-                    <div class="form-group">
                     <div class="row">
-                    <div class="col-xs-5">
-                    <div class="form-check">
-                    <div style="margin-left: 25px;" >
-                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="0"/>
-                    <label id="checkLabel" class="form-check-label">無効を含む</label>
-                    </div>
-                    </div>
-                    </div>
-                    </div>
-                    </div>
-              </form>
+                      <div class="col-xs-5">
+                        <div class="form-group">
+                          <div class="row">
+                            <div class="col-xs-5">
+                              <div class="form-check">
+                                <div style="margin-left: 25px;">
+                                  <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?> />
+                                  <label id="checkLabel" class="form-check-label">無効を含む</label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                </form>
               </div>
               <table id="details_table" class="table table-bordered">
                 <thead>
@@ -73,39 +73,36 @@ if (isset($_SESSION["loginAccount"])) {
                   if ($resultSet->num_rows > 0) {
                     while ($row = $resultSet->fetch_assoc()) {
                   ?>
-                      <tr style="display: <?php echo $row["invalid"]==0?"":"none;"?>">
+                      <tr>
                         <td><?php echo $row["no"] ?></td>
-                        <td><input type="text" id="<?php echo $row["no"]."Name" ?>" value="<?php echo $row["name"] ?>" class="form-control"></td>
-                        <td><?php 
-                        if($row["invalid"]==0)
-                        {
+                        <td><input type="text" id="<?php echo $row["no"] . "Name" ?>" value="<?php echo $row["name"] ?>" class="form-control"></td>
+                        <td><?php
+                            if ($row["invalid"] == 0) {
+                            ?>
+                            <input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" name="" value="無効" onclick="invalidate(this.id);">
+                          <?php
+                            } else {
                           ?>
-                          <input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" name="" value="無効" onclick="invalidate(this.id);">
-                        <?php
-                        }
-                        else
-                        {
-                        ?>
-                          <input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" name="" value="有効" onclick="validate(this.id);">
-                        <?php
-                        }
-                        ?>
+                            <input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" name="" value="有効" onclick="validate(this.id);">
+                          <?php
+                            }
+                          ?>
                         </td>
                         <td class="align_button"><input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" name="" value="変更" onclick="updateMaker(this.id);"></td>
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
                       </tr>
-                      <?php
+                  <?php
                     }
                   }
                   // $resultStmt->free_result();
                   // freeConnection($conn);
                   ?>
-                      <tr>
-                        <td></td>
-                        <td><input type="text" name="newMakerName" id="newMakerName" value="" class="form-control"></td>
-                        <td></td>
-                        <td class="align_button"><input class="btn btn-primary update_button" type="button" id="addNewMaker" value="追加" onclick="addNew();"></td>
-                      </tr>
+                  <tr>
+                    <td></td>
+                    <td><input type="text" name="newMakerName" id="newMakerName" value="" class="form-control"></td>
+                    <td></td>
+                    <td class="align_button"><input class="btn btn-primary update_button" type="button" id="addNewMaker" value="追加" onclick="addNew();"></td>
+                  </tr>
 
                 </tbody>
               </table>
@@ -119,6 +116,7 @@ if (isset($_SESSION["loginAccount"])) {
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
+
   </body>
   <?php include "html/footer.inc" ?>
 
@@ -130,111 +128,140 @@ if (isset($_SESSION["loginAccount"])) {
 ?>
 
 <script>
-
-function updateMaker(id)
-{
-  var newName = document.getElementById(id+"Name").value;
-  $.ajax({
-      url: "../../include/maker_functions/updateMaker.php",
-      type: "POST",
-      dataType: "text",
-      data: {
-        inputId: id,
-        inputName : newName
-      },
-      success: function(response) {
-        alert("Details updated");
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.log(textStatus, errorThrown);
-      }
-    });
-}
-
-function addNew()
-{
-  var newName = document.getElementById("newMakerName").value;
-  $.ajax({
-      url: "../../include/maker_functions/addMaker.php",
-      type: "POST",
-      dataType: "text",
-      data: {
-        inputName : newName
-      },
-      success: function(response) {
-        alert("New maker added");
-        window.location.reload();
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.log(textStatus, errorThrown);
-      }
-    });
-}
-
-function invalidate(id)
-{
-  var newName = document.getElementById(id+"Name").value;
-  $.ajax({
-      url: "../../include/maker_functions/invalidate.php",
-      type: "POST",
-      dataType: "text",
-      data: {
-        inputId : id
-      },
-      success: function(response) {
-        alert("Set as invalid");
-        window.location.reload();
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.log(textStatus, errorThrown);
-      }
-    });
-}
-
-function validate(id)
-{
-  var newName = document.getElementById(id+"Name").value;
-  $.ajax({
-      url: "../../include/maker_functions/validate.php",
-      type: "POST",
-      dataType: "text",
-      data: {
-        inputId : id
-      },
-      success: function(response) {
-        alert("Set as valid");
-        window.location.reload();
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.log(textStatus, errorThrown);
-      }
-    });
-}
-function searchTableByInvalid() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("searchInvalid").checked;
-  filter = input;
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
-
-  // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[4];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue==1) 
-      {
-        if(filter==true)
-        {
-          tr[i].style.display = "";
+  function updateMaker(id) {
+    var newName = document.getElementById(id + "Name").value;
+    if (newName != "" && newName != null) {
+      $.ajax({
+        url: "../../include/maker_functions/updateMaker.php",
+        type: "POST",
+        dataType: "json",
+        data: {
+          inputId: id,
+          inputName: newName
+        },
+        success: function(response) {
+          if (response.status == "OK") {
+            $("#alertSuccessText").text(response.message);
+            $("#alertSuccess").modal('toggle');
+          } else {
+            $("#alertFailText").text(response.message);
+            $("#alertFail").modal('toggle');
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus, errorThrown);
         }
-        else
-        {
-          tr[i].style.display = "none";
-        }
-      }
+      });
+    } else {
+      $("#alertFailText").text("Name cannot be blank");
+      $("#alertFail").modal('toggle');
     }
   }
-}
+
+  function addNew() {
+    var newName = document.getElementById("newMakerName").value;
+    if (newName != "" && newName != null) {
+      $.ajax({
+        url: "../../include/maker_functions/addMaker.php",
+        type: "POST",
+        dataType: "json",
+        data: {
+          inputName: newName
+        },
+        success: function(response) {
+          if (response.status == "OK") {
+            $("#alertSuccessText").text(response.message);
+            $("#alertSuccess").modal('toggle');
+          } else {
+            $("#alertFailText").text(response.message);
+            $("#alertFail").modal('toggle');
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus, errorThrown);
+        }
+      });
+    } else {
+      $("#alertFailText").text("Name cannot be blank");
+      $("#alertFail").modal('toggle');
+    }
+  }
+
+  function invalidate(id) {
+    var newName = document.getElementById(id + "Name").value;
+    $.ajax({
+      url: "../../include/maker_functions/invalidate.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        inputId: id
+      },
+      success: function(response) {
+        if (response.status == "OK") {
+          $("#alertSuccessText").text(response.message);
+          $("#alertSuccess").modal('toggle');
+        } else {
+          $("#alertFailText").text(response.message);
+          $("#alertFail").modal('toggle');
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+      }
+    });
+  }
+
+  function validate(id) {
+    var newName = document.getElementById(id + "Name").value;
+    $.ajax({
+      url: "../../include/maker_functions/validate.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        inputId: id
+      },
+      success: function(response) {
+        if (response.status == "OK") {
+          $("#alertSuccessText").text(response.message);
+          $("#alertSuccess").modal('toggle');
+        } else {
+          $("#alertFailText").text(response.message);
+          $("#alertFail").modal('toggle');
+        }
+
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+      }
+    });
+  }
+
+  function searchTableByInvalid() {
+    // Declare variables
+    // var input, filter, table, tr, td, i, txtValue;
+    // input = document.getElementById("searchInvalid").checked;
+    // filter = input;
+    // table = document.getElementById("details_table");
+    // tr = table.getElementsByTagName("tr");
+
+    // // Loop through all table rows, and hide those who don't match the search query
+    //   for (i = 0; i < tr.length; i++) {
+    //   td = tr[i].getElementsByTagName("td")[4];
+    //   if (td) {
+    //     txtValue = td.textContent || td.innerText;
+    //     if (txtValue==1) 
+    //     {
+    //       if(filter==true)
+    //       {
+    //         tr[i].style.display = "";
+    //       }
+    //       else
+    //       {
+    //         tr[i].style.display = "none";
+    //       }
+    //     }
+    //   }
+    // }
+    document.getElementById('searchForm').submit();
+  }
 </script>

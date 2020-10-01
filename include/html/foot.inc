@@ -8,7 +8,7 @@
 
 
 <footer class="main-footer">
-<strong>Copyright &copy; 2014-2019 <a href="#">NCI</a>.</strong>
+<strong>Copyright &copy; <a href="#">NCI</a>.</strong>
 All rights reserved.
 <div class="float-right d-none d-sm-inline-block">
   <!-- <b>Version</b> 3.0.5 -->
@@ -62,4 +62,9 @@ $.widget.bridge('uibutton', $.ui.button)
 <!-- jquery-validation -->
 <script src="../refer/template/plugins/jquery-validation/jquery.validate.min.js"></script>
 <script src="../refer/template/plugins/jquery-validation/additional-methods.min.js"></script>
-
+<script src="../refer/js/nci.js"></script>
+<script>
+  $("#logout-button").click(function(){
+    $("#logout-form").submit();
+  });
+</script>

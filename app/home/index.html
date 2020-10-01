@@ -1,9 +1,4 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) 
-{
-    session_start();
-}
-header("content-type: text/html; charset=UTF-8"); 
 //Get array of roles from session variable 
 ?>
 <?php include "html/sidebar.inc"?>
@@ -28,7 +23,7 @@ header("content-type: text/html; charset=UTF-8");
 }
 else
 {
-    header("Location: ../../include/logout.php");
+    header("Location: ../../include/common/logout.php");
 }
 ?>
 

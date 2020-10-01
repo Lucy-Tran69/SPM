@@ -1,9 +1,5 @@
 <?php
 include "hader.inc";
-if(session_status()==PHP_SESSION_NONE && isset($_SESSION['roles']) && isset($_SESSION['username']))
-{
-    session_start();
-}
 $menu = $_SESSION['roles'];
 ?>
 <style>

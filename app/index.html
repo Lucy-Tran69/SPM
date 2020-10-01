@@ -1,11 +1,20 @@
 <?php
-if (session_status() == PHP_SESSION_NONE || session_status() == PHP_SESSION_DISABLED) 
-{
+include_once "common/session.php";
+
+if (!isset($_SESSION[AUTH])) {
   header("Location: ../app/login/");
 }
-else
-{
+else {
   header("Location: ../app/home/");
 }
+
+// if (session_status() == PHP_SESSION_NONE || session_status() == PHP_SESSION_DISABLED) 
+// {
+//   header("Location: ../app/login/");
+// }
+// else
+// {
+//   header("Location: ../app/home/");
+// }
 
 ?>

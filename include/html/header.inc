@@ -1,4 +1,5 @@
-<!-- <?php  include_once "common/authentication.php"; ?> -->
+<?php  include_once "common/session.php"; ?>
+<?php  include_once "common/authentication.php"; ?>
 
 <!DOCTYPE html>
 <html>
@@ -32,4 +33,7 @@
     <link rel="stylesheet" href="../refer/template/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
     <!-- Toastr -->
     <link rel="stylesheet" type="text/css" href="../refer/template/plugins/toastr/toastr.min.css" />
+
+    <!-- Common css -->
+    <link rel="stylesheet" type="text/css" href="../refer/css/nci_style.css" />
 </head>

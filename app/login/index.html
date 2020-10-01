@@ -1,26 +1,26 @@
 <?php
+include "html/hader.inc";
 include "common/login.php";
 ?>
 
 <!-- <link rel="stylesheet" type="text/css" href="../include/css/styles.css"/> -->
-<?php include "html/hader.inc";?> 
 <title>Login</title>
 <body class="hold-transition login-page">
-<div class="login-box" style="margin-top:8%;">
+<div class="login-box" >
 <div class="login-logo">
     <a><b>ログイン</b></a>
   </div>
   <!-- /.login-logo -->
   <div class="card">
     <div class="card-body login-card-body">
-      <p class="login-box-msg">アカウントとパスワードを入力してください</p>
+      <p class="login-box-msg"></p>
 
       <form action="../../include/common/login.php" method="post" id="login_form">
         <div class="input-group mb-3">
         <input type="text" id="username" name="username" class="form-control" placeholder="アカウント">
           <div class="input-group-append">
             <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
+              <span class="fas fa-user"></span>
             </div>
           </div>
         </div>
@@ -87,12 +87,14 @@ function validate()
         }
         else
         {
-          window.location.href="../home/";
+          window.location.href="../home/index.html";
         }
       },
       error: function(jqXHR, textStatus, errorThrown) 
       {
         console.log(textStatus, errorThrown);
+        console.warn(jqXHR.responseText);
+        loginAlert("Error");
       }
     });
 

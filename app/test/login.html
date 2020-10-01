@@ -1,3 +1,6 @@
+<?php  include_once "common/session.php"; ?>
+<?php  include_once "common/authentication.php"; ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,18 +22,26 @@
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 </head>
 <body class="hold-transition login-page">
-<div class="login-box">
+<div style="width: 500px;" class="login-box" >
   <div class="login-logo">
     <b>NCI システム</b>
   </div>
   <!-- /.login-logo -->
   <div class="card">
     <div class="card-body login-card-body">
-      <!-- <p class="login-box-msg">Sign in to start your session</p> -->
+      <p class="login-box-msg"></p>
 
-      <form action="test.html" method="post">
+      <?php if (isset($_SESSION["er_msg"])) { ?>
+
+      <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <?php echo $_SESSION["er_msg"] ?>  
+      </div>
+      <?php } ?>
+
+      <form action="dologin.php" method="post">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" placeholder="ユーザーID">
+          <input name="username" type="text" class="form-control" placeholder="ユーザーID">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-user"></span>
@@ -38,15 +49,15 @@
           </div>
         </div>
         <div class="input-group mb-3">
-          <input type="password" class="form-control" placeholder="パスワード">
+          <input name="pass" type="password" class="form-control" placeholder="パスワード">
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>
             </div>
           </div>
         </div>
-        <div class="row">
-            <button type="submit" class="btn btn-primary btn-block">ログイン</button>
+        <div class="row d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary">ログイン</button>
         </div>
       </form>
     </div>
@@ -54,7 +65,11 @@
   </div>
 </div>
 <!-- /.login-box -->
-
+<?php
+if (isset($_SESSION["er_msg"])) {
+  unset($_SESSION["er_msg"]);
+}
+?>
 <!-- jQuery -->
 <script src="../../include/template/plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->

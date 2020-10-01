@@ -1,4 +1,5 @@
 <?php
+    include_once "common/session.php";
     include_once "FlashMessages.php";
     $msg = new \Plasticbrain\FlashMessages\FlashMessages();
 
@@ -12,17 +13,17 @@
         $id = $params['id'];
         if($status === 'success') {
             if(!empty($id)){
-                $msg->success('Edited '.$title.' Topic successfully');
+                $msg->success($title.'トピックスの編集に成功しました。');
             }
             else{
-                $msg->success('Added '.$title.' Topic successfully');
+                $msg->success($title.'トピックスの追加に成功しました。');
             }
         } else {
            if(!empty($id)){
-            $msg->error('Edit '.$title.' Topic failed');
+            $msg->error($title.'トピックスの編集に失敗しました。');
         }
             else{
-                $msg->error('Add '.$title.' Topic failed');
+                $msg->error($title.'トピックスの追加に失敗しました。');
             }
         }
         

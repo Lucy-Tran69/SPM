@@ -1,4 +1,8 @@
 <?php
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
     include_once "database/db.inc";
 
     $err_msg = "";

@@ -1,10 +1,6 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) 
-{
-  session_start();
-}
-include "../../include/check_view_permission.php";
-$url = "users";
+include "../../include/common/check_view_permission.php";
+$url = "customer";
 check_view_permission($url);
 header("content-type: text/html; charset=UTF-8");
 //Get array of roles from session variable 
@@ -26,7 +22,7 @@ if (isset($_SESSION["loginAccount"])) {
   <div class="col-12">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Customer Management</h3>
+        <h3 class="card-title">取引先管理</h3>
       </div>
       <div class="card card-default">
         <div class="card-body">
@@ -99,6 +95,13 @@ if (isset($_SESSION["loginAccount"])) {
       'deferRender': true,
       'info': false,
       'autoWidth': false,
+      'lengthChange': false,
+      'language': {
+                    "paginate": {
+                    "previous": "前へ",
+                    "next" : "次へ"
+                    }
+                },
       'serverMethod': 'post',
       'ajax':{
         'url': '../../include/customer.php',
@@ -112,7 +115,7 @@ if (isset($_SESSION["loginAccount"])) {
         {
           data: 'no',
           render: function (data, type, row) {
-          return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i>変更</a></div>';
+          return '<div class="row justify-content-center"><a href="edit-customer.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i>変更</a></div>';
           }
         },
       ],
@@ -142,6 +145,13 @@ if (isset($_SESSION["loginAccount"])) {
                 'autoWidth': false,
                 'responsive': true,
                 'deferRender': true,
+                'lengthChange': false,
+                'language': {
+                    "paginate": {
+                    "previous": "前へ",
+                    "next" : "次へ"
+                    }
+                },
                 'ajax': {
                     type: 'POST',
                     url: '../../include/customer.php',
@@ -157,7 +167,7 @@ if (isset($_SESSION["loginAccount"])) {
                     {
                       data: 'no',
                       render: function (data, type, row) {
-                      return '<div class="row justify-content-center"><a href="' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i>変更</a></div>';
+                      return '<div class="row justify-content-center"><a href="edit-customer.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i>変更</a></div>';
                       }
                     },
                 ],

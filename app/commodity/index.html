@@ -41,12 +41,12 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form">
+              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
                   <div class="form-group">
                   <div class="row">
                     <div class="col-xs-5">
-                  <label id="itemLabel">権限</label>
-                  <select name="selectedRole" id="selectedRole" class="form-control" onchange="searchTableByRole();">
+                  <label id="itemLabel">メーカ名</label>
+                  <select name="selectedRole" id="selectedRole" class="form-control" onchange="searchTableByMaker();">
                     <option value="">-</option>
                         <?php
                         if ($makerResultSet->num_rows > 0) {
@@ -65,25 +65,37 @@ if (isset($_SESSION["loginAccount"])) {
                     <div class="form-group">
                     <div class="row">
                     <div class="col-xs-5">
-                    <label id="nameLabel" class="searchTable_label">氏名</label>
-                    <input type="text" id="searchName" name="searchName" class="form-control" onkeyup="searchTableByName();"/>
+                    <label id="nameLabel" class="searchTable_label">商品コード</label>
+                    <input type="text" id="searchName" name="searchName" class="form-control" onkeyup="searchTableByCode();"/>
                     </div>
                     </div>
                     </div>
                     <div class="form-group">
                     <div class="row">
                     <div class="col-xs-5">
-                    <label id="custLabel" class="searchTable_label">取引先名</label>
-                    <input type="text" name="searchCustomer" id="searchCustomer" class="form-control" onkeyup="searchTableByCustomer();"/>
+                    <label id="custLabel" class="searchTable_label">商品名</label>
+                    <input type="text" name="searchCustomer" id="searchCustomer" class="form-control" onkeyup="searchTableByName();"/>
                     </div>
                     </div>
                     </div>
+                    <div class="form-group">
+                    <div class="row">
+                    <div class="col-xs-5">
+                    <label id="itemLabel">タイプ</label>
+                    <select name="selectedType" id="selectedType" class="form-control" onchange="searchTableByType();">
+                      <option value="0" <?php if(isset($_POST['selectedType'])){ if($_POST['selectedType']===0)echo "selected='selected'"; }?> default>すべて</option>
+                      <option value="1" <?php if(isset($_POST['selectedType'])){ if($_POST['selectedType']==1)echo "selected='selected'"; }?>>モノクロ</option>
+                      <option value="2" <?php if(isset($_POST['selectedType'])){ if($_POST['selectedType']==2)echo "selected='selected'"; }?>>カラー</option>
+                    </select>
+                  </div>
+                  </div>
+                  </div>
                     <div class="form-group">
                     <div class="row">
                     <div class="col-xs-5">
                     <div class="form-check">
-                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="0"/>
-                    <label id="checkLabel" class="form-check-label">ログインできないユーザ</label>
+                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="<?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>" <?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>/>
+                    <label id="checkLabel" class="form-check-label">無効を含む</label>
                     </div>
                     </div>
                     </div>
@@ -107,12 +119,13 @@ if (isset($_SESSION["loginAccount"])) {
                   if ($resultSet->num_rows > 0) {
                     while ($row = $resultSet->fetch_assoc()) {
                   ?>
-                      <tr style="display: <?php echo $row["invalid"]==0?"":"none;"?>">
+                      <tr>
                         <td><?php echo $row["code"] ?></td>
                         <td><?php echo $row["name"] ?></td>
                         <td><?php echo $row["maker"] ?></td>
                         <td><?php echo $row["memo"] ?></td>
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
+                        <td style="display: none;"><?php echo $row["type"] ?></td>
                         <td class="align_button">
                             <input class="btn btn-primary" type="button" id="<?php echo $row["no"]; ?>" value="変更" onclick="openModal(this.id);" data-toggle="modal" data-target="#details">
                             <input class="btn btn-primary" type="button" id="<?php echo $row["no"]; ?>" value="コーピ" onclick="openModalCopy(this.id);" data-toggle="modal" data-target="#copy">
@@ -143,7 +156,7 @@ if (isset($_SESSION["loginAccount"])) {
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body align_form">
-          <form action="../../include/commodity_functions/updateCommodity.php" method="POST" class="form_style">
+          <form action="../../include/commodity_functions/updateCommodity.php" method="POST" class="form_style" onsubmit="return validateUpdate();">
             <input type="hidden" id="inputId" name="inputId" />
             <table class="popup_table">
               <tr>
@@ -180,19 +193,19 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="codeLabel" class="label_align_table">商品コード</label></td>
-                <td><input type="text" id="inputCode" name="inputCode" /></td>
+                <td><input type="text" id="inputCode" name="inputCode" required/></td>
               </tr>
               <tr>
                 <td><label id="codeLabel" class="label_align_table">商品名</label></td>
-                <td><input type="text" id="inputName" name="inputName" /></td>
+                <td><input type="text" id="inputName" name="inputName" required/></td>
               </tr>
               <tr>
                 <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
-                <td><input type="text" id="inputPrice" name="inputPrice" /></td>
+                <td><input type="text" id="inputPrice" name="inputPrice" required/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
-                <td><input type="number" id="inputPaid" name="inputPaid" /></td>
+                <td><input type="number" max="99" id="inputPaid" name="inputPaid" /></td>
               </tr>
               <tr>
                 <td><label id="customerLabel" class="label_align_table">対応プリンタ</label></td>
@@ -215,6 +228,10 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="checkbox" id="inputInvalid" name="inputInvalid" /></td>
               </tr>
             </table>
+            <div class="alert alert-danger alert-dismissible" id="alertInputFail" style="display: none;">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <p id="alertInputFailText"></p>
+              </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -233,7 +250,7 @@ if (isset($_SESSION["loginAccount"])) {
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body align_form">
-          <form action="../../include/commodity_functions/copyCommodity.php" method="POST" class="form_style">
+          <form action="../../include/commodity_functions/copyCommodity.php" method="POST" class="form_style" onsubmit="return validateCopy();">
             <table class="popup_table">
               <tr>
                 <td><label id="nameLabel" class="label_align_table">メーカ名</label></td>
@@ -269,19 +286,19 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="codeLabel" class="label_align_table">商品コード</label></td>
-                <td><input type="text" id="copyCode" name="copyCode" /></td>
+                <td><input type="text" id="copyCode" name="copyCode" required/></td>
               </tr>
               <tr>
                 <td><label id="codeLabel" class="label_align_table">商品名</label></td>
-                <td><input type="text" id="copyName" name="copyName" /></td>
+                <td><input type="text" id="copyName" name="copyName" required/></td>
               </tr>
               <tr>
                 <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
-                <td><input type="text" id="copyPrice" name="copyPrice" /></td>
+                <td><input type="text" id="copyPrice" name="copyPrice" required/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
-                <td><input type="number" id="copyPaid" name="copyPaid" /></td>
+                <td><input type="number" max="99" id="copyPaid" name="copyPaid" /></td>
               </tr>
               <tr>
                 <td><label id="customerLabel" class="label_align_table">対応プリンタ</label></td>
@@ -304,6 +321,10 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="checkbox" id="copyInvalid" name="copyInvalid" /></td>
               </tr>
             </table>
+            <div class="alert alert-danger alert-dismissible" id="alertCopyFail" style="display: none;">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <p id="alertCopyFailText"></p>
+              </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -322,7 +343,7 @@ if (isset($_SESSION["loginAccount"])) {
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body align_form">
-          <form action="../../include/commodity_functions/insertCommodity.php" method="POST" class="form_style">
+          <form action="../../include/commodity_functions/insertCommodity.php" method="POST" class="form_style" onsubmit="return validateInsert();">
           <table class="popup_table">
               <tr>
                 <td><label id="nameLabel" class="label_align_table">メーカ名</label></td>
@@ -358,19 +379,19 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="codeLabel" class="label_align_table">商品コード</label></td>
-                <td><input type="text" id="insertCode" name="insertCode" /></td>
+                <td><input type="text" id="insertCode" name="insertCode" required/></td>
               </tr>
               <tr>
                 <td><label id="codeLabel" class="label_align_table">商品名</label></td>
-                <td><input type="text" id="insertName" name="insertName" /></td>
+                <td><input type="text" id="insertName" name="insertName" required/></td>
               </tr>
               <tr>
                 <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
-                <td><input type="text" id="insertPrice" name="insertPrice" /></td>
+                <td><input type="text" id="insertPrice" name="insertPrice" required/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
-                <td><input type="number" id="insertPaid" name="insertPaid" /></td>
+                <td><input type="number" max="99" id="insertPaid" name="insertPaid" /></td>
               </tr>
               <tr>
                 <td><label id="customerLabel" class="label_align_table">対応プリンタ</label></td>
@@ -393,6 +414,10 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="checkbox" id="insertInvalid" name="insertInvalid" /></td>
               </tr>
             </table>
+            <div class="alert alert-danger alert-dismissible" id="alertInsertFail" style="display: none;">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <p id="alertInsertFailText"></p>
+              </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -415,7 +440,13 @@ if (isset($_SESSION["loginAccount"])) {
 <script>
   // var modal = document.getElementById("details");
   // var span = document.getElementsByClassName("close")[0];
-
+  var regexAlnum = new RegExp("^[a-zA-Z0-9]+$");
+  var regexJapanese = /[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]/g;
+  // var regexJapaneseAlnum = /[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u0030-\u0039]|[\u0041-\u005A]|[\u0061-\u007A]/g; 
+  var pHiragana = "[\\u3041-\\u3096\\u309D-\\u309F]|\\uD82C\\uDC01|\\uD83C\\uDE00";
+  var pKatakana = "[\\u30A1-\\u30FA\\u30FD-\\u30FF\\u31F0-\\u31FF\\u32D0-\\u32FE\\u3300-\\u3357\\uFF66-\\uFF6F\\uFF71-\\uFF9D]|\\uD82C\\uDC00";
+  var pHan = "[\\u2E80-\\u2E99\\u2E9B-\\u2EF3\\u2F00-\\u2FD5\\u3005\\u3007\\u3021-\\u3029\\u3038-\\u303B\\u3400-\\u4DB5\\u4E00-\\u9FD5\\uF900-\\uFA6D\\uFA70-\\uFAD9]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1]|\\uD87E[\\uDC00-\\uDE1D]";
+  var regexJapaneseAlnum = new RegExp("^([\\w-]|" + pHiragana + "|" + pKatakana + "|" + pHan + ")+$");
   function openModal(cartid) {
     $.ajax({
       url: "../../include/commodity_functions/getSelectedCommodity.php",
@@ -504,10 +535,32 @@ if (isset($_SESSION["loginAccount"])) {
   //   modal.style.display = "none";
   // }
 
-function searchTableByName() {
+function searchTableByCode() {
   // Declare variables
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById("searchName");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("details_table");
+  tr = table.getElementsByTagName("tr");
+
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+
+function searchTableByName() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("searchCustomer");
   filter = input.value.toUpperCase();
   table = document.getElementById("details_table");
   tr = table.getElementsByTagName("tr");
@@ -526,29 +579,7 @@ function searchTableByName() {
   }
 }
 
-function searchTableByCustomer() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("searchCustomer");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
-
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[4];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-
-function searchTableByRole() {
+function searchTableByMaker() {
   // Declare variables
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById("selectedRole");
@@ -558,7 +589,7 @@ function searchTableByRole() {
 
   // Loop through all table rows, and hide those who don't match the search query
     for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[3];
+    td = tr[i].getElementsByTagName("td")[2];
     if (td) {
       txtValue = td.textContent || td.innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
@@ -571,30 +602,282 @@ function searchTableByRole() {
 }
 
 function searchTableByInvalid() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("searchInvalid").checked;
-  filter = input;
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
+  // // Declare variables
+  // var input, filter, table, tr, td, i, txtValue;
+  // input = document.getElementById("searchInvalid").checked;
+  // filter = input;
+  // table = document.getElementById("details_table");
+  // tr = table.getElementsByTagName("tr");
 
-  // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[4];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue==1) 
-      {
-        if(filter==true)
-        {
-          tr[i].style.display = "";
-        }
-        else
-        {
-          tr[i].style.display = "none";
-        }
-      }
+  // // Loop through all table rows, and hide those who don't match the search query
+  //   for (i = 0; i < tr.length; i++) {
+  //   td = tr[i].getElementsByTagName("td")[4];
+  //   if (td) {
+  //     txtValue = td.textContent || td.innerText;
+  //     if (txtValue==1) 
+  //     {
+  //       if(filter==true)
+  //       {
+  //         tr[i].style.display = "";
+  //       }
+  //       else
+  //       {
+  //         tr[i].style.display = "none";
+  //       }
+  //     }
+  //   }
+  // }
+  document.getElementById('searchForm').submit();
+}
+
+function searchTableByType() {
+  document.getElementById('searchForm').submit();
+}
+
+function validateUpdate()
+{
+  var flag=true;
+  var name = document.getElementById("inputName");
+  var code = document.getElementById("inputCode");
+  var price = document.getElementById("inputPrice");
+  var printers = document.getElementById("inputPrinters");
+  var note = document.getElementById("inputNote");
+  var memo = document.getElementById("inputMemo");
+  if(regexJapaneseAlnum.test(name.value)==false)
+  {
+    flag=false;
+    $("#alertInputFail").show();
+    $("#alertInputFailText").text('Name contains invalid characters'); 
+  }
+  if((new TextEncoder().encode(name)).length>=1024)
+  {
+    flag=false;
+    $("#alertInputFail").show();
+    $("#alertInputFailText").text('Name is too long'); 
+  }
+
+  if(regexJapaneseAlnum.test(code.value)==false)
+  {
+    flag=false;
+    $("#alertInputFail").show();
+    $("#alertInputFailText").text('Code contains invalid characters'); 
+  }
+  if((new TextEncoder().encode(code)).length>=128)
+  {
+    flag=false;
+    $("#alertInputFail").show();
+    $("#alertInputFailText").text('Code is too long'); 
+  }
+
+  var x = price.value;
+  if(regexJapaneseAlnum.test(price.value)==false)
+  {
+    flag=false;
+    $("#alertInputFail").show();
+    $("#alertInputFailText").text('Price contains invalid characters'); 
+  }
+  if((new TextEncoder().encode(price)).length>=218)
+  {
+    flag=false;
+    $("#alertInputFail").show();
+    $("#alertInputFailText").text('Price is too long'); 
+  }
+
+  if(printers!=null && printers!="")
+  {
+    if((new TextEncoder().encode(printers)).length>=4000)
+    {
+      flag=false;
+      $("#alertInputFail").show();
+      $("#alertInputFailText").text('Printer support is too long'); 
     }
   }
+
+  if(note!=null && note!="")
+  {
+    if((new TextEncoder().encode(note)).length>=4000)
+    {
+      flag=false;
+      $("#alertInputFail").show();
+      $("#alertInputFailText").text('Note is too long'); 
+    }
+  }
+
+  if(memo!=null && memo!="")
+  {
+    if((new TextEncoder().encode(memo)).length>=4000)
+    {
+      var x = (new TextEncoder().encode(memo)).length;
+      flag=false;
+      $("#alertInputFail").show();
+      $("#alertInputFailText").text('Memo is too long'); 
+    }
+  }
+
+  return flag;
+}
+
+function validateInsert()
+{
+  var flag=true;
+  var name = document.getElementById("insertName");
+  var code = document.getElementById("insertCode");
+  var price = document.getElementById("insertPrice");
+  var printers = document.getElementById("insertPrinters");
+  var note = document.getElementById("insertNote");
+  var memo = document.getElementById("insertMemo");
+  if(regexJapaneseAlnum.test(name.value)==false)
+  {
+    flag=false;
+    $("#alertInsertFail").show();
+    $("#alertInsertFailText").text('Name contains invalid characters'); 
+  }
+  if((new TextEncoder().encode(name)).length>=1024)
+  {
+    flag=false;
+    $("#alertInsertFail").show();
+    $("#alertInsertFailText").text('Name is too long'); 
+  }
+
+  if(regexJapaneseAlnum.test(code.value)==false)
+  {
+    flag=false;
+    $("#alertInsertFail").show();
+    $("#alertInsertFailText").text('Code contains invalid characters'); 
+  }
+  if((new TextEncoder().encode(code)).length>=128)
+  {
+    flag=false;
+    $("#alertInsertFail").show();
+    $("#alertInsertFailText").text('Code is too long'); 
+  }
+
+  if(regexJapaneseAlnum.test(price.value)==false)
+  {
+    flag=false;
+    $("#alertInsertFail").show();
+    $("#alertInsertFailText").text('Price contains invalid characters'); 
+  }
+  if((new TextEncoder().encode(price)).length>=218)
+  {
+    flag=false;
+    $("#alertInsertFail").show();
+    $("#alertInsertFailText").text('Price is too long'); 
+  }
+
+  if(printers!=null && printers!="")
+  {
+    if((new TextEncoder().encode(printers)).length>=4000)
+    {
+      flag=false;
+      $("#alertInsertFail").show();
+      $("#alertInsertFailText").text('Printer support is too long'); 
+    }
+  }
+
+  if(note!=null && note!="")
+  {
+    if((new TextEncoder().encode(note)).length>=4000)
+    {
+      flag=false;
+      $("#alertInsertFail").show();
+      $("#alertInsertFailText").text('Note is too long'); 
+    }
+  }
+
+  if(memo!=null && memo!="")
+  {
+    if((new TextEncoder().encode(memo)).length>=4000)
+    {
+      var x = (new TextEncoder().encode(memo)).length;
+      flag=false;
+      $("#alertInsertFail").show();
+      $("#alertInsertFailText").text('Memo is too long'); 
+    }
+  }
+
+  return flag;
+}
+
+function validateCopy()
+{
+  var flag=true;
+  var name = document.getElementById("copyName");
+  var code = document.getElementById("copyCode");
+  var price = document.getElementById("copyPrice");
+  var printers = document.getElementById("copyPrinters");
+  var note = document.getElementById("copyNote");
+  var memo = document.getElementById("copyMemo");
+  if(regexJapaneseAlnum.test(name.value)==false)
+  {
+    flag=false;
+    $("#alertCopyFail").show();
+    $("#alertCopyFailText").text('Name contains invalid characters'); 
+  }
+  if((new TextEncoder().encode(name)).length>=1024)
+  {
+    flag=false;
+    $("#alertCopyFail").show();
+    $("#alertCopyFailText").text('Name is too long'); 
+  }
+
+  if(regexJapaneseAlnum.test(code.value)==false)
+  {
+    flag=false;
+    $("#alertCopyFail").show();
+    $("#alertCopyFailText").text('Code contains invalid characters'); 
+  }
+  if((new TextEncoder().encode(code)).length>=128)
+  {
+    flag=false;
+    $("#alertCopyFail").show();
+    $("#alertCopyFailText").text('Code is too long'); 
+  }
+
+  if(regexJapaneseAlnum.test(price.value)==false)
+  {
+    flag=false;
+    $("#alertCopyFail").show();
+    $("#alertCopyFailText").text('Price contains invalid characters'); 
+  }
+  if((new TextEncoder().encode(price)).length>=218)
+  {
+    flag=false;
+    $("#alertCopyFail").show();
+    $("#alertCopyFailText").text('Price is too long'); 
+  }
+
+  if(printers!=null && printers!="")
+  {
+    if((new TextEncoder().encode(printers)).length>=4000)
+    {
+      flag=false;
+      $("#alertCopyFail").show();
+      $("#alertCopyFailText").text('Printer support is too long'); 
+    }
+  }
+
+  if(note!=null && note!="")
+  {
+    if((new TextEncoder().encode(note)).length>=4000)
+    {
+      flag=false;
+      $("#alertCopyFail").show();
+      $("#alertCopyFailText").text('Note is too long'); 
+    }
+  }
+
+  if(memo!=null && memo!="")
+  {
+    if((new TextEncoder().encode(memo)).length>=4000)
+    {
+      var x = (new TextEncoder().encode(memo)).length;
+      flag=false;
+      $("#alertCopyFail").show();
+      $("#alertCopyFailText").text('Memo is too long'); 
+    }
+  }
+
+  return flag;
 }
 </script>

@@ -41,7 +41,7 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form">
+              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
                   <div class="form-group">
                   <div class="row">
                     <div class="col-xs-5">
@@ -82,7 +82,7 @@ if (isset($_SESSION["loginAccount"])) {
                     <div class="row">
                     <div class="col-xs-5">
                     <div class="form-check">
-                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="0"/>
+                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="<?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>" <?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>/>
                     <label id="checkLabel" class="form-check-label">ログインできないユーザ</label>
                     </div>
                     </div>
@@ -109,7 +109,7 @@ if (isset($_SESSION["loginAccount"])) {
                   if ($resultSet->num_rows > 0) {
                     while ($row = $resultSet->fetch_assoc()) {
                   ?>
-                      <tr style="display: <?php echo $row["invalid"]==0?"":"none;"?>">
+                      <tr>
                         <td><?php echo $row["no"] ?></td>
                         <td><?php echo $row["name"] ?></td>
                         <td><?php echo $row["account"] ?></td>
@@ -177,7 +177,7 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="emailLabel" class="label_align_table">Email</label></td>
-                <td><input type="email" id="inputEmail" name="inputEmail" /></td>
+                <td><input type="email" id="inputEmail" name="inputEmail" required autocomplete="off"/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
@@ -186,6 +186,7 @@ if (isset($_SESSION["loginAccount"])) {
               <tr>
                 <td><label id="customerLabel" class="label_align_table">取引先</label></td>
                 <td><select id="inputCustomer" name="inputCustomer">
+                    <option value="">-</option>
                     <?php
                     if ($custResultSet->num_rows > 0) {
                       while ($row = $custResultSet->fetch_assoc()) {
@@ -201,6 +202,7 @@ if (isset($_SESSION["loginAccount"])) {
               <tr>
                 <td><label id="officeLabel" class="label_align_table">所属</label></td>
                 <td><select id="inputOffice" name="inputOffice">
+                    <option value="">-</option>
                     <?php
                     if ($officeResultSet->num_rows > 0) {
                       while ($row = $officeResultSet->fetch_assoc()) {
@@ -268,7 +270,7 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="emailLabel" class="label_align_table">Email</label></td>
-                <td><input type="email" id="insertEmail" name="insertEmail" /></td>
+                <td><input type="email" id="insertEmail" name="insertEmail" required autocomplete="off"/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
@@ -277,6 +279,7 @@ if (isset($_SESSION["loginAccount"])) {
               <tr>
                 <td><label id="customerLabel" class="label_align_table">取引先</label></td>
                 <td><select id="insertCustomer" name="insertCustomer">
+                    <option value="">-</option>
                     <?php
                     if ($custResultSet->num_rows > 0) {
                       mysqli_data_seek($custResultSet,0);
@@ -293,6 +296,7 @@ if (isset($_SESSION["loginAccount"])) {
               <tr>
                 <td><label id="officeLabel" class="label_align_table">所属</label></td>
                 <td><select id="insertOffice" name="insertOffice">
+                    <option value="">-</option>
                     <?php
                     if ($officeResultSet->num_rows > 0) {
                       mysqli_data_seek($officeResultSet,0);
@@ -335,7 +339,10 @@ if (isset($_SESSION["loginAccount"])) {
   var span = document.getElementsByClassName("close")[0];
   var regexAlnum = new RegExp("^[a-zA-Z0-9]+$");
   var regexJapanese = /[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]/g;
-  var regexJapaneseAlnum = /[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u0030-\u0039]|[\u0041-\u005A]|[\u0061-\u007A]/g; 
+  var pHiragana = "[\\u3041-\\u3096\\u309D-\\u309F]|\\uD82C\\uDC01|\\uD83C\\uDE00";
+  var pKatakana = "[\\u30A1-\\u30FA\\u30FD-\\u30FF\\u31F0-\\u31FF\\u32D0-\\u32FE\\u3300-\\u3357\\uFF66-\\uFF6F\\uFF71-\\uFF9D]|\\uD82C\\uDC00";
+  var pHan = "[\\u2E80-\\u2E99\\u2E9B-\\u2EF3\\u2F00-\\u2FD5\\u3005\\u3007\\u3021-\\u3029\\u3038-\\u303B\\u3400-\\u4DB5\\u4E00-\\u9FD5\\uF900-\\uFA6D\\uFA70-\\uFAD9]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1]|\\uD87E[\\uDC00-\\uDE1D]";
+  var regexJapaneseAlnum = new RegExp("^([\\w-]|" + pHiragana + "|" + pKatakana + "|" + pHan + ")+$");
 
   function openModal(userid) {
     $.ajax({
@@ -441,36 +448,38 @@ function searchTableByRole() {
 
 function searchTableByInvalid() {
   // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("searchInvalid").checked;
-  filter = input;
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
+  // var input, filter, table, tr, td, i, txtValue;
+  // input = document.getElementById("searchInvalid").checked;
+  // filter = input;
+  // table = document.getElementById("details_table");
+  // tr = table.getElementsByTagName("tr");
 
-  // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[6];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue==1) 
-      {
-        if(filter==true)
-        {
-          tr[i].style.display = "";
-        }
-        else
-        {
-          tr[i].style.display = "none";
-        }
-      }
-    }
-  }
+  // // Loop through all table rows, and hide those who don't match the search query
+  //   for (i = 0; i < tr.length; i++) {
+  //   td = tr[i].getElementsByTagName("td")[6];
+  //   if (td) {
+  //     txtValue = td.textContent || td.innerText;
+  //     if (txtValue==1) 
+  //     {
+  //       if(filter==true)
+  //       {
+  //         tr[i].style.display = "";
+  //       }
+  //       else
+  //       {
+  //         tr[i].style.display = "none";
+  //       }
+  //     }
+  //   }
+  // }
+
+  document.getElementById('searchForm').submit();
 }
 
 function validateInsert()
 {
   var name = document.getElementById("insertName");
-  if(!regexJapaneseAlnum.test(name.value))
+  if(regexJapaneseAlnum.test(name.value)==false)
   {
     alert("Name is invalid");
     return false;

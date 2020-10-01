@@ -17,7 +17,7 @@ $stmt = $conn->prepare("select maker.name as mName,
                         LEFT JOIN commodity on maker.no=commodity.maker
                         LEFT JOIN inventory on inventory.commodity=commodity.no
                         LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
-                        where commodity.name IS NOT NULL");
+                        where commodity.name IS NOT NULL order by commodity.no ASC");
 $result = execute($stmt,$conn);
 if($result==TRUE)
 {

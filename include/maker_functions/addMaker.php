@@ -4,7 +4,8 @@ if (session_status() == PHP_SESSION_NONE)
     session_start();
 }
 include_once "database/db.inc";
-
+$msg = "";
+$status = "OK";
 if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 {
     $name = $_POST["inputName"];
@@ -18,16 +19,31 @@ if ($conn->connect_error)
     die("Failed to connect to database. " . $conn->connect_error);
 }
 
-$stmt = $conn->prepare("insert INTO maker(name,invalid,inday,inuser,upday,upuser) VALUES (?,0,?,?,?,?)");
-$stmt->bind_param('ssisi',$name,$upday,$upuser,$upday,$upuser);
-$result = execute($stmt,$conn);
-if($result)
+if(empty($name))
 {
-    header("Location: ../../app/maker/");  
-}
-else
-{
-    echo "SQL Error";
+    $msg = "Name cannot be blank";
+    $status="";
 }
 
+if($status=="OK")
+{
+    $stmt = $conn->prepare("insert INTO maker(name,invalid,inday,inuser,upday,upuser) VALUES (?,0,?,?,?,?)");
+    $stmt->bind_param('ssisi',$name,$upday,$upuser,$upday,$upuser);
+    $result = execute($stmt,$conn);
+    if($result)
+    {
+        $msg = "Maker added";
+        // header("Location: ../../app/maker/");  
+    }
+    else
+    {
+        $status="";
+        $msg = "Database Error Occured";
+    }
+}
+
+echo json_encode(array(
+    "status"=>$status,
+    "message"=>$msg
+));
 ?>

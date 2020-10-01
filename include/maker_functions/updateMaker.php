@@ -4,7 +4,8 @@ if (session_status() == PHP_SESSION_NONE)
     session_start();
 }
 include_once "database/db.inc";
-
+$msg = "";
+$status = "OK";
 if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 {
     $name = $_POST["inputName"];
@@ -19,17 +20,33 @@ if ($conn->connect_error)
     die("Failed to connect to database. " . $conn->connect_error);
 }
 
-$stmt = $conn->prepare("update maker set name=?,upday=?,upuser=? where no=?");
-$stmt->bind_param('ssii',$name,$upday,$upuser,$id);
+if(empty($name))
+{
+    $msg = "Name cannot be blank";
+    $status="";
+}
 
-$result = execute($stmt,$conn);
-if($result)
+if($status=="OK")
 {
-    header("Location: ../../app/maker/");  
+    $stmt = $conn->prepare("update maker set name=?,upday=?,upuser=? where no=?");
+    $stmt->bind_param('ssii',$name,$upday,$upuser,$id);
+    
+    $result = execute($stmt,$conn);
+    if($result)
+    {
+        $msg = "Name updated";
+        // header("Location: ../../app/maker/");  
+    }
+    else
+    {
+        $msg = "Database Error Occured";
+        $status="";
+    }
 }
-else
-{
-    echo "SQL Error";
-}
+
+echo json_encode(array(
+    "status"=>$status,
+    "message"=>$msg
+));
 
 ?>

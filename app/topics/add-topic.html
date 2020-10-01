@@ -1,0 +1,226 @@
+<?php
+    include_once "html/header.inc";
+    include_once "html/menu.inc";
+    include_once "html/showmessage.inc";
+?>
+
+<style type="text/css" media="all">
+    .custom-file-label::after {
+        content: none;
+    }
+</style>
+<?php
+if (isset($_SESSION["loginAccount"])) {
+?>
+<input type="hidden" name="" id="add-topic" value="トピックス追加">
+<?php  include_once "html/showmessage.inc"; ?>
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-12">
+        <!-- jquery validation -->
+        <div class="card card-primary">
+            <form action="createTopic.php" role="form" id="addTopic" method="POST" novalidate="novalidate"
+                enctype="multipart/form-data">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="title">タイトル</label>
+                        <input type="title" name="title" class="form-control" id="title" placeholder="タイトル">
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <!-- text input -->
+                            <div class="form-group">
+                                <label for="openDay" data-target="#openDay"
+                                    data-toggle="datetimepicker">公開日</label>
+                                <div class="input-group date" id="openDay" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input openDay"
+                                        name="openDay" data-target="#openDay" data-toggle="datetimepicker"
+                                        placeholder="公開日" />
+                                    <div class="input-group-append" data-target="#openDay"
+                                        data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fas fa-calendar-week"></i></div>
+                                    </div>
+                                </div>
+                                <!-- /.input group -->
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="closeDay" data-target="#closeDay"
+                                    data-toggle="datetimepicker">終了日</label>
+                                <div class="input-group date" id="closeDay" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input closeDay"
+                                        name="closeDay" data-target="#closeDay" data-toggle="datetimepicker"
+                                        placeholder=" 終了日" />
+                                    <div class="input-group-append" data-target="#closeDay"
+                                        data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fas fa-calendar-week"></i></div>
+                                    </div>
+                                </div>
+                                <!-- /.input group -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="body">本文</label>
+                        <textarea type="body" name="body" class="form-control" rows="6" id="body"
+                            placeholder="本文"></textarea>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-1">
+                                    <div class="form-group">
+                                        <label for="imgFile">画像</label>
+                                    </div>
+                                </div>
+                                 <div class="col-sm-11">
+                                    <div class="form-group">
+                                         <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="imgFile"
+                                                    id="imgFile" onchange="preview_image(event)">
+                                                <label class="custom-file-label" for="imgFile"></label>
+                                            </div>
+                                            <label class="input-group-append" for="imgFile">
+                                                <span class="input-group-text">ファイル</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="row">
+                                <div class="col-sm-1">
+                                    <div class="form-group">
+                                    </div>
+                                </div>
+                                 <div class="col-sm-11">
+                                 <div class="form-group">
+                                        <label for="imgLink">リンク</label>
+                                        <input type="imgLink" name="imgLink" class="form-control" id="imgLink" placeholder="リンク">
+                                    </div> 
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                 <div class="row">
+                                <div class="col-sm-1">
+                                    <div class="form-group">
+                                        <label for="imgFile">リンク</label>
+                                    </div>
+                                </div>
+                                 <div class="col-sm-11">
+                                   <div class="form-group">
+                                        <label for="titleLink">タイトル</label>
+                                        <input type="titleLink" name="titleLink" class="form-control"
+                                            id="titleLink" placeholder="タイトル">
+                                    </div>
+                                </div>
+                            </div>
+                              <div class="row">
+                                <div class="col-sm-1">
+                                    <div class="form-group">
+                                        <label for="imgFile"></label>
+                                    </div>
+                                </div>
+                                 <div class="col-sm-11">
+                                   <div class="form-group">
+                                         <label for="urlImage">URL</label>
+                                        <input type="urlImage" name="urlImage" class="form-control"
+                                            id="urlImage" placeholder="URL">
+                                    </div>
+                                </div>
+                            </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <div class="row justify-content-md-center">
+                        <button type="submit" class="btn btn-primary">登録</button>
+                        <button type="button" class="btn btn-secondary" style="margin-left: 20px;"
+                            onclick="onBtnclick()">プレビュー</button>
+                         <button type="button" class="btn btn-default" style="margin-left: 20px;" onclick="redirectListTopic()">戻る</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (left) -->
+    <!-- right column -->
+    <div class="col-md-6">
+
+    </div>
+    <!--/.col (right) -->
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="previewTopic" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <b style="color: red;" id="newTitle"></b>
+                    <b id="preTitle"></b>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row justify-content-end" style="margin-bottom: 10px;">
+                        <span class="ju" id="preOpenday"></span>
+                    </div>
+                    <div class="row mb-2 justify-content-center" id="img" style="margin-bottom: 10px;">
+                        <p id="preImg"></p>
+                       <!--  <a target="_blank" rel="noopener noreferrer" id="preImgLink">
+                            <img class="image-pre" id="output_image" style="height: 250px; width: 250px;" />
+                        </a> -->
+                    </div>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <p id="preBody"></p>
+                    </div>
+                    <div class="row">
+                        <u id="bothTitle">
+                            <a target="_blank" rel="noopener noreferrer" id="preBLink">
+                                <span id="preBLinkTitle"></span>
+                            </a>
+                        </u>
+                        <u id="exceptTitle">
+                            <a target="_blank" rel="noopener noreferrer" id="preELink"></a>
+                        </u>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+                <button type="submit" class="btn btn-primary btn-modal-submit">登録</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php
+} else {
+    //header("Location: ../../include/logout.php");
+}
+?>
+<?php include_once "html/foot.inc"; ?>
+<script type="text/javascript" src="../../app/refer/js/topic/topics.js"></script>
+<!-- bs-custom-file-input -->
+<script src="../../app/refer/template/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<!-- bs-custom-file-input -->
+<script type="text/javascript">
+    $(document).ready(function () {
+      bsCustomFileInput.init();
+  });
+</script>
+
+</body>
+</html>
