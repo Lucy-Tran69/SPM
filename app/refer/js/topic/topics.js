@@ -178,6 +178,58 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
+     $('#btn-submit').click(function(e) {
+
+        var file_data = $('#imgFile').prop('files')[0];   
+        var form_data = new FormData();                  
+        form_data.append('imgFile', file_data);
+        form_data.append('no', $("#no").val());
+        form_data.append('title', $("#title").val());
+        form_data.append('openDay', $(".openDay").val());
+        form_data.append('closeDay', $(".closeDay").val());
+        form_data.append('body', $("#body").val());
+        form_data.append('titleLink', $("#titleLink").val());
+        form_data.append('urlImage', $("#urlImage").val());
+       
+        $.ajax({
+            url: "createTopic.php",
+            type: "POST",
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: form_data,
+            success: function(response)  {
+                // debugger
+                var response = JSON.parse(response);
+
+                if(response.statusCode == 200){
+                      
+                    window.location.href = "index.html";
+                     var messages = '<div class="alert alert-success alert-dismissible">' + 
+                       '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                       '%message%' +
+                       '</div>';                   
+                       $("#d-message").empty();
+                       messages = messages.replace('%message%', response.msg);
+                       $("#d-message").append(messages);
+
+                } else { 
+                     var messages = '<div class="alert alert-danger alert-dismissible">' + 
+                       '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                       '%message%' +
+                       '</div>';                   
+                       $("#d-message").empty();
+                       messages = messages.replace('%message%', response.msg);
+                       $("#d-message").append(messages);
+                      
+                   }
+            },
+            error: function(jqXHR, textStatus, errorThrown)  {
+                alert( "Bug" );
+            },
+        });
+    });
+
 });
 
 function redirectAddOrEditTopic() {
@@ -185,6 +237,7 @@ function redirectAddOrEditTopic() {
 }
 
 function onBtnclick() {
+    // debugger
     var preTitle = $("#title").val();
     var preOpenDay = $(".openDay").val();
     var preBody = $("#body").val();
@@ -199,30 +252,48 @@ function onBtnclick() {
     }
     preBody = preBody.replace(/\n/g, '<br>');
 
+    if (!preImgLink.match("^http")) {
+        preImgLink = 'https://' + preImgLink;
+    }
+    else {
+        preImgLink = preImgLink;
+    }
+
+    var linkCode = '<a target="_blank" href="%link%">%title%</a>';
+
+    if (!preLink.match("^http")) {
+        preLink = 'https://' + preLink;
+    }
+     else {
+        preLink = preLink;
+    }
+    
+    if (preLink != '' && preLinkTitle == '') {
+        linkCode = linkCode.replace('%link%', preLink);
+        linkCode = linkCode.replace('%title%', preLink);
+    }
+    else if (preLink != '' && preLinkTitle != '') 
+    {
+        linkCode = linkCode.replace('%link%', preLink);
+        linkCode = linkCode.replace('%title%', preLinkTitle);
+    } 
+    else {
+        linkCode = '';
+    }
+
+    $("#pr-link").empty();
+    $("#pr-link").append(linkCode);
+
     $("#preTitle").text(preTitle);
     $("#preOpenday").text(preOpenDay);
     $("#preBody").empty();
     $("#preBody").append(preBody);
     $("#preImgLink").attr("href", preImgLink);
-    $("#preLinkTitle").text(preLinkTitle);
-    $("#preLink").attr("href", preLink);
+    
 
     var img = $('#imgFile').val();
     if (img == '') {
         $('#img').hide();
-    }
-
-    if(preLinkTitle == ''){
-        $('#bothTitle').hide();
-        $("#preELink").attr("href", preLink);
-        $("#preELink").text(preLink);
-        $('#exceptTitle').show();
-    }
-    else {
-        $('#exceptTitle').hide();
-        $("#preBLinkTitle").text(preLinkTitle);
-        $("#preBLink").attr("href", preLink);
-        $('#bothTitle').show();
     }
 
     $("#previewTopic").modal('show');

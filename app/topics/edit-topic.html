@@ -1,7 +1,8 @@
 <?php
     include_once "html/header.inc";
     include_once "html/menu.inc";
-    include_once "html/showmessage.inc";
+    //include_once "html/showmessage.inc";
+    include_once "getTopicById.php"
 ?>
 <style type="text/css" media="all">
     .custom-file-label {
@@ -14,27 +15,10 @@
         content: none;
     }
 </style>
-<?php
-if (isset($_SESSION["loginAccount"])) {
-    if(isset($_GET["id"]) && !empty(trim($_GET["id"])) && is_numeric($_GET['id'])){
-        include_once "database/db.inc";
 
-        $conn  = getConnection();
-
-        if($conn->connect_error) {
-            die("Failed to connect to database. ".$conn->connect_error);
-        }        
-
-        $id = $_GET['id'];
-        $sql = "SELECT no, title, opday, clday, body, image, image_link, link_title, link_url FROM topics WHERE no='$id'";
-        $getTopic = mysqli_query($conn, $sql);
-        
-        if(mysqli_num_rows($getTopic) > 0){
-            $row = mysqli_fetch_assoc($getTopic); 
-?>
 <input type="hidden" name="" id="edit-topic" value="トピックス編集">
-<!-- <?php  include_once "html/showmessage.inc"; ?> -->
 <div id="d-message">
+</div>
 <div class="row">
     <!-- left column -->
     <div class="col-md-12">
@@ -43,7 +27,7 @@ if (isset($_SESSION["loginAccount"])) {
             <form action="" role="form" id="editTopic" method="POST" novalidate="novalidate"
                 enctype="multipart/form-data">
                 <div class="card-body">
-                    <input type="hidden" name="no" value="<?php echo $row['no']; ?>">
+                    <input type="hidden" id="no" name="no" value="<?php echo $row['no']; ?>">
                     <div class="form-group">
                         <label for="title">タイトル</label>
                         <input type="title" name="title" class="form-control" id="title" placeholder="タイトル"
@@ -244,21 +228,6 @@ if (isset($_SESSION["loginAccount"])) {
 </div>
 
 <?php
-    }else{
-        // set header response code
-        http_response_code(404);
-        echo "<h1>404 Page Not Found!</h1>";
-    }
-
-    }else{
-    // set header response code
-    http_response_code(404);
-    echo "<h1>404 Page Not Found!</h1>";
-    }
-} else {
-    //header("Location: ../../include/logout.php");
-}
-
 include_once "html/foot.inc";
 ?>
 

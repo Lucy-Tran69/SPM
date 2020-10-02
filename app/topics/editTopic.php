@@ -10,8 +10,6 @@ if ($conn->connect_error) {
 	die("Failed to connect to database. " . $conn->connect_error);
 }
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-	$fileImage = $_POST["imgFile"];
-	print_r($fileImage); die();
 	$no = isset($_POST["no"]) ? (int)$_POST["no"] : '';
 	$title = isset($_POST["title"]) ? strip_tags($_POST["title"]) : '';
 	$body = isset($_POST["body"]) ? strip_tags($_POST["body"]) : '';
@@ -109,18 +107,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$checkOK = 0;
 		}
 	}
-	// print_r($msg->error()); die();
 
 	if ($checkOK === 1) {
 		$image = $imgFileOld;
 		
 		if(!empty($imgFileNew)) {
+			// $idFile = uniqid();
+
+			// $image = $idFile . '.' . $imageFileType;
 			$image = $imgFileNew;
 			// Check if $uploadOk is set to 0 by an error
 			if ($uploadOk === 0) {
 				array_push($errmsg, "指定されたファイルはアップロードできません。");
 				// if everything is ok, try to upload file
 			} else {
+				// $destination = $target_dir . basename($image);
+				// move_uploaded_file($image, $destination);
 				if (!move_uploaded_file($_FILES["imgFile"]["tmp_name"], $target_file)) {
 					array_push($errmsg, "アップロードでエラーが発生しました。もう一度お試しください。");
 				}
@@ -128,30 +130,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		}
 
 		$sql = "UPDATE topics SET title=?, body=?, opday=?, clday=?, image=?, image_link=?, link_title=?, link_url=?, inuser=? WHERE no=?";
-		if($stmt = mysqli_prepare($conn, $sql)){
-			mysqli_stmt_bind_param($stmt, 'sssssssssi', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user, $no);
+		$stmt = $conn->prepare($sql);
 
-            if(mysqli_stmt_execute($stmt)){
-            	array_push($ssmsg, $title.'トピックスの編集に成功しました。');
-            	$_SESSION["success_msg"]=$ssmsg;
-                // header("Location: index.html");
-				exit();
-            } else{
-            	array_push($errmsg, "Error " . mysqli_error($conn));
-            	$_SESSION["err_msg"]= $errmsg;
-				// header("Location: index.html");
-				exit();
-            }
+		$stmt->bind_param('ssssssssii', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user, $no);
+
+		$stmt->execute();	
+
+		if ($stmt->error) {
+			array_push($errmsg, "Error ");
+			echo json_encode(array("statusCode"=>201, "msg" =>  $errmsg));
 		}
+		else {
+			array_push($ssmsg, $title.'トピックスの編集に成功しました。');
+			// $_SESSION["success_msg"]=$ssmsg;
+			echo json_encode(array("statusCode"=>200, "msg" =>  $ssmsg));
+		} 
 	
 		$stmt->close();
 	}
 	else {
-		$_SESSION["err_msg"]= $errmsg;
+		// $_SESSION["err_msg"]= $errmsg;
+		echo json_encode(array("statusCode"=>201, "msg" =>  $errmsg));
+
 	}
 }
 
-include_once "html/showmessage.inc";
+//include_once "html/showmessage.inc";
 
 function remove_special_character($string) {
 	$t = $string;

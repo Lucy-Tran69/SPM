@@ -69,63 +69,60 @@ $(function () {
     });
 
      $('#btn-submit').click(function(e) {
-        debugger
-        var fileOld = $('#imgFileOld').val();
-        var fileNew = $('#imgFile').get(0).files;
+
+        var file_data = $('#imgFile').prop('files')[0];   
+        var form_data = new FormData();                  
+        form_data.append('imgFile', file_data);
+        form_data.append('no', $("#no").val());
+        form_data.append('title', $("#title").val());
+        form_data.append('openDay', $(".openDay").val());
+        form_data.append('closeDay', $(".closeDay").val());
+        form_data.append('body', $("#body").val());
+        form_data.append('titleLink', $("#titleLink").val());
+        form_data.append('urlImage', $("#urlImage").val());
+        form_data.append('imgFileOld', $("#imgFileOld").val());
+       
         $.ajax({
             url: "editTopic.php",
             type: "POST",
-            dataType: "html",
-            enctype: 'multipart/form-data',
-            contentType: false
-            processData: false
-            data: {
-                title: $("#title").val(),
-                openDay:$("#openDay").val(),
-                closeDay: $("#closeDay").val(),
-                body:$("#body").val(),
-                imgLink: $("#imgLink").val(),
-                titleLink:$("#titleLink").val(),
-                urlImage: $("#urlImage").val(),
-                imgFileOld: fileOld,
-                imgFile: fileNew,
-            },
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: form_data,
             success: function(response)  {
-                debugger
-                $("#d-message").empty();
-                $("#d-message").html(response);
-                 // alert(response);
+                // debugger
+                var response = JSON.parse(response);
+
+                if(response.statusCode == 200){
+                      
+                    window.location.href = "index.html";
+                     var messages = '<div class="alert alert-success alert-dismissible">' + 
+                       '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                       '%message%' +
+                       '</div>';                   
+                       $("#d-message").empty();
+                       messages = messages.replace('%message%', response.msg);
+                       $("#d-message").append(messages);
+
+                } else { 
+                     var messages = '<div class="alert alert-danger alert-dismissible">' + 
+                       '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                       '%message%' +
+                       '</div>';                   
+                       $("#d-message").empty();
+                       messages = messages.replace('%message%', response.msg);
+                       $("#d-message").append(messages);
+                      
+                   }
             },
             error: function(jqXHR, textStatus, errorThrown)  {
                 alert( "Bug" );
             },
         });
     });
-    //  $("#editTopic").submit(function(event){
-    //     console.log("cccccccc");
-    //     $.ajax({
-    //         url : "editTopic.php",
-    //         type : "POST",
-    //         dataType : "html",
-    //         data : {
-              
-    //         },
-    //         success: function(response)  {
-    //             $("#d-message").empty();
-    //             $("#d-message").html(response);
-    //             alert( response );
-    //         },
-    //         error: function(jqXHR, textStatus, errorThrown)  {
-    //             alert( "error" );
-
-    //         }
-    //     });
-    //     event.preventDefault();
-    // });
 });
 
 function onBtnclick() {
-    // debugger
     var preTitle = $("#title").val();
     var preOpenDay = $(".openDay").val();
     var preBody = $("#body").val();
@@ -140,6 +137,13 @@ function onBtnclick() {
     }
 
     preBody = preBody.replace(/\n/g, '<br>');
+
+     if (!preImgLink.match("^http")) {
+        preImgLink = 'https://' + preImgLink;
+    }
+    else {
+        preImgLink = preImgLink;
+    }
 
     $("#preTitle").text(preTitle);
     $("#preOpenday").text(preOpenDay);
@@ -157,6 +161,13 @@ function onBtnclick() {
     }
 
     var linkCode = '<a target="_blank" href="%link%">%title%</a>';
+
+    if (!preLink.match("^http")) {
+        preLink = 'https://' + preLink;
+    }
+     else {
+        preLink = preLink;
+    }
     
     if (preLink != '' && preLinkTitle == '') {
         linkCode = linkCode.replace('%link%', preLink);

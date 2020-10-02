@@ -1,7 +1,7 @@
 <?php
     include_once "html/header.inc";
     include_once "html/menu.inc";
-    include_once "html/showmessage.inc";
+    //include_once "html/showmessage.inc";
 ?>
 
 <style type="text/css" media="all">
@@ -13,13 +13,13 @@
 if (isset($_SESSION["loginAccount"])) {
 ?>
 <input type="hidden" name="" id="add-topic" value="トピックス追加">
-<?php  include_once "html/showmessage.inc"; ?>
+<div id="d-message"></div>
 <div class="row">
     <!-- left column -->
     <div class="col-md-12">
         <!-- jquery validation -->
         <div class="card card-primary">
-            <form action="createTopic.php" role="form" id="addTopic" method="POST" novalidate="novalidate"
+            <form action="" role="form" id="addTopic" method="POST" novalidate="novalidate"
                 enctype="multipart/form-data">
                 <div class="card-body">
                     <div class="form-group">
@@ -141,7 +141,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <!-- /.card-body -->
                 <div class="card-footer">
                     <div class="row justify-content-md-center">
-                        <button type="submit" class="btn btn-primary">登録</button>
+                        <button id="btn-submit" type="button" class="btn btn-primary">登録</button>
                         <button type="button" class="btn btn-secondary" style="margin-left: 20px;"
                             onclick="onBtnclick()">プレビュー</button>
                          <button type="button" class="btn btn-default" style="margin-left: 20px;" onclick="redirectListTopic()">戻る</button>
@@ -178,23 +178,15 @@ if (isset($_SESSION["loginAccount"])) {
                         <span class="ju" id="preOpenday"></span>
                     </div>
                     <div class="row mb-2 justify-content-center" id="img" style="margin-bottom: 10px;">
-                        <p id="preImg"></p>
-                       <!--  <a target="_blank" rel="noopener noreferrer" id="preImgLink">
+                        <a target="_blank" rel="noopener noreferrer" id="preImgLink">
                             <img class="image-pre" id="output_image" style="height: 250px; width: 250px;" />
-                        </a> -->
+                        </a>
                     </div>
                     <div class="row" style="margin-bottom: 10px;">
                         <p id="preBody"></p>
                     </div>
                     <div class="row">
-                        <u id="bothTitle">
-                            <a target="_blank" rel="noopener noreferrer" id="preBLink">
-                                <span id="preBLinkTitle"></span>
-                            </a>
-                        </u>
-                        <u id="exceptTitle">
-                            <a target="_blank" rel="noopener noreferrer" id="preELink"></a>
-                        </u>
+                       <p id="pr-link"></p>
                     </div>
                 </div>
             </div>
