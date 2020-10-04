@@ -68,10 +68,10 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
-     $('#btn-submit').click(function(e) {
+    $('#btn-submit').click(function (e) {
 
-        var file_data = $('#imgFile').prop('files')[0];   
-        var form_data = new FormData();                  
+        var file_data = $('#imgFile').prop('files')[0];
+        var form_data = new FormData();
         form_data.append('imgFile', file_data);
         form_data.append('no', $("#no").val());
         form_data.append('title', $("#title").val());
@@ -81,7 +81,7 @@ $(function () {
         form_data.append('titleLink', $("#titleLink").val());
         form_data.append('urlImage', $("#urlImage").val());
         form_data.append('imgFileOld', $("#imgFileOld").val());
-       
+
         $.ajax({
             url: "editTopic.php",
             type: "POST",
@@ -89,34 +89,34 @@ $(function () {
             contentType: false,
             processData: false,
             data: form_data,
-            success: function(response)  {
+            success: function (response) {
                 // debugger
                 var response = JSON.parse(response);
 
-                if(response.statusCode == 200){
-                      
-                    window.location.href = "index.html";
-                     var messages = '<div class="alert alert-success alert-dismissible">' + 
-                       '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
-                       '%message%' +
-                       '</div>';                   
-                       $("#d-message").empty();
-                       messages = messages.replace('%message%', response.msg);
-                       $("#d-message").append(messages);
+                if (response.statusCode == 200) {
 
-                } else { 
-                     var messages = '<div class="alert alert-danger alert-dismissible">' + 
-                       '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
-                       '%message%' +
-                       '</div>';                   
-                       $("#d-message").empty();
-                       messages = messages.replace('%message%', response.msg);
-                       $("#d-message").append(messages);
-                      
-                   }
+                    window.location.href = "index.html";
+                    var messages = '<div class="alert alert-success alert-dismissible">' +
+                        '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                        '%message%' +
+                        '</div>';
+                    $("#d-message").empty();
+                    messages = messages.replace('%message%', response.msg);
+                    $("#d-message").append(messages);
+
+                } else {
+                    var messages = '<div class="alert alert-danger alert-dismissible">' +
+                        '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                        '%message%' +
+                        '</div>';
+                    $("#d-message").empty();
+                    messages = messages.replace('%message%', response.msg);
+                    $("#d-message").append(messages);
+
+                }
             },
-            error: function(jqXHR, textStatus, errorThrown)  {
-                alert( "Bug" );
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Bug");
             },
         });
     });
@@ -138,7 +138,7 @@ function onBtnclick() {
 
     preBody = preBody.replace(/\n/g, '<br>');
 
-     if (!preImgLink.match("^http")) {
+    if (!preImgLink.match("^http")) {
         preImgLink = 'https://' + preImgLink;
     }
     else {
@@ -154,8 +154,8 @@ function onBtnclick() {
     $("#preLink").attr("href", preLink);
 
     var img = $('#imgFile').val();
-    if (img == ''){
-       var output = document.getElementById('output_image');
+    if (img == '') {
+        var output = $('output_image');
         var imgOld = $('#imgFileOld').val();
         output.src = "../../app/refer/images/topics/" + imgOld;
     }
@@ -165,19 +165,18 @@ function onBtnclick() {
     if (!preLink.match("^http")) {
         preLink = 'https://' + preLink;
     }
-     else {
+    else {
         preLink = preLink;
     }
-    
+
     if (preLink != '' && preLinkTitle == '') {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLink);
     }
-    else if (preLink != '' && preLinkTitle != '') 
-    {
+    else if (preLink != '' && preLinkTitle != '') {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLinkTitle);
-    } 
+    }
     else {
         linkCode = '';
     }
@@ -189,7 +188,7 @@ function onBtnclick() {
 }
 
 function preview_image(event) {
-  var reader = new FileReader();
+    var reader = new FileReader();
     reader.onload = function () {
         var output = document.getElementById('output_image');
         output.src = reader.result;
