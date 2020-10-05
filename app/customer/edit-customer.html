@@ -4,7 +4,7 @@
     check_view_permission($url);
     include "../../include/html/header.inc";
     include "../../include/html/menu.inc";
-    include "../../include/cusomer_functions/editCustomer.php";
+    include "getItem.php";
 ?>
 <style type="text/css" media="all">
     .custom-file-label::after {
@@ -44,11 +44,11 @@ if (isset($_SESSION["loginAccount"])) {
             $row = mysqli_fetch_assoc($getCustomer); 
             // print_r($row);die();
 ?>
+<div id="d-message"></div>
 <section class="content">
         <div class="container-fluid">
             <div class="row">
                 <!-- left column -->
-
                 <div class="col-md-12">
                     <!-- jquery validation -->
                     <div class="card card-primary">
@@ -146,7 +146,7 @@ if (isset($_SESSION["loginAccount"])) {
                                     <label class="col-md-2 col-sm-3 col-form-label-sm"></label>
                                     <div class="col-md-6 col-sm-8 mx-auto">
                                         <button type="submit" class="btn btn-primary mr-2">登録</button>
-                                        <button type="button" class="btn btn-primary mr-2" onclick="redirectCustomerList()">Back</button>
+                                        <button type="button" class="btn btn-default btn-primary mr-2" onclick="redirectCustomerList()">戻る</button>
                                     </div>
                                 </div>
                             </div>
@@ -200,18 +200,24 @@ include "../../include/html/foot.inc"
             rules: {
                 cd: { required: true,
                       checkAlphabetAndNumber : true,
+                      maxlength : 8     
                     },
-                name: { required: true
+                name: { required: true,
+                        maxlength : 126  
                     },
                 tel: { required: true,
-                       checkNumber: true
+                       checkNumber: true,
+                       maxlength : 16
                     }, 
                 zip: { required: true,
-                       checkNumber: true
+                       checkNumber: true,
+                       maxlength : 16  
                     }, 
-                address: { required: true
+                address: { required: true,
+                           maxlength : 512  
                     },
-                charge: { required: true
+                charge: { required: true,
+                          maxlength : 512  
                     },
                 sale: { required: true
                     },
@@ -220,28 +226,92 @@ include "../../include/html/foot.inc"
             },
             messages: {
                 cd: {
-                    required: "Please enter Code Customer.",
-                    checkAlphabetAndNumber: "Please enter charecter haftSize.",
+                    required: "取引先コードを入力してください。",
+                    checkAlphabetAndNumber: "数字・文字のみ（特殊文字を含めない）を入力してください。",
+                    maxlength: "取引先コードは8文字以内で入力してください。"
                 },
-                name: "Please enter Name Customer.",
+                name: {
+                    required: "取引先名を入力してください。",
+                    maxlength: "取引先名は126文字以内で入力してください。"
+                },
                 tel: {
-                    required: "Please enter Telephone.",
-                    checkNumber: "Please enter number."
+                    required: "電話番号を入力してください。",
+                    checkNumber: "数字のみ（特殊文字を含めない）入力してください。",
+                    maxlength: "電話番号は数字16桁以内で入力してください。"
                 },
                 zip: {
-                    required: "Please enter Zip.",
-                    checkNumber: "Please enter number."
+                    required: "郵便番号を入力してください。",
+                    checkNumber: "数字のみ（特殊文字を含めない）入力してください。",
+                    maxlength: "郵便番号は数字16桁以内で入力してください。"
                 },
-                sale: {
-                    required: "Please enter Zip."
+                address: {
+                    required: "住所を入力してください。",
+                    maxlength:"住所は512文字以内で入力してください。"
                 },
-                address: "Please enter Address.",
-                charge: "Please enter Charge.",
-                sale: "Please enter Sale.",
-                supervisor: "Please enter Supervisor.",
+                charge: {
+                    required: "担当者名を入力してください。",
+                    maxlength: "担当者名は512文字以内で入力してください。"
+                },
+                sale: "営業担当を選択してください。",
+                supervisor: "承認者を選択してください。",
             }
         });
+
+         $("#editCustomer").submit(function(event){
+            var form = $("#editCustomer");
+            // check if the input is valid
+            if(!form.valid()) 
+            {
+                return false;
+            }
+            var invalid = 0;
+            if (document.getElementById("invalid").checked) {
+                 invalid = 1;
+            }
+        $.ajax({
+            url : "editCustomer.php",
+            type : "POST",
+            data : {
+                id: $("#id").val(),
+                cd : $("#cd").val(),
+                name : $("#name").val(),
+                tel : $("#tel").val(),
+                zip : $("#zip").val(),
+                address : $("#address").val(),
+                charge : $("#charge").val(),
+                sale : $("#sale").val(),
+                supervisor : $("#supervisor").val(),
+                invalid : invalid
+            },
+            success: function(response)  {
+                //check response is blank if success 
+                if (!$.trim(response)) {
+                    window.location.href = "index.html";
+                } 
+                // if error
+                else {
+                    $("#flash-message").html(response);        
+                }
+
+                // var response = JSON.parse(response);
+                // if(response.statusCode==200){
+                //     window.location.href = "index.html";
+                // } else {
+                //     var st = "";
+                //     for(var i = 0; i < response.msg.length; i ++){
+                //         st = st.concat(response.msg[i] + '</br>');
+                //     }
+                //     $("#d-message").html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+st+'</div>');
+                // }
+            },
+            error: function(jqXHR, textStatus, errorThrown)  {
+            }
+        });
+        event.preventDefault();
+        });
+
     });
+
     // checkAlphabetAndNumber haftsize
     jQuery.validator.addMethod("checkAlphabetAndNumber", function (str) {
             if (str) {
@@ -265,5 +335,4 @@ include "../../include/html/foot.inc"
 </script>
 
 </body>
-
 </html>

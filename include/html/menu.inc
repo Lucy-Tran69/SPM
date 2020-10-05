@@ -51,9 +51,6 @@
 			</ul>
 		</nav>
 		<!-- /.navbar -->
-  		
-		
-<?php  ?>
 
 		<!-- Main Sidebar Container -->
 		<aside class="main-sidebar elevation-4  sidebar-dark-primary">
@@ -78,79 +75,54 @@
 
 				<!-- Sidebar Menu -->
 				<nav class="mt-2">
-					<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-						data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
-            <?php if ( count($master_menu) > 0 ) { ?>
-              <li class="nav-header">マスター管理</li>  
-              <?php foreach ($master_menu as $key => $value) { ?>  
-                <li class="nav-item">
-                  <a href="<?php echo "../".$value["value"]."/"; ?>" class="nav-link">
-                    <i class="nav-icon fas fa-angle-right"></i>
-                    <!-- <i class="nav-icon far fa-calendar-alt"></i> -->
-                    <p>
-                      <?php echo $value["display"]; ?>  
-                      <!-- <span class="badge badge-info right">2</span> -->
-                    </p>
-                  </a>
-                </li>
-              <?php } ?>  
-            <?php } ?>
-
-            <?php if ( count($other_menu) > 0 ) { ?>
-              <li class="nav-header">一般管理</li>  
-              <?php foreach ($other_menu as $key => $value) { ?>  
-                <li class="nav-item">
-                  <a href="<?php echo "../".$value["value"]."/"; ?>" class="nav-link">
-                    <i class="nav-icon fas fa-angle-right"></i>
-                    <p>
-                      <?php echo $value["display"] ?>  
-                      <!-- <span class="badge badge-info right">2</span> -->
-                    </p>
-                  </a>
-                </li>
-              <?php } ?>  
-            <?php } ?>
-			
-			<?php 
-			
-			?>  
-            <?php ?>  
-            <?php ?>  
-            <?php ?>  
-            
-
-
-
-						<!-- <li class="nav-item has-treeview menu-open">
-							<a href="../../app/topic/" class="nav-link active">
-								<i class="nav-icon fas fa-tachometer-alt"></i>
+					<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+						<!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
+						<?php if ( count($master_menu) > 0 ) { ?>
+						<li class="nav-header">マスター管理</li>  
+						<?php foreach ($master_menu as $key => $value) { ?>  
+							<li class="nav-item">
+							<a href="<?php echo "../".$value["value"]."/"; ?>" class="nav-link">
+								<i class="nav-icon fas fa-angle-right"></i>
 								<p>
-									Topic Management
+								<?php echo $value["display"]; ?>  
 								</p>
 							</a>
-						</li> -->
-          
-          
+							</li>
+						<?php } ?>  
+						<?php } ?>
 
-          
-          </ul>
-		
-				</nav>
-				<!-- /.sidebar-menu -->
-
-				<div class="logout-panel">
-					<form class="logout-btn" action="../../include/common/logout.php"> 
-					<button class="btn btn-success" id="logout-button"  href="#" role="button">
+						<?php if ( count($other_menu) > 0 ) { ?>
+						<li class="nav-header  pt-1">一般管理</li>  
+						<?php foreach ($other_menu as $key => $value) { ?>  
+							<li class="nav-item">
+							<a href="<?php echo "../".$value["value"]."/"; ?>" class="nav-link">
+								<i class="nav-icon fas fa-angle-right"></i>
+								<p>
+								<?php echo $value["display"] ?>  
+								</p>
+							</a>
+							</li>
+						<?php } ?>  
+						<?php } ?>
+						
+						<?php ?>  
+			
+			<li class="nav-header logout-panel pt-1"></li>  
+			<li class="nav-item">
+				<form id="logout-form" class="logout-btn" action="../../include/common/logout.php"> 
+					<a href="javascript:{}" class="nav-link btn btn-danger" onclick="document.getElementById('logout-form').submit();">
 						<i class="fas fa-sign-out-alt nav-icon"></i>
-						ログアウト
-					</button>
+						<p>ログアウト</p>
+					</a>
+				</form>
+			</li>
 
-         				<!-- <i class="fas fa-sign-out-alt"></i>
-						<button type="submit" class="btn btn-success" value="ログアウト" /> -->
-					</form>
-				</div>
+		
 
+		</ul>
+		
+	</nav>
+	<!-- /.sidebar-menu -->
 
 			</div>
 			<!-- /.sidebar -->
@@ -173,5 +145,12 @@
 			<!-- Main content -->
 			<section class="content">
 				<div class="container-fluid">
+				<div id="flash-message">
+					<?php
+					if (isset($msg)) {
+						$msg->display();
+					}
+					?>
+				</div>
 
         

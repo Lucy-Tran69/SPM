@@ -11696,7 +11696,7 @@
 			 *      } );
 			 *    } );
 			 */
-			"sProcessing": "Processing...",
+			"sProcessing": "処理中。。。",
 	
 	
 			/**

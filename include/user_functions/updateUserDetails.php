@@ -13,6 +13,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     $password = password_hash($_POST["inputPass"],PASSWORD_DEFAULT);
     $role = $_POST["inputRole"];
     $email = $_POST["inputEmail"];
+    $start = $_POST["inputStart"];
     $expire = $_POST["inputExpire"];
     $customer = $_POST["inputCustomer"]==""?null:$_POST["inputCustomer"];
     $office = $_POST["inputOffice"]==""?null:$_POST["inputOffice"];
@@ -31,13 +32,13 @@ if ($conn->connect_error)
 $stmt;
 if(empty($password))
 {
-    $stmt = $conn->prepare("update users set name=?,account=?,role=?,email=?,effective_en_day=?,customer=?,office=?,invalid=?,upday=?,upuser=? where no=?");
-    $stmt->bind_param('ssissiiisii',$name,$account,$role,$email,$expire,$customer,$office,$invalid,$upday,$upuser,$id);
+    $stmt = $conn->prepare("update users set name=?,account=?,role=?,email=?,effective_st_day=?,effective_en_day=?,customer=?,office=?,invalid=?,upday=?,upuser=? where no=?");
+    $stmt->bind_param('ssisssiiisii',$name,$account,$role,$email,$start,$expire,$customer,$office,$invalid,$upday,$upuser,$id);
 }
 else
 {
-    $stmt = $conn->prepare("update users set name=?,account=?,role=?,email=?,effective_en_day=?,customer=?,office=?,invalid=?,upday=?,upuser=?,password=? where no=?");
-    $stmt->bind_param('ssissiiisisi',$name,$account,$role,$email,$expire,$customer,$office,$invalid,$upday,$upuser,$password,$id);
+    $stmt = $conn->prepare("update users set name=?,account=?,role=?,email=?,effective_st_day=?,effective_en_day=?,customer=?,office=?,invalid=?,upday=?,upuser=?,password=? where no=?");
+    $stmt->bind_param('ssisssiiisisi',$name,$account,$role,$email,$start,$expire,$customer,$office,$invalid,$upday,$upuser,$password,$id);
 }
 
 

@@ -1,0 +1,70 @@
+<style>
+    .hidden {
+        display: none;
+    }
+
+    #topicsList a {
+        text-decoration: underline;
+    }
+</style>
+<div class="card">
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">トピックス</h3>
+        </div>
+    <!-- /.card-header -->
+    <div id="topicTable" class="card-body table-responsive p-0" style="height: 350px;">
+        <table class="table table-striped table-head-fixed text-nowrap">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">公開日</th>
+                    <th>タイトル</th>
+                </tr>
+            </thead>
+            <tbody id="topicsList">
+                <?php include 'topicsUserList.php'; ?>
+            </tbody>
+        </table>
+        <div id="loadding" class="hidden text-center">
+          ロード中… 
+        </div>
+        <button id="loadmore" type="button" class="btn btn-block btn-primary"
+            style="width: 120px; margin: 10px auto;">もっと見る</button>
+    </div>
+    <!-- /.card-body -->
+</div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="modal-detail-topic">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row justify-content-end" style="margin-bottom: 10px;">
+                        <span id="openday"></span>
+                    </div>
+                    <div class="row mb-2 justify-content-center" id="img" style="margin-bottom: 10px;">
+                        <a href="#" target="_blank" rel="noopener noreferrer" id="imgLink">
+                            <img id="topicImage" style="width: 250px;" />
+                        </a>
+                    </div>
+                    <div class="row" style="margin-bottom: 10px;">
+                        <p id="topicBody"></p>
+                    </div>
+                    <div class="row">
+                        <p><a id="topicLink" target="_blank" href="#"></a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,35 +1,40 @@
 <?php
-include_once "common/session.php";
-include_once "../../include/database/db.inc";
+if (session_status() == PHP_SESSION_NONE) {
+	session_start();
+}
 
 // $ssmsg = array();
 // $errmsg = array();
+include_once "../../include/database/db.inc";
+
 $conn  = getConnection();
 
-if($conn->connect_error) {
-	die("Failed to connect to database. ".$conn->connect_error);
+if ($conn->connect_error) {
+	die("Failed to connect to database. " . $conn->connect_error);
 }
 
-if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
-{
-    $insert_user = $_SESSION["loginUserId"];
-   	$cd = $_POST["cd"];
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
+	$insert_user = $_SESSION["loginUserId"];
+    $upday = date('Y-m-d H:i:s');
+	$id = $_POST["id"];
+	$cd = $_POST["cd"];
    	$checkOK = 1;
-   	//echo $cd;
+   	//echo $id;
    	if (empty($cd)) {
-		$msg->error('取引先コードを入力してください。');
-    //   array_push($errmsg,"取引先コードを入力してください。");
+		   $msg->error('取引先コードを入力してください。');
+    	// array_push($errmsg,'取引先コードを入力してください。');
     	$checkOK = 0;
   	}
   	if (isset($cd) && mb_strlen(mb_convert_encoding($cd, "UTF-8")) >  8) {
-       $msg->error('取引先コードは8文字以内で入力してください。');
-    	//array_push($errmsg,'取引先コードは8文字以内で入力してください。');
+		  $msg->error('取引先コードは8文字以内で入力してください。');
+    	// array_push($errmsg,'取引先コードは8文字以内で入力してください。');
     	$checkOK = 0;
   	} else {
 	    $cd = test_input($_POST["cd"]);
+	    // check if name only contains letters and whitespace
 	    if (!preg_match("/^[a-z A-Z 0-9]*$/",$cd)) {
 			$msg->error('数字・文字のみ（特殊文字を含めない）を入力してください。');
-	      //array_push($errmsg,'数字・文字のみ（特殊文字を含めない）を入力してください。');
+	    //   array_push($errmsg,'数字・文字のみ（特殊文字を含めない）を入力してください。');
 	      $checkOK = 0;
     	}
   	}
@@ -37,11 +42,11 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
   	$name = $_POST["name"];
   	if (empty($name)) {
 		  $msg->error('取引先名を入力してください。');
-    	//array_push($errmsg,'取引先名を入力してください。');
+    	// array_push($errmsg,'取引先名を入力してください。');
     	$checkOK = 0;
   	}elseif (isset($name) && mb_strlen(mb_convert_encoding($name, "UTF-8")) > 126 ) {
 		  $msg->error('取引先名は126文字以内で入力してください。');
-  		//array_push($errmsg,'取引先名は126文字以内で入力してください。');
+  		// array_push($errmsg,'取引先名は126文字以内で入力してください。');
   		$checkOK = 0;
   	}
 
@@ -82,7 +87,6 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
   	if (empty($charge)) {
 		  $msg->error('担当者名を入力してください。');
     	// array_push($errmsg,'担当者名を入力してください。');
-    //   $_SESSION["err_msg"] = $errmsg;
     	$checkOK = 0;
   	}elseif (isset($charge) && mb_strlen(mb_convert_encoding($charge, "UTF-8")) > 512 ) {
 		  $msg->error('担当者名は512文字以内で入力してください。');
@@ -99,14 +103,14 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 
   	$supervisor = $_POST["supervisor"];
   	if (empty($supervisor)) {
-		  $msg->error('承認者を選択してください。');
-    	// array_push($errmsg,'承認者を選択してください。');
+		$msg->error('承認者を選択してください。');
+		// array_push($errmsg,'承認者を選択してください。');
     	$checkOK = 0;
   	}
 
-    $invalid = isset($_POST["invalid"]) ? $_POST["invalid"] : 0;
+  	$invalid = isset($_POST["invalid"]) ? $_POST["invalid"] : 0;
 
-    $checkDupCdInDb = "select count(*) as count_row from customer where cd = '$cd'";
+    $checkDupCdInDb = "select count(*) as count_row from customer where cd = '$cd' and no != $id";
     $NumDupCdInDb = mysqli_query($conn,$checkDupCdInDb);
 
     $row = mysqli_fetch_assoc($NumDupCdInDb);
@@ -118,25 +122,27 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     }
 
   	if ($checkOK == 1) {
-  		//save db
-  		$sql = "insert into customer (cd, name, tel, zip, address, charge, sales, supervisor, invalid, inuser)
-                values ('$cd','$name','$tel','$zip','$address','$charge',$sale,$supervisor,$invalid, $insert_user)";
-  		if (mysqli_query($conn, $sql)) {
-  			// header("Location: index.html");
-  		  	// $msg->success("新規取引先の追加に成功しました。");
-		//   array_push($ssmsg, "新規取引先の追加に成功しました。");
-		  $msg->success('新規取引先の追加に成功しました。');
+	    $sql = "update customer set cd = '$cd', name = '$name', tel = '$tel', zip = '$zip', address = '$address', charge = '$charge', sales = $sale, supervisor = $supervisor, invalid= $invalid, 
+	    			upday =  '$upday' , upuser = $insert_user 
+	      			where no = $id";
+	                // print_r($sql);die();
+	    if (mysqli_query($conn, $sql)) {
+		  //header("Location: ../../app/customer/customer.html");
+		  $msg->success('取引先編集に成功しました。');
+	    //    array_push($ssmsg, "取引先編集に成功しました。");
         //   $_SESSION["success_msg"]=$ssmsg;
         //   echo json_encode(array("statusCode"=>200, "msg" =>  $ssmsg));
-  		  	// $_SESSION["success_msg"]=array("新規取引先の追加に成功しました。");
-          // header("Location: index.html");
-          // exit();
-  		} else {
-           echo json_encode(array("statusCode"=>201, "msg" =>  mysqli_error($conn)));
-  		}
+	        // header("Location: ../../app/customer/customer.html");
+	        // exit;
+	        //header('Location:customer.html');
+	    } else {
+			$msg->error('mysqli_error($conn)');
+			$msg->display();
+	    //    echo json_encode(array("statusCode"=>201, "msg" =>  mysqli_error($conn)));
+	    }
   	}else{
-	//   echo json_encode(array("statusCode"=>201, "msg" =>  $errmsg));
-	  $msg->display();
+		  $msg->display();
+    //   echo json_encode(array("statusCode"=>201, "msg" =>  $errmsg));
     }
 }
 
@@ -148,4 +154,3 @@ function test_input($data) {
   $data = htmlspecialchars($data);
   return $data;
 }
-?>

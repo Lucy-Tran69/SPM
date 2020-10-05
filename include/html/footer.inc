@@ -4,5 +4,6 @@
   }
 </style>
 <footer class="footer">(c) www.nci.co.jp</footer>
+</div>
 </body>
 </html>

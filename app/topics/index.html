@@ -1,19 +1,16 @@
 <?php
     include_once "html/header.inc";
     include_once "html/menu.inc";
-    include_once "html/showmessage.inc";
-    if (isset($_SESSION["loginAccount"])) {
 ?>
 
-<input type="hidden" name="" id="list-topic" value="トピックス一覧">
-<div class="alert dismissable alert-success" style="display: none;" id="deleteSuccess">
+<input type="hidden" name="" id="page-name" value="トピックス一覧">
+<!-- <div class="alert dismissable alert-success" style="display: none;" id="deleteSuccess">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">×</span>
     </button>
     <span id="messageDelete"></span>
-</div>
-<div id="d-message">
-</div>
+</div> -->
+
 <div class="card card-default">
     <div class="card-body">
         <div class="row justify-content-md-center">
@@ -43,11 +40,11 @@
         <div class="row justify-content-end" style="margin-bottom: 20px; margin-right: 10px">
             <button type="button" class="btn btn-primary" onclick="redirectAddOrEditTopic()">追加</button>
         </div>
-        <table id="topicsTable" class="table table-bordered table-hover">
+        <table id="topicsTable" class="table table-bordered table-striped">
             <thead>
                 <tr class="text-center">
                     <th>作成日</th>
-                    <th>公開日時</th>
+                    <th>公開日</th>
                     <th>終了日</th>
                     <th>タイトル</th>
                     <th></th>
@@ -57,11 +54,7 @@
     </div>
     <!-- /.card-body -->
 </div>
-<?php
-} else {
-  //header("Location: ../../include/logout.php");
-}
-include_once "html/foot.inc" ?>
+<?php include_once "html/foot.inc" ?>
 <script type="text/javascript" src="../../app/refer/js/topic/topics.js"></script>
 
 </body>

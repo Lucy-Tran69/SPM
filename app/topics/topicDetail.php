@@ -13,13 +13,10 @@
     $data = array();
 
     if(!empty($id)) {
-        ## Fetch records
         $sql = "SELECT title, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, image, image_link, body, link_title, link_url FROM topics WHERE no=$id";
 
-        // Thực hiện câu truy vấn
-        $query = mysqli_query($conn, $sql) or die ('Lỗi câu truy vấn');
+        $query = mysqli_query($conn, $sql) or die ('Error');
 
-        // Duyệt kết quả rồi đưa vào mảng result
         $result = array();
         while ($row = mysqli_fetch_array($query))
         {
@@ -35,6 +32,5 @@
         }
     }
     echo json_encode($data);
-    // die();
     $conn->close();
 ?>

@@ -1,7 +1,6 @@
 <?php
     include_once "html/header.inc";
     include_once "html/menu.inc";
-    //include_once "html/showmessage.inc";
 ?>
 
 <style type="text/css" media="all">
@@ -9,26 +8,21 @@
         content: none;
     }
 </style>
-<?php
-if (isset($_SESSION["loginAccount"])) {
-?>
-<input type="hidden" name="" id="add-topic" value="トピックス追加">
-<div id="d-message"></div>
+
+<input type="hidden" name="" id="page-name" value="トピックス追加">
+
 <div class="row">
-    <!-- left column -->
     <div class="col-md-12">
-        <!-- jquery validation -->
         <div class="card card-primary">
             <form action="" role="form" id="addTopic" method="POST" novalidate="novalidate"
                 enctype="multipart/form-data">
                 <div class="card-body">
                     <div class="form-group">
                         <label for="title">タイトル</label>
-                        <input type="title" name="title" class="form-control" id="title" placeholder="タイトル">
+                        <input type="text" name="title" class="form-control" id="title" placeholder="タイトル">
                     </div>
                     <div class="row">
                         <div class="col-sm-6">
-                            <!-- text input -->
                             <div class="form-group">
                                 <label for="openDay" data-target="#openDay"
                                     data-toggle="datetimepicker">公開日</label>
@@ -41,7 +35,6 @@ if (isset($_SESSION["loginAccount"])) {
                                         <div class="input-group-text"><i class="fas fa-calendar-week"></i></div>
                                     </div>
                                 </div>
-                                <!-- /.input group -->
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -57,13 +50,12 @@ if (isset($_SESSION["loginAccount"])) {
                                         <div class="input-group-text"><i class="fas fa-calendar-week"></i></div>
                                     </div>
                                 </div>
-                                <!-- /.input group -->
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="body">本文</label>
-                        <textarea type="body" name="body" class="form-control" rows="6" id="body"
+                        <textarea type="text" name="body" class="form-control" rows="6" id="body"
                             placeholder="本文"></textarea>
                     </div>
                     <div class="card">
@@ -97,7 +89,7 @@ if (isset($_SESSION["loginAccount"])) {
                                  <div class="col-sm-11">
                                  <div class="form-group">
                                         <label for="imgLink">リンク</label>
-                                        <input type="imgLink" name="imgLink" class="form-control" id="imgLink" placeholder="リンク">
+                                        <input type="text" name="imgLink" class="form-control" id="imgLink" placeholder="リンク">
                                     </div> 
                                 </div>
                             </div>
@@ -114,7 +106,7 @@ if (isset($_SESSION["loginAccount"])) {
                                  <div class="col-sm-11">
                                    <div class="form-group">
                                         <label for="titleLink">タイトル</label>
-                                        <input type="titleLink" name="titleLink" class="form-control"
+                                        <input type="text" name="titleLink" class="form-control"
                                             id="titleLink" placeholder="タイトル">
                                     </div>
                                 </div>
@@ -128,7 +120,7 @@ if (isset($_SESSION["loginAccount"])) {
                                  <div class="col-sm-11">
                                    <div class="form-group">
                                          <label for="urlImage">URL</label>
-                                        <input type="urlImage" name="urlImage" class="form-control"
+                                        <input type="text" name="urlImage" class="form-control"
                                             id="urlImage" placeholder="URL">
                                     </div>
                                 </div>
@@ -141,7 +133,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <!-- /.card-body -->
                 <div class="card-footer">
                     <div class="row justify-content-md-center">
-                        <button id="btn-submit" type="button" class="btn btn-primary">登録</button>
+                        <button type="submit" class="btn btn-primary">追加</button>
                         <button type="button" class="btn btn-secondary" style="margin-left: 20px;"
                             onclick="onBtnclick()">プレビュー</button>
                          <button type="button" class="btn btn-default" style="margin-left: 20px;" onclick="redirectListTopic()">戻る</button>
@@ -149,14 +141,9 @@ if (isset($_SESSION["loginAccount"])) {
                 </div>
             </form>
         </div>
-        <!-- /.card -->
     </div>
-    <!--/.col (left) -->
-    <!-- right column -->
     <div class="col-md-6">
-
     </div>
-    <!--/.col (right) -->
 </div>
 
 <div class="modal fade bd-example-modal-lg" id="previewTopic" tabindex="-1" role="dialog"
@@ -198,11 +185,6 @@ if (isset($_SESSION["loginAccount"])) {
     </div>
 </div>
 
-<?php
-} else {
-    //header("Location: ../../include/logout.php");
-}
-?>
 <?php include_once "html/foot.inc"; ?>
 <script type="text/javascript" src="../../app/refer/js/topic/topics.js"></script>
 <!-- bs-custom-file-input -->

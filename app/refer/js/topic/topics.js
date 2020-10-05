@@ -178,8 +178,12 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
-     $('#btn-submit').click(function(e) {
-
+     formAddTopic.submit(function(e) {
+        event.preventDefault();
+          if(!formAddTopic.valid()) 
+          {
+            return false;
+           }
         var file_data = $('#imgFile').prop('files')[0];   
         var form_data = new FormData();                  
         form_data.append('imgFile', file_data);
@@ -194,38 +198,22 @@ $(function () {
         $.ajax({
             url: "createTopic.php",
             type: "POST",
-            cache: false,
             contentType: false,
             processData: false,
             data: form_data,
+            dataType:"html",
             success: function(response)  {
-                // debugger
-                var response = JSON.parse(response);
-
-                if(response.statusCode == 200){
-                      
+                //check response is blank if success 
+                if (!$.trim(response)) {
                     window.location.href = "index.html";
-                     var messages = '<div class="alert alert-success alert-dismissible">' + 
-                       '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
-                       '%message%' +
-                       '</div>';                   
-                       $("#d-message").empty();
-                       messages = messages.replace('%message%', response.msg);
-                       $("#d-message").append(messages);
-
-                } else { 
-                     var messages = '<div class="alert alert-danger alert-dismissible">' + 
-                       '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
-                       '%message%' +
-                       '</div>';                   
-                       $("#d-message").empty();
-                       messages = messages.replace('%message%', response.msg);
-                       $("#d-message").append(messages);
-                      
-                   }
+                } 
+                // if error
+                else {
+                    $("#flash-message").html(response);        
+                }
             },
             error: function(jqXHR, textStatus, errorThrown)  {
-                alert( "Bug" );
+                // alert( "Bug" );
             },
         });
     });

@@ -12,12 +12,12 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     $name = $_POST["insertName"];
     $role = $_POST["insertRole"];
     $email = $_POST["insertEmail"];
+    $start = $_POST["insertStart"];
     $expire = $_POST["insertExpire"];
     $customer = $_POST["insertCustomer"]==""?NULL:$_POST["insertCustomer"];
     $office = $_POST["insertOffice"]==""?NULL:$_POST["insertOffice"];
     $invalid = $_POST["insertInvalid"]==null? 0:1;
     $password = password_hash($_POST["insertPass"],PASSWORD_DEFAULT);
-    $start = date('Y-m-d');
     $insert_user = $_SESSION["loginUserId"];
 }
 

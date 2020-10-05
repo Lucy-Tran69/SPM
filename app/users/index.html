@@ -1,6 +1,5 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) 
-{
+if (session_status() == PHP_SESSION_NONE) {
   session_start();
 }
 include "common/check_view_permission.php";
@@ -10,16 +9,55 @@ header("content-type: text/html; charset=UTF-8");
 //Get array of roles from session variable 
 ?>
 <style>
-.update_button{
-  width:50%;
+  .update_button {
+    width: 50%;
+  }
+
+  .align_button {
+    text-align: center;
+  }
+
+  .align_form {
+    text-align: -webkit-center;
+  }
+
+/* .table-wrapper {
+  max-height: 500px;
+  overflow: auto;
+  display:inline-block;
 }
 
-.align_button{
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+} */
+.tableFixHead {
+  overflow-y: auto;
+  height: 500px;
+}
+
+.tableFixHead table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.tableFixHead th,
+.tableFixHead td {
+  padding: 8px 16px;
+}
+
+thead{
   text-align: center;
 }
-
-.align_form{
-  text-align:-webkit-center;
+tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 </style>
 <?php include "html/sidebar.inc" ?>
@@ -41,57 +79,58 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
               <!-- /.card-header -->
               <div class="card-body">
-              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
+                <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
                   <div class="form-group">
-                  <div class="row">
-                    <div class="col-xs-5">
-                  <label id="itemLabel">権限</label>
-                    <select name="selectedRole" id="selectedRole" class="form-control" onchange="searchTableByRole();">
-                    <option value="">-</option>
-                        <?php
-                        if ($roleResultSet->num_rows > 0) {
-                          mysqli_data_seek($roleResultSet,0);
-                          while ($row = $roleResultSet->fetch_assoc()) {
-                        ?>
-                            <option value="<?php echo $row["name"]; ?>"><?php echo $row["name"]; ?></option>
-                        <?php
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <label id="itemLabel">権限</label>
+                        <select name="selectedRole" id="selectedRole" class="form-control">
+                          <option value="">-</option>
+                          <?php
+                          if ($roleResultSet->num_rows > 0) {
+                            mysqli_data_seek($roleResultSet, 0);
+                            while ($row = $roleResultSet->fetch_assoc()) {
+                          ?>
+                              <option value="<?php echo $row["no"]; ?>" <?php if(isset($_POST["selectedRole"]) && $_POST["selectedRole"]==$row["no"]){echo "selected='selected'";} ?> ><?php echo $row["name"]; ?></option>
+                          <?php
+                            }
                           }
-                        }
-                        ?>
-                      </select>
+                          ?>
+                        </select>
+                      </div>
+                    </div>
                   </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <label id="nameLabel" class="searchTable_label">氏名</label>
+                        <input type="text" id="searchName" name="searchName" value="<?php echo isset($_POST["searchName"])?$_POST["searchName"]:"";?>" class="form-control"/>
+                      </div>
+                    </div>
                   </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <label id="custLabel" class="searchTable_label">取引先名</label>
+                        <input type="text" name="searchCustomer" id="searchCustomer" value="<?php echo isset($_POST["searchCustomer"])?$_POST["searchCustomer"]:"";?>" class="form-control"/>
+                      </div>
+                    </div>
                   </div>
-                    <div class="form-group">
+                  <div class="form-group">
                     <div class="row">
-                    <div class="col-xs-5">
-                    <label id="nameLabel" class="searchTable_label">氏名</label>
-                    <input type="text" id="searchName" name="searchName" class="form-control" onkeyup="searchTableByName();"/>
+                      <div class="col-xs-5">
+                        <div class="form-check">
+                          <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" value="<?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?> />
+                          <label id="checkLabel" class="form-check-label">ログインできないユーザ</label>
+                        </div>
+                      </div>
                     </div>
-                    </div>
-                    </div>
-                    <div class="form-group">
-                    <div class="row">
-                    <div class="col-xs-5">
-                    <label id="custLabel" class="searchTable_label">取引先名</label>
-                    <input type="text" name="searchCustomer" id="searchCustomer" class="form-control" onkeyup="searchTableByCustomer();"/>
-                    </div>
-                    </div>
-                    </div>
-                    <div class="form-group">
-                    <div class="row">
-                    <div class="col-xs-5">
-                    <div class="form-check">
-                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="<?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>" <?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>/>
-                    <label id="checkLabel" class="form-check-label">ログインできないユーザ</label>
-                    </div>
-                    </div>
-                    </div>
-                    </div>
-                <input type="submit" value="検索" class="btn btn-primary" style="width: 100px; margin-left: 250px;">
-                <input type="button" value="追加" class="btn btn-primary" style="width: 100px; margin-left: 250px;" data-target="#insert" data-toggle="modal">
-              </form>
+                  </div>
+                  <input type="submit" value="検索" class="btn btn-primary" style="width: 100px; margin-left: 250px;">
+                  <button type="button" value="" class="btn btn-info" style="width: 100px; margin-left: 250px;" data-target="#insert" data-toggle="modal" onclick="setExpire('INSERT');"><i class="fas fa-plus"></i>&nbsp;追加</button>
+                </form>
               </div>
+              <div class="tableFixHead">
               <table id="details_table" class="table table-bordered">
                 <thead>
                   <tr>
@@ -115,9 +154,9 @@ if (isset($_SESSION["loginAccount"])) {
                         <td><?php echo $row["account"] ?></td>
                         <td><?php echo $row["role"] ?></td>
                         <td><?php echo $row["cname"] ?></td>
-                        <td><?php echo $row["effective_st_day"] ?></td>
+                        <td><?php echo $row["effective_en_day"] ?></td>
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
-                        <td class="align_button"><input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" value="変更" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"></td>
+                        <td class="align_button"><button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"><i class="fas fa-pencil-alt"></i>変更</button></td>
                       </tr>
                   <?php
                     }
@@ -127,6 +166,13 @@ if (isset($_SESSION["loginAccount"])) {
                   ?>
                 </tbody>
               </table>
+              </div>
+              <!-- <ul class="pagination" style="margin-left: 38%;">
+                <li class="paginate_button page-item previous disabled" id="customerTable_previous"><a href="#" aria-controls="customerTable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+                <li class="paginate_button page-item active"><a href="#" aria-controls="customerTable" data-dt-idx="1" tabindex="0" class="page-link">1</a></li>
+                <li class="paginate_button page-item "><a href="#" aria-controls="customerTable" data-dt-idx="2" tabindex="0" class="page-link">2</a></li>
+                <li class="paginate_button page-item next" id="customerTable_next"><a href="#" aria-controls="customerTable" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>
+              </ul> -->
               <!-- /.card-footer-->
             </div>
             <!-- /.card -->
@@ -139,21 +185,21 @@ if (isset($_SESSION["loginAccount"])) {
   <!-- /.content-wrapper -->
   <div class="modal fade" tabindex="-1" role="dialog" id="details">
     <div class="modal-dialog" role="document">
-      <div class="modal-content">
+      <div class="modal-content" style="width: max-content;">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body align_form">
-          <form action="../../include/user_functions/updateUserDetails.php" method="POST" class="form_style">
+          <form action="../../include/user_functions/updateUserDetails.php" method="POST" class="form_style" onsubmit="return validateUpdate();">
             <input type="hidden" id="inputId" name="inputId" />
             <table class="popup_table">
               <tr>
                 <td><label id="nameLabel" class="label_align_table">氏名</label></td>
-                <td><input type="text" id="inputName" name="inputName" required autocomplete="off"/></td>
+                <td><input type="text" id="inputName" name="inputName" required autocomplete="off" /></td>
               </tr>
               <tr>
                 <td><label id="accountLabel" class="label_align_table">アカウント</label></td>
-                <td><input type="text" id="inputAccount" name="inputAccount" required autocomplete="off"/></td>
+                <td><input type="text" id="inputAccount" name="inputAccount" required autocomplete="off" /></td>
               </tr>
               <tr>
                 <td><label id="passwordLabel" class="label_align_table">パスウード</label></td>
@@ -164,7 +210,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><select id="inputRole" name="inputRole">
                     <?php
                     if ($roleResultSet->num_rows > 0) {
-                      mysqli_data_seek($roleResultSet,0);
+                      mysqli_data_seek($roleResultSet, 0);
                       while ($row = $roleResultSet->fetch_assoc()) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
@@ -177,11 +223,13 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="emailLabel" class="label_align_table">Email</label></td>
-                <td><input type="email" id="inputEmail" name="inputEmail" required autocomplete="off"/></td>
+                <td><input type="email" id="inputEmail" name="inputEmail" required autocomplete="off" /></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
-                <td><input type="date" id="inputExpire" name="inputExpire" min="<?php echo date('Y-m-d');?>" required/></td>
+                <td><input type="date" id="inputStart" name="inputStart" required />~
+                <input type="date" id="inputExpire" name="inputExpire" min="<?php echo date('Y-m-d'); ?>" />
+                </td>
               </tr>
               <tr>
                 <td><label id="customerLabel" class="label_align_table">取引先</label></td>
@@ -233,7 +281,7 @@ if (isset($_SESSION["loginAccount"])) {
   <!-- Add user modal -->
   <div class="modal fade" tabindex="-1" role="dialog" id="insert">
     <div class="modal-dialog" role="document">
-      <div class="modal-content">
+      <div class="modal-content" style="width: max-content;">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
@@ -242,22 +290,22 @@ if (isset($_SESSION["loginAccount"])) {
             <table class="popup_table">
               <tr>
                 <td><label id="nameLabel" class="label_align_table">氏名</label></td>
-                <td><input type="text" id="insertName" name="insertName" required autocomplete="off"/></td>
+                <td><input type="text" id="insertName" name="insertName" required autocomplete="off" /></td>
               </tr>
               <tr>
                 <td><label id="accountLabel" class="label_align_table">アカウント</label></td>
-                <td><input type="text" id="insertAccount" name="insertAccount" required autocomplete="off"/></td>
+                <td><input type="text" id="insertAccount" name="insertAccount" required autocomplete="off" /></td>
               </tr>
               <tr>
                 <td><label id="passwordLabel" class="label_align_table">パスウード</label></td>
-                <td><input type="password" id="insertPass" name="insertPass" required autocomplete="off"/></td>
+                <td><input type="password" id="insertPass" name="insertPass" required autocomplete="off" /></td>
               </tr>
               <tr>
                 <td><label id="roleLabel" class="label_align_table">権限</label></td>
                 <td><select id="insertRole" name="insertRole">
                     <?php
                     if ($roleResultSet->num_rows > 0) {
-                      mysqli_data_seek($roleResultSet,0);
+                      mysqli_data_seek($roleResultSet, 0);
                       while ($row = $roleResultSet->fetch_assoc()) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
@@ -270,11 +318,13 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="emailLabel" class="label_align_table">Email</label></td>
-                <td><input type="email" id="insertEmail" name="insertEmail" required autocomplete="off"/></td>
+                <td><input type="email" id="insertEmail" name="insertEmail" required autocomplete="off" /></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
-                <td><input type="date" id="insertExpire" name="insertExpire" min="<?php echo date('Y-m-d');?>" value="<?php echo date('Y-m-d');?>" required/></td>
+                <td><input type="date" id="insertStart" name="insertStart" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" required />~<
+                <input type="date" id="insertExpire" name="insertExpire" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" />
+                </td>
               </tr>
               <tr>
                 <td><label id="customerLabel" class="label_align_table">取引先</label></td>
@@ -282,7 +332,7 @@ if (isset($_SESSION["loginAccount"])) {
                     <option value="">-</option>
                     <?php
                     if ($custResultSet->num_rows > 0) {
-                      mysqli_data_seek($custResultSet,0);
+                      mysqli_data_seek($custResultSet, 0);
                       while ($row = $custResultSet->fetch_assoc()) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
@@ -299,7 +349,7 @@ if (isset($_SESSION["loginAccount"])) {
                     <option value="">-</option>
                     <?php
                     if ($officeResultSet->num_rows > 0) {
-                      mysqli_data_seek($officeResultSet,0);
+                      mysqli_data_seek($officeResultSet, 0);
                       while ($row = $officeResultSet->fetch_assoc()) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
@@ -344,6 +394,62 @@ if (isset($_SESSION["loginAccount"])) {
   var pHan = "[\\u2E80-\\u2E99\\u2E9B-\\u2EF3\\u2F00-\\u2FD5\\u3005\\u3007\\u3021-\\u3029\\u3038-\\u303B\\u3400-\\u4DB5\\u4E00-\\u9FD5\\uF900-\\uFA6D\\uFA70-\\uFAD9]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1]|\\uD87E[\\uDC00-\\uDE1D]";
   var regexJapaneseAlnum = new RegExp("^([\\w-]|" + pHiragana + "|" + pKatakana + "|" + pHan + ")+$");
 
+  function setExpire(type) {
+    if (type == "INSERT") {
+      var str = $("#insertStart").val();
+      var parts = str.split("-");
+
+      var year = parts[0] && parseInt(parts[0], 10);
+      var month = parts[1] && parseInt(parts[1], 10);
+      var day = parts[2] && parseInt(parts[2], 10);
+      var duration = parseInt("1", 10);
+
+      if (day <= 31 && day >= 1 && month <= 12 && month >= 1) {
+
+        var expiryDate = new Date(year, month - 1, day);
+        expiryDate.setFullYear(expiryDate.getFullYear() + duration);
+
+        var day = ('0' + expiryDate.getDate()).slice(-2);
+        var month = ('0' + (expiryDate.getMonth() + 1)).slice(-2);
+        var year = expiryDate.getFullYear();
+
+        $("#insertExpire").val(year + "-" + month + "-" + day);
+
+      } else {
+        // display error message
+      }
+    } else if (type == "UPDATE") {
+      var str = $("#inputStart").val();
+      var parts = str.split("-");
+
+      var year = parts[0] && parseInt(parts[0], 10);
+      var month = parts[1] && parseInt(parts[1], 10);
+      var day = parts[2] && parseInt(parts[2], 10);
+      var duration = parseInt("1", 10);
+
+      if (day <= 31 && day >= 1 && month <= 12 && month >= 1) {
+
+        var expiryDate = new Date(year, month - 1, day);
+        expiryDate.setFullYear(expiryDate.getFullYear() + duration);
+
+        var day = ('0' + expiryDate.getDate()).slice(-2);
+        var month = ('0' + (expiryDate.getMonth() + 1)).slice(-2);
+        var year = expiryDate.getFullYear();
+
+        $("#inputExpire").val(year + "-" + month + "-" + day);
+
+      } else {
+        // display error message
+      }
+    }
+
+  }
+  $(document).ready(function() {
+    $("#insertStart").change(function() {
+      setExpire("INSERT");
+    });
+  });
+
   function openModal(userid) {
     $.ajax({
       url: "../../include/user_functions/getSelectedUser.php",
@@ -358,7 +464,12 @@ if (isset($_SESSION["loginAccount"])) {
           $("#inputName").val(response.name);
           $("#inputAccount").val(response.account);
           $('#inputRole').val(response.role).change();
-          $("#inputExpire").val(response.expire);
+          $("#inputStart").val(response.start);
+          if (response.expire == "" || response.expire == null) {
+            setExpire('UPDATE');
+          } else {
+            $("#inputExpire").val(response.expire);
+          }
           $("#inputCustomer").val(response.customer).change();
           $("#inputOffice").val(response.office).change();
           $("#inputEmail").val(response.email);
@@ -380,114 +491,149 @@ if (isset($_SESSION["loginAccount"])) {
     modal.style.display = "none";
   }
 
-function searchTableByName() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("searchName");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
+  function searchTableByName() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchName");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("details_table");
+    tr = table.getElementsByTagName("tr");
 
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[1];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-
-function searchTableByCustomer() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("searchCustomer");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
-
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[4];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-
-function searchTableByRole() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("selectedRole");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
-
-  // Loop through all table rows, and hide those who don't match the search query
+    // Loop through all table rows, and hide those who don't match the search query
     for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[3];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
+      td = tr[i].getElementsByTagName("td")[1];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
       }
     }
   }
-}
 
-function searchTableByInvalid() {
-  // Declare variables
-  // var input, filter, table, tr, td, i, txtValue;
-  // input = document.getElementById("searchInvalid").checked;
-  // filter = input;
-  // table = document.getElementById("details_table");
-  // tr = table.getElementsByTagName("tr");
+  function searchTableByCustomer() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchCustomer");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("details_table");
+    tr = table.getElementsByTagName("tr");
 
-  // // Loop through all table rows, and hide those who don't match the search query
-  //   for (i = 0; i < tr.length; i++) {
-  //   td = tr[i].getElementsByTagName("td")[6];
-  //   if (td) {
-  //     txtValue = td.textContent || td.innerText;
-  //     if (txtValue==1) 
-  //     {
-  //       if(filter==true)
-  //       {
-  //         tr[i].style.display = "";
-  //       }
-  //       else
-  //       {
-  //         tr[i].style.display = "none";
-  //       }
-  //     }
-  //   }
-  // }
-
-  document.getElementById('searchForm').submit();
-}
-
-function validateInsert()
-{
-  var name = document.getElementById("insertName");
-  if(regexJapaneseAlnum.test(name.value)==false)
-  {
-    alert("Name is invalid");
-    return false;
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[4];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
   }
-  else
-  {
-    return true;
-  }
-}
 
+  function searchTableByRole() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("selectedRole");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("details_table");
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[3];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+
+  function searchTableByInvalid() {
+    // Declare variables
+    // var input, filter, table, tr, td, i, txtValue;
+    // input = document.getElementById("searchInvalid").checked;
+    // filter = input;
+    // table = document.getElementById("details_table");
+    // tr = table.getElementsByTagName("tr");
+
+    // // Loop through all table rows, and hide those who don't match the search query
+    //   for (i = 0; i < tr.length; i++) {
+    //   td = tr[i].getElementsByTagName("td")[6];
+    //   if (td) {
+    //     txtValue = td.textContent || td.innerText;
+    //     if (txtValue==1) 
+    //     {
+    //       if(filter==true)
+    //       {
+    //         tr[i].style.display = "";
+    //       }
+    //       else
+    //       {
+    //         tr[i].style.display = "none";
+    //       }
+    //     }
+    //   }
+    // }
+
+    document.getElementById('searchForm').submit();
+  }
+
+  function validateInsert() {
+    var flag=true;
+    var c = $("#insertCustomer").val();
+    var o = $("#insertOffice").val();
+    var r = $("#insertRole").val();
+    var name = document.getElementById("insertName");
+    if (regexJapaneseAlnum.test(name.value) == false) 
+    {
+      alert("Name is invalid");
+      flag=false;
+    } 
+    if((r>=1 && r<=4) && (c=="" || c==null))
+    {
+      alert("Customer is invalid");
+      flag=false;
+    }
+    if(r>=5 && r<=6 && (o=="" || o==null))
+    {
+      alert("Office is invalid");
+      flag=false;
+    }
+
+    return flag;
+  }
+
+  function validateUpdate() {
+    var flag=true;
+    var c = $("#inputCustomer").val();
+    var o = $("#inputOffice").val();
+    var r = $("#inputRole").val();
+    var name = document.getElementById("inputName");
+    if (regexJapaneseAlnum.test(name.value) == false) 
+    {
+      alert("Name is invalid");
+      flag=false;
+    } 
+    if((r>=1 && r<=4) && (c=="" || c==null))
+    {
+      alert("Customer is invalid");
+      flag=false;
+    }
+    if(r>=5 && r<=6 && (o=="" || o==null))
+    {
+      alert("Office is invalid");
+      flag=false;
+    }
+
+    return flag;
+  }
 </script>

@@ -1,24 +1,99 @@
 <?php 
-
+// header("Content-type:application/pdf");
+// header("Content-Disposition:attachment;filename='filename.pdf'");
 include_once('database/db.inc');
 require_once('libs/japanese.php');
-
-
+$invalid = isset($_POST["pdfInvalid"])?$_POST["pdfInvalid"]:null;
+$inventory= isset($_POST["pdfInventory"])?$_POST["pdfInventory"]:null;
 $err_msg = "";
 $conn  = getConnection();
 if($conn->connect_error)
 {
     die("Failed to connect to database. ".$conn->connect_error);
 }
+$searchQuery = "";
+$searchCd = "";
+$searchMaker = "";
 
-$stmt = $conn->prepare("select maker.name as mName,
-                        commodity.name as cName,
-                        inventory_mark.display as display 
-                        from maker 
-                        LEFT JOIN commodity on maker.no=commodity.maker
-                        LEFT JOIN inventory on inventory.commodity=commodity.no
-                        LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
-                        where commodity.name IS NOT NULL order by commodity.no ASC");
+    $maker = isset($_POST["selectedMaker"])?$_POST["selectedMaker"]:null;
+    $code = isset($_POST["searchCartridge"])?$_POST["searchCartridge"]:null;
+   // echo json_encode ($status);die();
+    if(!empty($code)){
+        $searchCd = " and commodity.name like '%$code%' ";
+    }
+    if(!empty($maker)){
+        $searchMaker = " and maker.no = ".$maker;
+    }
+   
+    if (!empty($searchCd) || !empty($searchMaker)) {
+        if (!empty($searchCd))
+        {
+            $searchQuery = $searchQuery.$searchCd ;
+        }
+        if (!empty($searchMaker))
+        {
+            $searchQuery = $searchQuery.$searchMaker;
+        }
+    }
+$stmt;
+if($inventory==null)
+{
+if($invalid==null)
+{
+    $stmt = $conn->prepare("select maker.name as mName,
+                    commodity.name as cName,
+                    inventory_mark.display as display 
+                    from maker 
+                    LEFT JOIN commodity on maker.no=commodity.maker
+                    LEFT JOIN inventory on inventory.commodity=commodity.no
+                    LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
+                    where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." order by commodity.cd ASC");
+}
+else
+{
+    $stmt = $conn->prepare("select maker.name as mName,
+                    commodity.name as cName,
+                    inventory_mark.display as display 
+                    from maker 
+                    LEFT JOIN commodity on maker.no=commodity.maker
+                    LEFT JOIN inventory on inventory.commodity=commodity.no
+                    LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
+                    where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery. " AND inventory.inventory_mark<>4 order by commodity.cd ASC");
+}
+}
+else
+{   
+if($invalid==null)
+{
+    $stmt = $conn->prepare("select maker.name as mName,
+                    commodity.name as cName,
+                    inventory_mark.display as display 
+                    from maker 
+                    LEFT JOIN commodity on maker.no=commodity.maker
+                    inner JOIN inventory on inventory.commodity=commodity.no
+                    LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
+                    where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." order by commodity.cd ASC");
+}
+else
+{
+    $stmt = $conn->prepare("select maker.name as mName,
+                    commodity.name as cName,
+                    inventory_mark.display as display  
+                    from maker 
+                    LEFT JOIN commodity on maker.no=commodity.maker
+                    inner JOIN inventory on inventory.commodity=commodity.no
+                    LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
+                    where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." AND inventory.inventory_mark<>4 order by commodity.cd ASC");
+}
+}
+// $stmt = $conn->prepare("select maker.name as mName,
+// commodity.name as cName,
+// inventory_mark.display as display 
+// from maker 
+//                         LEFT JOIN commodity on maker.no=commodity.maker
+//                         LEFT JOIN inventory on inventory.commodity=commodity.no
+//                         LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
+//                         where commodity.name IS NOT NULL order by commodity.no ASC");
 $result = execute($stmt,$conn);
 if($result==TRUE)
 {
@@ -35,23 +110,83 @@ if($result==TRUE)
 //     array_push($content, $item);
 // }
 //↑↑↑ dummy data
+$id = $_POST["UserId"];
+$officeStmt = $conn->prepare("select office,customer from users where no=?");
+$officeStmt->bind_param('i',$id);
+$officeResult = execute($officeStmt, $conn);
+if ($officeResult == TRUE) {
+    $officeResult = $officeStmt->get_result();
+    $officeResultSet = $officeResult;
+}
+$office;
+$customer;
+$tel;
+if ($officeResultSet->num_rows > 0) 
+{
+    mysqli_data_seek($officeResultSet, 0);
+    while ($row = $officeResultSet->fetch_assoc()) 
+    {
+        $office = $row["office"];
+        $customer = $row["customer"];
+    }
 
+    if (!empty($office)) 
+    {
+        $Stmt = $conn->prepare("select tel from office where no=".$office);
+        $Result = execute($Stmt, $conn);
+        if ($Result == TRUE) 
+        {
+            $Result = $Stmt->get_result();
+            $ResultSet = $Result;
+        }
+    }
+    else if(!empty($customer))
+    {
+        $Stmt = $conn->prepare("select tel from customer where no=".$customer);
+        $Result = execute($Stmt, $conn);
+        if ($Result == TRUE) 
+        {
+            $Result = $Stmt->get_result();
+            $ResultSet = $Result;
+        }
+    }
+
+    while($row = $ResultSet->fetch_assoc())
+    {
+        $tel = $row["tel"];
+    }
+}
 class PDF extends PDF_Japanese
 {
+    public $tel;
+    public function __construct($custom) {
+        parent::__construct();
+        $this->tel = $custom;
+    }
     function Header()
     {
-        $this->SetFont('SJIS','B',14);
+
+        $this->SetFont('SJIS','',14);
        
         //set 
         $this->SetTextColor(0,0,0);
 
         // 表のタイトル
+        $top = "在庫表";
+        $this->Cell(0, 10,mb_convert_encoding($top, 'SJIS'),0,0,'C', false);
+        $this->Ln();
+        $this->Cell(0, 10,mb_convert_encoding("エヌシーアイ販売(株)　CS業務担当", 'SJIS'),0,0,'R', false);
+        $this->Ln();
+        $this->Cell(0, 10,mb_convert_encoding("TEL :".$this->tel." FAX :".$this->tel, 'SJIS'),0,0,'R', false);
+        
+        //line break
+        $this->Ln();
         $title = "在庫状況表示：　○/在庫あり　△/在庫少量　リターン/リターン再生対応";
         $this->Cell(0, 10,mb_convert_encoding($title, 'SJIS'),0,0,'C', false);
         
         //line break
         $this->Ln();
-
+        $this->SetFont('SJIS','B',14);
         //テーブルのヘッダー
         // $headers = array("No", "品名", "数", "担当者");
         $headers = array("メーカー","完成品在庫","在庫状況");
@@ -89,7 +224,7 @@ class PDF extends PDF_Japanese
     }
 }
 
-$pdf = new PDF();
+$pdf = new PDF($tel);
 $pdf->AddSJISFont();
 $pdf->AddPage();
 
@@ -111,7 +246,7 @@ foreach ($result as $row) {
 }
 
 $pdf->Output();
+// readfile("filename.pdf");
 $pdf->Close();
-
 
 ?>

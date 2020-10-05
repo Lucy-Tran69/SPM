@@ -3,8 +3,6 @@ include_once "common/session.php";
 include_once "database/db.inc";
 
 $conn  = getConnection();
-$errmsg = array();
-$ssmsg = array();
 
 if ($conn->connect_error) {
 	die("Failed to connect to database. " . $conn->connect_error);
@@ -25,33 +23,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$checkOK = 1;
 
 	if (empty($title)) {
-		array_push($errmsg, "タイトルをご入力ください。");
+		$msg->error("タイトルをご入力ください。");
 		$checkOK = 0;
 	}
 
 	if (mb_strlen(mb_convert_encoding($title, "UTF-8")) > 512) {
-		array_push($errmsg, "タイトルは1024文字以内でご入力ください。");
+		$msg->error("タイトルは1024文字以内でご入力ください。");
 		$checkOK = 0;
 	}
 
 	if (empty($body)) {
-		array_push($errmsg, "本文をご入力ください。");
+		$msg->error('本文をご入力ください。');
 		$checkOK = 0;
 	}
 
 	if (mb_strlen(mb_convert_encoding($body, "UTF-8")) > 30000) {
-		array_push($errmsg, "本文は60000文字以内でご入力ください。");
+		$msg->error('本文は60000文字以内でご入力ください。');
 		$checkOK = 0;
 	}
 
 	if (empty($file)) {
-		array_push($errmsg, "タアップロードファイルをご指定ください。");
+		$msg->error('タアップロードファイルをご指定ください。');
 		$checkOK = 0;
 	}
 
 	if (!empty($closeDay)) {
 		if (strtotime($openDay) > strtotime($closeDay)) {
-			array_push($errmsg, "公開日は終了日より未来の日付を指定してください。");
+			$msg->error('公開日は終了日より未来の日付を指定してください。');
 			$checkOK = 0;
 		}
 	} else {
@@ -59,12 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 
 	if (mb_strlen(mb_convert_encoding($titleLink, "UTF-8")) > 512) {
-		array_push($errmsg, "タイトルのリンクは1024文字以内でご入力ください。");
+		$msg->error('タイトルのリンクは1024文字以内でご入力ください。');
 		$checkOK = 0;
 	}
 
 	if (mb_strlen(mb_convert_encoding($urlImage, "UTF-8")) > 512) {
-		array_push($errmsg, "URLのリンクは1024文字以内でご入力ください。");
+		$msg->error('URLのリンクは1024文字以内でご入力ください。');
 		$checkOK = 0;
 	}
 
@@ -80,28 +78,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		if ($check !== false) {
 			$uploadOk = 1;
 		} else {
-			array_push($errmsg, "ファイル形式は画像形式ではありません。もう一度お試しください。");
+			$msg->error('ファイル形式は画像形式ではありません。もう一度お試しください。');
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
 
 	// Check if file already exists
 		if (file_exists($target_file)) {
-			array_push($errmsg, "このファイルが既に存在しています。");
+			$msg->error('このファイルが既に存在しています。');
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
 
 	// Check file size
 		if ($_FILES["imgFile"]["size"] > 102400000) {
-			array_push($errmsg, "アップロードされたファイルサイズは100MBを超えています。100MB以下にしてください。");
+			$msg->error('アップロードされたファイルサイズは100MBを超えています。100MB以下にしてください。');
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
 
 	// Allow certain file formats
 		if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-			array_push($errmsg, "アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。");
+			$msg->error('アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。');
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
@@ -112,11 +110,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 		// Check if $uploadOk is set to 0 by an error
 		if ($uploadOk == 0) {
-			array_push($errmsg, "指定されたファイルはアップロードできません。");
+			$msg->error('指定されたファイルはアップロードできません。');
 			// if everything is ok, try to upload file
 		} else {
 			if (!move_uploaded_file($_FILES["imgFile"]["tmp_name"], $target_file)) {
-				array_push($errmsg, "アップロードでエラーが発生しました。もう一度お試しください。");
+				$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');
 			}
 		}
 
@@ -127,21 +125,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 		$stmt->bind_param('ssssssssi', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user);
 
-		$stmt->execute();	
+		$stmt->execute();
+		$msg->success($title.'トピックスの追加に成功しました。');
+		$msg->display();	
 
-		if ($stmt->affected_rows > 0) {
-			array_push($ssmsg, $title.'トピックスの追加に成功しました。');
-			// $_SESSION["success_msg"]=$ssmsg;
-			echo json_encode(array("statusCode"=>200, "msg" =>  $ssmsg));
-		} else {
-			array_push($errmsg, "Error ");
-			echo json_encode(array("statusCode"=>201, "msg" =>  $errmsg));
-		}
+		// if ($stmt->error) {
+		// 	$msg->error($title.'トピックスの追加に失敗しました。');
+		// 	$msg->display();
+		// } else {
+		// 	$msg->success($title.'トピックスの追加に成功しました。');
+		// }
 		
 		$stmt->close();
 	}
 	else {
-		echo json_encode(array("statusCode"=>201, "msg" =>  $errmsg));
+		$msg->display();
 	}
 }
 

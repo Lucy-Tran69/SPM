@@ -10,7 +10,7 @@ header("content-type: text/html; charset=UTF-8");
 ?>
 <style>
   .update_button {
-    width: 50%;
+    width: 40%;
   }
 
   .align_button {
@@ -20,6 +20,28 @@ header("content-type: text/html; charset=UTF-8");
   .align_form {
     text-align: -webkit-center;
   }
+
+/* .tableFixHead {
+  overflow-y: auto;
+  height: 500px;
+}
+
+.tableFixHead table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.tableFixHead th,
+.tableFixHead td {
+  padding: 8px 16px;
+} */
+
+tr{
+  text-align: center;
+}
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
 </style>
 <?php include "html/sidebar.inc" ?>
 <?php include "html/alerts.inc" ?>
@@ -79,16 +101,16 @@ if (isset($_SESSION["loginAccount"])) {
                         <td><?php
                             if ($row["invalid"] == 0) {
                             ?>
-                            <input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" name="" value="無効" onclick="invalidate(this.id);">
+                            <button class="btn btn-danger" type="button" id="<?php echo $row["no"]; ?>" name="" value="" onclick="invalidate(this.id);"><i class="fas  fa-minus-circle"></i>&nbsp;無効</button>
                           <?php
                             } else {
                           ?>
-                            <input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" name="" value="有効" onclick="validate(this.id);">
+                            <button class="btn btn-primary" type="button" id="<?php echo $row["no"]; ?>" name="" value="" onclick="validate(this.id);"><i class="fas  fa-plus-circle"></i>&nbsp;有効</button>
                           <?php
                             }
                           ?>
                         </td>
-                        <td class="align_button"><input class="btn btn-primary update_button" type="button" id="<?php echo $row["no"]; ?>" name="" value="変更" onclick="updateMaker(this.id);"></td>
+                        <td class="align_button"><button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" name="" value="" onclick="updateMaker(this.id);"><i class="fas fa-pencil-alt"></i>変更</button></td>
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
                       </tr>
                   <?php
@@ -101,7 +123,7 @@ if (isset($_SESSION["loginAccount"])) {
                     <td></td>
                     <td><input type="text" name="newMakerName" id="newMakerName" value="" class="form-control"></td>
                     <td></td>
-                    <td class="align_button"><input class="btn btn-primary update_button" type="button" id="addNewMaker" value="追加" onclick="addNew();"></td>
+                    <td class="align_button"><button class="btn btn-info" type="button" id="addNewMaker" value="" onclick="addNew();"><i class="fas fa-plus"></i>&nbsp;追加</button></td>
                   </tr>
 
                 </tbody>

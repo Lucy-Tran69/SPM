@@ -1,8 +1,8 @@
 <?php
 
-define("DBUSER","root");
-define("DBPASS","");
-define("DBSERVER","localhost");
+define("DBUSER","nci_ims");
+define("DBPASS","XLBphSrbPqNQ7uVg");
+define("DBSERVER","192.168.111.98");
 define("DBNAME","nci_ims");
 
 //DB Connection Functions
