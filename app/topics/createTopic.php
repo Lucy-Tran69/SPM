@@ -126,15 +126,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$stmt->bind_param('ssssssssi', $title, $body, $openDay, $closeDay, $image, $imageLink, $titleLink, $urlImage, $insert_user);
 
 		$stmt->execute();
-		$msg->success($title.'トピックスの追加に成功しました。');
-		$msg->display();	
 
-		// if ($stmt->error) {
-		// 	$msg->error($title.'トピックスの追加に失敗しました。');
-		// 	$msg->display();
-		// } else {
-		// 	$msg->success($title.'トピックスの追加に成功しました。');
-		// }
+		if ($stmt->error) {
+			$msg->error($title.'トピックスの追加に失敗しました。');
+			$msg->display();
+		} else {
+			$msg->success($title.'トピックスの追加に成功しました。');
+		}
 		
 		$stmt->close();
 	}

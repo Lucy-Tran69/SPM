@@ -13,8 +13,8 @@ $(function () {
         'serverMethod': 'post',
         'language': {
             "paginate": {
-              "previous": "前へ",
-              "next" : "次へ"
+                "previous": "前へ",
+                "next": "次へ"
             }
         },
         'ajax': {
@@ -62,8 +62,8 @@ $(function () {
             'deferRender': true,
             'language': {
                 "paginate": {
-                  "previous": "前へ",
-                  "next" : "次へ"
+                    "previous": "前へ",
+                    "next": "次へ"
                 }
             },
             "ajax": {
@@ -157,20 +157,6 @@ $(function () {
             body: "本文を入力して下さい",
             imgFile: "画像を入力して下さい",
         },
-        errorElement: 'span',
-        errorPlacement: function (error, element) {
-            error.addClass('invalid-feedback');
-            element.closest('.form-group').append(error);
-        },
-        highlight: function (element, errorClass, validClass) {
-            $(element).addClass('is-invalid');
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element).removeClass('is-invalid');
-        },
-        submitHandler: function (form) {
-            form.submit();
-        }
     });
 
     $('.btn-modal-submit').click(function () {
@@ -178,14 +164,13 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
-     formAddTopic.submit(function(e) {
+    formAddTopic.submit(function (event) {
         event.preventDefault();
-          if(!formAddTopic.valid()) 
-          {
+        if (!formAddTopic.valid()) {
             return false;
-           }
-        var file_data = $('#imgFile').prop('files')[0];   
-        var form_data = new FormData();                  
+        }
+        var file_data = $('#imgFile').prop('files')[0];
+        var form_data = new FormData();
         form_data.append('imgFile', file_data);
         form_data.append('no', $("#no").val());
         form_data.append('title', $("#title").val());
@@ -194,25 +179,26 @@ $(function () {
         form_data.append('body', $("#body").val());
         form_data.append('titleLink', $("#titleLink").val());
         form_data.append('urlImage', $("#urlImage").val());
-       
+
         $.ajax({
             url: "createTopic.php",
             type: "POST",
             contentType: false,
             processData: false,
             data: form_data,
-            dataType:"html",
-            success: function(response)  {
+            dataType: "html",
+            success: function (res) {
+                debugger
                 //check response is blank if success 
-                if (!$.trim(response)) {
+                if (!$.trim(res)) {
                     window.location.href = "index.html";
-                } 
+                }
                 // if error
                 else {
-                    $("#flash-message").html(response);        
+                    $("#flash-message").html(res);
                 }
             },
-            error: function(jqXHR, textStatus, errorThrown)  {
+            error: function (jqXHR, textStatus, errorThrown) {
                 // alert( "Bug" );
             },
         });
@@ -252,19 +238,18 @@ function onBtnclick() {
     if (!preLink.match("^http")) {
         preLink = 'https://' + preLink;
     }
-     else {
+    else {
         preLink = preLink;
     }
-    
+
     if (preLink != '' && preLinkTitle == '') {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLink);
     }
-    else if (preLink != '' && preLinkTitle != '') 
-    {
+    else if (preLink != '' && preLinkTitle != '') {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLinkTitle);
-    } 
+    }
     else {
         linkCode = '';
     }
@@ -277,7 +262,7 @@ function onBtnclick() {
     $("#preBody").empty();
     $("#preBody").append(preBody);
     $("#preImgLink").attr("href", preImgLink);
-    
+
 
     var img = $('#imgFile').val();
     if (img == '') {
