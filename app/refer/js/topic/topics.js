@@ -52,8 +52,6 @@ $(function () {
             'info': false,
             'autoWidth': false,
             'deferRender': true,
-            "lengthChange": false,
-            'serverMethod': 'post',
             "ajax": {
                 type: 'POST',
                 url: 'topics.php',
@@ -161,14 +159,13 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
-     formAddTopic.submit(function(e) {
+    formAddTopic.submit(function (event) {
         event.preventDefault();
-          if(!formAddTopic.valid()) 
-          {
+        if (!formAddTopic.valid()) {
             return false;
-           }
-        var file_data = $('#imgFile').prop('files')[0];   
-        var form_data = new FormData();                  
+        }
+        var file_data = $('#imgFile').prop('files')[0];
+        var form_data = new FormData();
         form_data.append('imgFile', file_data);
         form_data.append('no', $("#no").val());
         form_data.append('title', $("#title").val());
@@ -178,25 +175,26 @@ $(function () {
         form_data.append('imgLink', $("#imgLink").val());
         form_data.append('titleLink', $("#titleLink").val());
         form_data.append('urlImage', $("#urlImage").val());
-       
+
         $.ajax({
             url: "createTopic.php",
             type: "POST",
             contentType: false,
             processData: false,
             data: form_data,
-            dataType:"html",
-            success: function(response)  {
+            dataType: "html",
+            success: function (res) {
+                debugger
                 //check response is blank if success 
-                if (!$.trim(response)) {
+                if (!$.trim(res)) {
                     window.location.href = "index.html";
-                } 
+                }
                 // if error
                 else {
-                    $("#flash-message").html(response);        
+                    $("#flash-message").html(res);
                 }
             },
-            error: function(jqXHR, textStatus, errorThrown)  {
+            error: function (jqXHR, textStatus, errorThrown) {
                 // alert( "Bug" );
             },
         });
@@ -236,19 +234,18 @@ function onBtnclick() {
     if (!preLink.match("^http") && preLink != '') {
         preLink = '//' + preLink;
     }
-     else {
+    else {
         preLink = preLink;
     }
-    
+
     if (preLink != '' && preLinkTitle == '') {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLink);
     }
-    else if (preLink != '' && preLinkTitle != '') 
-    {
+    else if (preLink != '' && preLinkTitle != '') {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLinkTitle);
-    } 
+    }
     else {
         linkCode = '';
     }
@@ -261,7 +258,7 @@ function onBtnclick() {
     $("#preBody").empty();
     $("#preBody").append(preBody);
     $("#preImgLink").attr("href", preImgLink);
-    
+
 
     var img = $('#imgFile').val();
     if (img == '') {

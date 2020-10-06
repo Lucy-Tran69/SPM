@@ -65,15 +65,14 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
-     formEditTopic.submit(function(e) {
-          event.preventDefault();
-          if(!formEditTopic.valid()) 
-          {
+    formEditTopic.submit(function (event) {
+        event.preventDefault();
+        if (!formEditTopic.valid()) {
             return false;
-           }
+        }
 
-        var file_data = $('#imgFile').prop('files')[0];   
-        var form_data = new FormData();                  
+        var file_data = $('#imgFile').prop('files')[0];
+        var form_data = new FormData();
         form_data.append('imgFile', file_data);
         form_data.append('no', $("#no").val());
         form_data.append('title', $("#title").val());
@@ -84,7 +83,7 @@ $(function () {
         form_data.append('titleLink', $("#titleLink").val());
         form_data.append('urlImage', $("#urlImage").val());
         form_data.append('imgFileOld', $("#imgFileOld").val());
-       
+
         $.ajax({
             url: "editTopic.php",
             type: "POST",
@@ -93,18 +92,19 @@ $(function () {
             processData: false,
             data: form_data,
             dataType:"html",
-            success: function(response)  {
+            success: function (res) {
+                debugger
                 //check response is blank if success 
-                if (!$.trim(response)) {
+                if (!$.trim(res)) {
                     window.location.href = "index.html";
-                } 
+                }
                 // if error
                 else {
-                    $("#flash-message").html(response);        
+                    $("#flash-message").html(res);
                 }
             },
-            error: function(jqXHR, textStatus, errorThrown)  {
-                alert( "Bug" );
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert("Bug");
             },
         });
     });
@@ -142,8 +142,8 @@ function onBtnclick() {
     $("#preLink").attr("href", preLink);
 
     var img = $('#imgFile').val();
-    if (img == ''){
-       var output = document.getElementById('output_image');
+    if (img == '') {
+        var output = document.getElementById('output_image');
         var imgOld = $('#imgFileOld').val();
         output.src = "../../app/refer/images/topics/" + imgOld;
     }
@@ -153,19 +153,18 @@ function onBtnclick() {
     if (!preLink.match("^http") && preLink != '') {
         preLink = '//' + preLink;
     }
-     else {
+    else {
         preLink = preLink;
     }
-    
+
     if (preLink != '' && preLinkTitle == '') {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLink);
     }
-    else if (preLink != '' && preLinkTitle != '') 
-    {
+    else if (preLink != '' && preLinkTitle != '') {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLinkTitle);
-    } 
+    }
     else {
         linkCode = '';
     }
@@ -177,7 +176,7 @@ function onBtnclick() {
 }
 
 function preview_image(event) {
-  var reader = new FileReader();
+    var reader = new FileReader();
     reader.onload = function () {
         var output = document.getElementById('output_image');
         output.src = reader.result;
