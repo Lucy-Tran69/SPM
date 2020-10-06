@@ -25,38 +25,20 @@
     ## Fetch records
     $empQuery = "SELECT no, title, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day FROM topics WHERE invalid = 0 AND opday <= '$date' order by open_day desc limit  $start,".($limit + 1);
 
-    $query = mysqli_query($conn, $empQuery) or die ('Lỗi câu truy vấn');
+    $query = mysqli_query($conn, $empQuery) or die ('');
     
     $result = array();
     while ($row = mysqli_fetch_array($query))
     {
         array_push($result, $row);
     }
-
-    // display data
-    $total = count($result);
    
-    if ($total > $limit){
+   if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
+        sleep(1);
+        die (json_encode($result));
+    } else{
+        $total = count($result);
         for ($i = 0; $i < $total - 1; $i++)
-        { ?>
-            <tr data-id="<?php echo $result[$i]['no']; ?>" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">
-                <td><a href="javascript:void(0)"><?php echo $result[$i]['open_day']; ?></a></td>
-                <td>
-                    <a href="javascript:void(0)">
-                        <?php
-                        $openDay = date('Y-m-d H:i:s', strtotime($result[$i]['open_day']. ' + 7 days'));
-                         if ($openDay >= $date) { ?>
-                            New!
-                        <?php } ?>
-                    <?php echo $result[$i]['title']; ?>
-                        
-                    </a>
-                </td>
-            </tr>
-    <?php }
-    }
-    else{
-        for ($i = 0; $i < $total; $i++)
         { ?>
             <tr data-id="<?php echo $result[$i]['no']; ?>" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">
                 <td><a href="javascript:void(0)"><?php echo $result[$i]['open_day']; ?></a></td>
@@ -67,15 +49,9 @@
                             New!
                     <?php } ?>
                     <?php echo $result[$i]['title']; ?>
-                        
                     </a>
                 </td>
             </tr>
     <?php }
-    }
-    
-    // check record > limit
-    if ($total <= $limit){
-        echo '<script language="javascript">stopped = true; </script>';
     }
 ?>

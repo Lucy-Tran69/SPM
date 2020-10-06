@@ -1,188 +1,176 @@
-<?php
-include "../../include/common/check_view_permission.php";
-$url = "customer";
-check_view_permission($url);
-header("content-type: text/html; charset=UTF-8");
-//Get array of roles from session variable 
-?>
 
 <style>
-  .align_button{
-  text-align: center;
-}
+  .align_button {
+    text-align: center;
+  }
+
+  .title_nowrap_align_middle {
+    white-space: nowrap;
+    vertical-align: middle;
+  }
 </style>
 
-<?php include "../../include/html/header.inc";?> 
-<?php include "../../include/html/menu.inc";?>
+<?php include "html/header.inc";?>
+<?php include "html/menu.inc";?>
 
 <?php
 if (isset($_SESSION["loginAccount"])) {
 ?>
-<input type="hidden" name="" id="index.html" value="取引先管理">
+<input type="hidden" name="" id="page-name" value="取引先管理">
 <div class="row">
-<?php
-  //include_once "html/showmessage.inc"
-?>
   <div class="col-12">
     <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">取引先管理</h3>
-      </div>
       <div class="card card-default">
         <div class="card-body">
-            <div class="row justify-content-md-center">
-                <div class="col-md-6">
-                    <form action="#" id="searchCustomer" method="POST" role="form">
-                        <div class="form-group">
-                            <label>取引先コード</label>
-                            <input type="text" class="form-control" id="cd" name="cd" placeholder="取引先コード" />
-                        </div>
-                        <div class="form-group">
-                          <label>取引先名</label>
-                          <input type="text" class="form-control" id="name" name="name" placeholder="取引先名" />
-                      </div>
-                        <div class="form-group">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="status" class="custom-control-input" id="status"  />
-                                <label class="custom-control-label" for="status">無効を含む</label>
-                            </div>
-                        </div>
-                        <div class="row justify-content-center">
-                            <button type="submit" class="btn btn-primary btn-lg">検索</button>
-                        </div> 
-                    </form>
+          <div class="row justify-content-md-center">
+            <div class="col-md-6">
+              <form action="#" id="searchCustomer" method="POST" role="form">
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label text-right">取引先コード</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="cd" name="cd" placeholder="取引先コード" />
+                  </div>             
                 </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label text-right">取引先名</label>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" id="name" name="name" placeholder="取引先名" />
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="offset-sm-4 col-sm-8">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" name="status" class="custom-control-input" id="status" />
+                      <label class="custom-control-label" for="status">無効を含む</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row justify-content-center">
+                  <button type="submit" class="btn btn-primary mr-2">検索</button>
+                </div>
+              </form>
             </div>
+          </div>
         </div>
-    </div>
-       <!-- /.card-header -->
-      <div class="card-body">
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body table-responsive-sm">
         <div class="row justify-content-end" style="margin-right: 10px; margin-bottom: 20px">
-           <button type="button" class="btn btn-primary" onclick="redirectAddOrEditCustomer()">追加</button>
+          <button type="button" class="btn btn-primary" onclick="redirectAddOrEditCustomer()">追加</button>
         </div>
-        <table id="customerTable" class="table table-bordered table-hover">
-          <thead>
-          <tr>
-            <th>取引先コード</th>
-            <th>取引先名</th>
-            <th>在庫閲覧ユーザ数</th>
-            <th>在庫・価格表閲覧ユーザ数</th>
-            <th>ステータス</th>
-            <th></th>
-          </tr>
-          </thead>
-        </table>
+        <div class="table-responsive">
+          <table id="customerTable" class="table table-bordered table-striped w-100">
+            <thead>
+              <tr>
+                <th class="title_nowrap_align_middle">取引先コード</th>
+                <th class="title_nowrap_align_middle">取引先名</th>
+                <th class="title_nowrap_align_middle">在庫閲覧ユーザ数</th>
+                <th class="title_nowrap_align_middle">在庫・価格表閲覧ユーザ数</th>
+                <th class="title_nowrap_align_middle">ステータス</th>
+                <th class="title_nowrap_align_middle"></th>
+              </tr>
+            </thead>
+          </table>
+        </div>
       </div>
       <!-- /.card-body -->
-     </div>
+    </div>
     <!-- /.card -->
-   </div>
+  </div>
   <!-- /.col -->
-</div> 
+</div>
 <?php
 } else {
   //header("Location: ../../include/logout.php");
 }
 ?>
-<?php include "../../include/html/foot.inc";?>
+<?php include "html/foot.inc";?>
 
 <script type="text/javascript">
-  $(function(){
-  const customerTable = $('#customerTable');
-   var table = customerTable.DataTable({
-      'start': 0,
+  $(function () {
+    const customerTable = $('#customerTable');
+    var table = customerTable.DataTable({
       'processing': true,
       'searching': false,
       'ordering': false,
-      'responsive': true,
       'serverSide': true,
       'deferRender': true,
       'info': false,
       'autoWidth': false,
       'lengthChange': false,
-      'language': {
-                    "paginate": {
-                    "previous": "前へ",
-                    "next" : "次へ"
-                    }
-                },
+      'scrollX': true,
       'serverMethod': 'post',
-      'ajax':{
-        'url': '../../include/customer_functions/customer.php',
+      'ajax': {
+        'url': '../../app/customer/customer.php',
       },
       'columns': [
         { data: 'cd', "defaultContent": "", "title": '取引先コード' },
         { data: 'name', "defaultContent": "", "title": '取引先名' },
         { data: 'NumberCustomerRole5', "defaultContent": "", "title": '在庫閲覧ユーザ数' },
         { data: 'NumberCustomerRole6', "defaultContent": "", "title": '在庫・価格表閲覧ユーザ数' },
-        { data: 'invalid', "defaultContent": "", "title": 'ステータス'},
+        { data: 'invalid', "defaultContent": "", "title": 'ステータス' },
         {
           data: 'no',
           render: function (data, type, row) {
-          return '<div class="row justify-content-center"><a href="edit-customer.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i>変更</a></div>';
+            return '<div class="row justify-content-center"><a href="edit-customer.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px; min-width: 85px;"><i class="fas fa-pencil-alt mr-2"></i>変更</a></div>';
           }
         },
       ],
     });
 
-   $('#searchCustomer').on('submit', function (e) {
-            e.preventDefault();
-            RequestData();
-        });
+    $('#searchCustomer').on('submit', function (e) {
+      e.preventDefault();
+      RequestData();
+    });
 
-        function RequestData() {
-            let cd = $('#cd').val();
-            let name = $('#name').val();
-            let status = 0;
-            if (document.getElementById("status").checked) {
-                  status = 1;
+    function RequestData() {
+      let cd = $('#cd').val();
+      let name = $('#name').val();
+      let status = 0;
+      if (document.getElementById("status").checked) {
+        status = 1;
+      }
+
+      $('#customerTable').DataTable().destroy();
+
+      $(customerTable).DataTable({
+        'processing': true,
+        'serverSide': true,
+        'searching': false,
+        'ordering': false,
+        'info': false,
+        'autoWidth': false,
+        'deferRender': true,
+        'lengthChange': false,
+        'scrollX': true,
+        'ajax': {
+          type: 'POST',
+          url: '../../app/customer/customer.php',
+          data: { 'cd': cd, 'name': name, 'status': status },
+        },
+        'start': 0,
+        'columns': [
+          { data: 'cd', "defaultContent": "", "title": '取引先コード' },
+          { data: 'name', "defaultContent": "", "title": '取引先名' },
+          { data: 'NumberCustomerRole5', "defaultContent": "", "title": '在庫閲覧ユーザ数' },
+          { data: 'NumberCustomerRole6', "defaultContent": "", "title": '在庫・価格表閲覧ユーザ数' },
+          { data: 'invalid', "defaultContent": "", "title": 'ステータス' },
+          {
+            data: 'no',
+            render: function (data, type, row) {
+              return '<div class="row justify-content-center"><a href="edit-customer.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px; min-width: 85px;"><i class="fas fa-pencil-alt mr-2"></i>変更</a></div>';
             }
-
-            $('#customerTable').DataTable().destroy();
-
-            $(customerTable).DataTable({
-                'processing': true,
-                'serverSide': true,
-                'searching': false,
-                'ordering': false,
-                'info': false,
-                'autoWidth': false,
-                'responsive': true,
-                'deferRender': true,
-                'lengthChange': false,
-                'language': {
-                    "paginate": {
-                    "previous": "前へ",
-                    "next" : "次へ"
-                    }
-                },
-                'ajax': {
-                    type: 'POST',
-                    url: '../../include/customer_functions/customer.php',
-                    data: { 'cd': cd, 'name': name, 'status': status},
-                },
-                'start': 0,
-                'columns': [
-                    { data: 'cd', "defaultContent": "", "title": '取引先コード' },
-                    { data: 'name', "defaultContent": "", "title": '取引先名' },
-                    { data: 'NumberCustomerRole5', "defaultContent": "", "title": '在庫閲覧ユーザ数' },
-                    { data: 'NumberCustomerRole6', "defaultContent": "", "title": '在庫・価格表閲覧ユーザ数' },
-                    { data: 'invalid', "defaultContent": "", "title": 'ステータス'},
-                    {
-                      data: 'no',
-                      render: function (data, type, row) {
-                      return '<div class="row justify-content-center"><a href="edit-customer.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i>変更</a></div>';
-                      }
-                    },
-                ],
-            });
-        }
+          },
+        ],
+      });
+    }
   });
 
-function redirectAddOrEditCustomer() {
-       window.location.href = "../../app/customer/add-customer.html";
-}
+  function redirectAddOrEditCustomer() {
+    window.location.href = "../../app/customer/add-customer.html";
+  }
 </script>
 
 </body>
+
 </html>

@@ -57,9 +57,6 @@ $(function () {
         },
         unhighlight: function (element, errorClass, validClass) {
             $(element).removeClass('is-invalid');
-        },
-        submitHandler: function (form) {
-            form.submit();
         }
     });
 
@@ -83,6 +80,7 @@ $(function () {
         form_data.append('openDay', $(".openDay").val());
         form_data.append('closeDay', $(".closeDay").val());
         form_data.append('body', $("#body").val());
+        form_data.append('imgLink', $("#imgLink").val());
         form_data.append('titleLink', $("#titleLink").val());
         form_data.append('urlImage', $("#urlImage").val());
         form_data.append('imgFileOld', $("#imgFileOld").val());
@@ -96,7 +94,6 @@ $(function () {
             data: form_data,
             dataType:"html",
             success: function(response)  {
-                debugger
                 //check response is blank if success 
                 if (!$.trim(response)) {
                     window.location.href = "index.html";
@@ -129,8 +126,8 @@ function onBtnclick() {
 
     preBody = preBody.replace(/\n/g, '<br>');
 
-     if (!preImgLink.match("^http")) {
-        preImgLink = 'https://' + preImgLink;
+     if (!preImgLink.match("^http") && preImgLink != '') {
+        preImgLink = '//' + preImgLink;
     }
     else {
         preImgLink = preImgLink;
@@ -153,8 +150,8 @@ function onBtnclick() {
 
     var linkCode = '<a target="_blank" href="%link%">%title%</a>';
 
-    if (!preLink.match("^http")) {
-        preLink = 'https://' + preLink;
+    if (!preLink.match("^http") && preLink != '') {
+        preLink = '//' + preLink;
     }
      else {
         preLink = preLink;

@@ -1,4 +1,5 @@
 <?php
+    include_once "common/session.php";
     include_once "database/db.inc";
 
     $err_msg = "";
@@ -20,6 +21,7 @@
         $title = isset($_POST["title"]) ? $_POST["title"] : '';
         $status = isset($_POST["status"]) ? $_POST["status"] : '';
         $topicID = isset($_POST["topicID"]) ? $_POST["topicID"] : '';
+        $topicTitle = isset($_POST["topicTitle"]) ? $_POST["topicTitle"] : '';
         
         if(!empty($title) && empty($status)){
             $searchQuery = "and title like '%$title%'";
@@ -32,7 +34,13 @@
         }
         if(!empty($topicID)) {
             $empQuery = "UPDATE topics SET invalid = 1 WHERE no = $topicID";
-            mysqli_query($conn, $empQuery);
+            
+            if (mysqli_query($conn, $empQuery)) {
+                $msg->success($topicTitle.'トピックスの削除に成功しました。');
+            }
+            else{
+                $msg->error($topicTitle.'トピックスの削除に失敗しました。');
+            }
         }
     }
 

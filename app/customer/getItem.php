@@ -1,5 +1,5 @@
 <?php
-include_once "../../include/database/db.inc";
+include_once "database/db.inc";
 
 $conn  = getConnection();
 

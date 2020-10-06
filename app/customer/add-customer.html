@@ -1,12 +1,4 @@
-<?php
-include "../../include/common/check_view_permission.php";
-$url = "customer";
-check_view_permission($url);
-header("content-type: text/html; charset=UTF-8");
-?>
-<?php include "../../include/html/header.inc" ?>
-
-<?php //include "../../include/html/menu.inc" ?>
+<?php include "html/header.inc" ?>
 
 <?php include "html/menu.inc" ?>
 
@@ -18,154 +10,152 @@ header("content-type: text/html; charset=UTF-8");
     }
 
     .center {
-      margin-left: 430px;
-      width: 60%;
-      padding: 10px;
+        margin-left: 333px;
+        width: 70%;
+        padding: 30px;
     }
 
     .required:after {
-    content:"*";color:red;
+        content: "*";
+        color: red;
     }
+
     .error {
-    color:red;
+        color: red;
     }
 </style>
 <?php
 if (isset($_SESSION["loginAccount"])) {
 ?>
+<input type="hidden" name="" id="page-name" value="取引先追加">
 <div id="d-message"></div>
-   <section class="content">
-        <div class="container-fluid">
-            <div class="row" id="customer">
-                <!-- left column -->
-                <div class="col-md-12">
-                    <!-- jquery validation -->
-
-                    <div class="card card-primary">
-                        <div class="card-header">
-
-                            <h3 class="card-title">取引先追加</h3>
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-12">
+        <!-- jquery validation -->
+        <div class="card card-primary">
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form action="" role="form" id="addCustomer" method="POST" novalidate="novalidate"
+                enctype="multipart/form-data">
+                <div class="card-body center">
+                    <div class="form-group row">
+                        <label for="cd" class="col-md-2 col-sm-3 col-form-label-sm text-right required">取引先コード</label>
+                        <div class="col-md-6 col-sm-8">
+                            <input type="text" name="cd" class="form-control" id="cd" placeholder="取引先コード">
                         </div>
-                        <!-- /.card-header -->
-                        <!-- form start -->
-                        <form action="" role="form" id="addCustomer" method="POST" novalidate="novalidate" enctype = "multipart/form-data">
-                            <div class="card-body center">
-                                <div class="form-group row">
-                                    <label for="cd" class="col-md-2 col-sm-3 col-form-label-sm text-right required">取引先コード</label>
-                                    <div class="col-md-6 col-sm-8">
-                                        <input type="text" name="cd" class="form-control" id="cd" placeholder="取引先コード">
-                                    </div>    
-                                </div>
-                                <div class="form-group row">
-                                    <label for="name" class="col-md-2 col-sm-3 col-form-label-sm text-right required">取引先名</label>
-                                    <div class="col-md-6 col-sm-8">
-                                        <input type="text" name="name" class="form-control " id="name" placeholder="取引先名">
-                                    </div>
-                                    
-                                </div>
-                                <div class="form-group row">
-                                    <label for="tel" class="col-md-2 col-sm-3 col-form-label-sm text-right required">TEL</label>
-                                    <div class="col-md-6 col-sm-8">
-                                        <input type="text" name="tel" class="form-control" id="tel" placeholder="TEL">
-                                    </div>
-                                    
-                                </div>
-                                <div class="form-group row">
-                                    <label for="zip" class="col-md-2 col-sm-3 col-form-label-sm text-right required">郵便番号</label>
-                                    <div class="col-md-6 col-sm-8">
-                                        <input type="text" name="zip" class="form-control" id="zip" placeholder="郵便番号">
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="address" class="col-md-2 col-sm-3 col-form-label-sm text-right required">住所</label>
-                                    <div class="col-md-6 col-sm-8">
-                                        <textarea type="text" name="address" class="form-control" rows="2" id="address" placeholder="住所"></textarea>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="charge" class="col-md-2 col-sm-3 col-form-label-sm text-right required">担当者名</label>
-                                    <div class="col-md-6 col-sm-8">
-                                        <textarea type="text" name="charge" class="form-control" rows="2" id="charge" placeholder="担当者名"></textarea>
-                                    </div>                                 
-                                </div>
-                                <div class="form-group row">
-                                    <label for="sale" class="col-md-2 col-sm-3 col-form-label-sm text-right required">営業担当</label>
-                                    <div class="col-md-6 col-sm-8">
-                                        <td><select id="sale" name="sale" class="form-control">
-                                             <option value=""></option>
-                                        <?php
+                    </div>
+                    <div class="form-group row">
+                        <label for="name" class="col-md-2 col-sm-3 col-form-label-sm text-right required">取引先名</label>
+                        <div class="col-md-6 col-sm-8">
+                            <input type="text" name="name" class="form-control " id="name" placeholder="取引先名">
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <label for="tel" class="col-md-2 col-sm-3 col-form-label-sm text-right required">TEL</label>
+                        <div class="col-md-6 col-sm-8">
+                            <input type="text" name="tel" class="form-control" id="tel" placeholder="TEL">
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <label for="zip" class="col-md-2 col-sm-3 col-form-label-sm text-right required">郵便番号</label>
+                        <div class="col-md-6 col-sm-8">
+                            <input type="text" name="zip" class="form-control" id="zip" placeholder="郵便番号">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="address" class="col-md-2 col-sm-3 col-form-label-sm text-right required">住所</label>
+                        <div class="col-md-6 col-sm-8">
+                            <textarea type="text" name="address" class="form-control" rows="2" id="address"
+                                placeholder="住所"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="charge" class="col-md-2 col-sm-3 col-form-label-sm text-right required">担当者名</label>
+                        <div class="col-md-6 col-sm-8">
+                            <textarea type="text" name="charge" class="form-control" rows="2" id="charge"
+                                placeholder="担当者名"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="sale" class="col-md-2 col-sm-3 col-form-label-sm text-right required">営業担当</label>
+                        <div class="col-md-6 col-sm-8">
+                            <td><select id="sale" name="sale" class="form-control">
+                                    <option value="">選択</option>
+                                    <?php
                                         if ($saleUserResultSet->num_rows > 0) {
                                           mysqli_data_seek($saleUserResultSet,0);
                                           while ($row = $saleUserResultSet->fetch_assoc()) {
                                         ?>
-                                            <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?></option>
-                                        <?php
+                                    <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?>
+                                    </option>
+                                    <?php
                                           }
                                         }
                                         ?>
-                                      </select>
-                                    </td>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="supervisor" class="col-md-2 col-sm-3 col-form-label-sm text-right required">承認者</label>
-                                    <div class="col-md-6 col-sm-8">
-                                        <td><select id="supervisor" name="supervisor" class="form-control">
-                                            <option value=""></option>
-                                        <?php
+                                </select>
+                            </td>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="supervisor"
+                            class="col-md-2 col-sm-3 col-form-label-sm text-right required">承認者</label>
+                        <div class="col-md-6 col-sm-8">
+                            <td><select id="supervisor" name="supervisor" class="form-control">
+                                    <option value="">選択</option>
+                                    <?php
                                         if ($approveUserResultSet->num_rows > 0) {
                                           mysqli_data_seek($approveUserResultSet,0);
                                           while ($row = $approveUserResultSet->fetch_assoc()) {
                                         ?>
-                                            <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?></option>
-                                        <?php
+                                    <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?>
+                                    </option>
+                                    <?php
                                           }
                                         }
                                         ?>
-                                      </select>
-                                    </td>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-md-2 col-sm-3 text-right">
-                                        <label id="invalidLabel" class="label_align_table ">停止</label>
-                                    </div>
-                                    <div class="col-md-2 col-sm-8 text-left">
-                                        <input type="checkbox" id="invalid" name="invalid"/>
-                                    </div> 
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-md-2 col-sm-3 col-form-label-sm"></label>
-                                    <div class="col-md-6 col-sm-8 mx-auto">
-                                        <button type="submit" class="btn btn-primary mr-2">登録</button>
-                                        <button type="button" class="btn btn-default btn-primary mr-2" onclick="redirectCustomerList()">戻る</button>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-md-6 col-sm-8">
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- /.card-body -->
-                            <div class="card-footer">
-                                <div class="row justify-content-md-center">
-                                   
-                                </div>
-                            </div>
-                        </form>
+                                </select>
+                            </td>
+                        </div>
                     </div>
-                    <!-- /.card -->
+                    <div class="form-group row">
+                        <div class="col-md-2 col-sm-3 text-right">
+                            <label id="invalidLabel" class="label_align_table ">停止</label>
+                        </div>
+                        <div class="col-md-2 col-sm-8 text-left">
+                            <input type="checkbox" id="invalid" name="invalid" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2 col-sm-3 col-form-label-sm"></label>
+                        <div class="col-md-6 col-sm-8 mx-auto">
+                            <button type="submit" class="btn btn-primary mr-2">登録</button>
+                            <button type="button" class="btn btn-default btn-primary mr-2"
+                                onclick="redirectCustomerList()">戻る</button>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-6 col-sm-8">
+                        </div>
+                    </div>
                 </div>
-                <!--/.col (left) -->
-                <!-- right column -->
-                <div class="col-md-6">
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <div class="row justify-content-md-center">
 
+                    </div>
                 </div>
-                <!--/.col (right) -->
-            </div>
-            <!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </section>
+            </form>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!--/.col (left) -->
+    <!-- right column -->
+    <!--/.col (right) -->
+</div>
+<!-- /.row -->
 <?php
 } else {
     //header("Location: ../../include/logout.php");
@@ -179,35 +169,43 @@ if (isset($_SESSION["loginAccount"])) {
 <!-- bs-custom-file-input -->
 <script type="text/javascript">
     $(document).ready(function () {
-      // bsCustomFileInput.init();
-     // validate From
-         $("#addCustomer").validate({
+        // bsCustomFileInput.init();
+        // validate From
+        $("#addCustomer").validate({
             rules: {
-                cd: { required: true,
-                      checkAlphabetAndNumber : true,
-                      maxlength : 8     
-                    },
-                name: { required: true,
-                        maxlength : 126  
-                    },
-                tel: { required: true,
-                       checkNumber: true,
-                       maxlength : 16
-                    }, 
-                zip: { required: true,
-                       checkNumber: true,
-                       maxlength : 16  
-                    }, 
-                address: { required: true,
-                           maxlength : 512  
-                    },
-                charge: { required: true,
-                          maxlength : 512  
-                    },
-                sale: { required: true
-                    },
-                supervisor: { required: true
-                    },  
+                cd: {
+                    required: true,
+                    checkAlphabetAndNumber: true,
+                    maxlength: 8
+                },
+                name: {
+                    required: true,
+                    maxlength: 126
+                },
+                tel: {
+                    required: true,
+                    checkNumber: true,
+                    maxlength: 16
+                },
+                zip: {
+                    required: true,
+                    checkNumber: true,
+                    maxlength: 16
+                },
+                address: {
+                    required: true,
+                    maxlength: 512
+                },
+                charge: {
+                    required: true,
+                    maxlength: 512
+                },
+                sale: {
+                    required: true
+                },
+                supervisor: {
+                    required: true
+                },
             },
             messages: {
                 cd: {
@@ -231,7 +229,7 @@ if (isset($_SESSION["loginAccount"])) {
                 },
                 address: {
                     required: "住所を入力してください。",
-                    maxlength:"住所は512文字以内で入力してください。"
+                    maxlength: "住所は512文字以内で入力してください。"
                 },
                 charge: {
                     required: "担当者名を入力してください。",
@@ -244,89 +242,71 @@ if (isset($_SESSION["loginAccount"])) {
         });
 
 
-        $("#addCustomer").submit(function(event){
-                var form = $("#addCustomer");
-                // check if the input is valid
-                if(!form.valid()) 
-                    {
-                        return false;
-                    }
-                var invalid = 0;
+        $("#addCustomer").submit(function (event) {
+            var form = $("#addCustomer");
+            // check if the input is valid
+            if (!form.valid()) {
+                return false;
+            }
+            var invalid = 0;
             if (document.getElementById("invalid").checked) {
-                 invalid = 1;
+                invalid = 1;
             }
             console.log(invalid);
-        $.ajax({
-            url : "CreateCustomer.php",
-            dataType:"html",
-            type : "POST",
-            data : {
-                cd : $("#cd").val(),
-                name : $("#name").val(),
-                tel : $("#tel").val(),
-                zip : $("#zip").val(),
-                address : $("#address").val(),
-                charge : $("#charge").val(),
-                sale : $("#sale").val(),
-                supervisor : $("#supervisor").val(),
-                invalid : invalid
-            },
-            success: function(response)  {
-                //check response is blank if success 
-                if (!$.trim(response)) {
-                    window.location.href = "index.html";
-                } 
-                // if error
-                else {
-                    $("#flash-message").html(response);        
+            $.ajax({
+                url: "CreateCustomer.php",
+                dataType: "html",
+                type: "POST",
+                data: {
+                    cd: $("#cd").val(),
+                    name: $("#name").val(),
+                    tel: $("#tel").val(),
+                    zip: $("#zip").val(),
+                    address: $("#address").val(),
+                    charge: $("#charge").val(),
+                    sale: $("#sale").val(),
+                    supervisor: $("#supervisor").val(),
+                    invalid: invalid
+                },
+                success: function (response) {
+                    //check response is blank if success 
+                    if (!$.trim(response)) {
+                        window.location.href = "index.html";
+                    }
+                    // if error
+                    else {
+                        $("#flash-message").html(response);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
                 }
-
-
-
-
-
-                // var response = JSON.parse(response);
-                // if(response.statusCode==200){
-                //     window.location.href = "index.html";
-                // } else {
-                //     var st = "";
-                //     for(var i = 0; i < response.msg.length; i ++){
-                //         st = st.concat(response.msg[i] + '</br>');
-                //     }
-                //     $("#d-message").html('<div class="alert alert-danger alert-dismissible"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+st+'</div>');
-                // }
-            },
-            error: function(jqXHR, textStatus, errorThrown)  {
-            }
-        });
-        event.preventDefault();
+            });
+            event.preventDefault();
         });
 
-        });
+    });
 
     // checkAlphabetAndNumber haftsize
     jQuery.validator.addMethod("checkAlphabetAndNumber", function (str) {
-            if (str) {
-                var regex = /^[0-9a-zA-Z]+$/g;
-                return regex.test(str);
-            }
-        });
+        if (str) {
+            var regex = /^[0-9a-zA-Z]+$/g;
+            return regex.test(str);
+        }
+    });
 
     jQuery.validator.addMethod("checkNumber", function (str) {
-            if (str) {
-                var regex = /^[0-9 -]+$/g;
-                return regex.test(str);
-            }
-        });
+        if (str) {
+            var regex = /^[0-9 -]+$/g;
+            return regex.test(str);
+        }
+    });
 
     function redirectCustomerList() {
-       window.location.href = "../../app/customer/index.html";
+        window.location.href = "../../app/customer/index.html";
     }
 
-
-
-   
 </script>
 
 </body>
+
 </html>

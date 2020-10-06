@@ -7,18 +7,11 @@ $(function () {
         'ordering': false,
         'info': false,
         'autoWidth': false,
-        'responsive': true,
         'deferRender': true,
         "lengthChange": false,
         'serverMethod': 'post',
-        'language': {
-            "paginate": {
-              "previous": "前へ",
-              "next" : "次へ"
-            }
-        },
         'ajax': {
-            'url': '../../include/topic_functions/topics.php'
+            'url': 'topics.php'
         },
         'columns': [
             { data: 'insert_day', "defaultContent": "", "title": '作成日' },
@@ -28,7 +21,7 @@ $(function () {
             {
                 data: "no",
                 render: function (data, type, row) {
-                    return '<div class="row justify-content-center"><a href="edit-topic.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
+                    return '<div class="row justify-content-center"><a href=edit-topic.html?id=' + data + ' class="btn btn-success margin-bottom-5px m-r-0" style="margin-right: 5px;"><i class="fas fa-pencil-alt mr-2"></i> 変更</a><a href="" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash mr-2"></i> 削除</a></div>';
                 }
             },
         ],
@@ -52,23 +45,18 @@ $(function () {
         }
 
         $(topicTable).DataTable({
-            'processing': true,
+           'processing': true,
             'serverSide': true,
             'searching': false,
             'ordering': false,
-            'info': true,
+            'info': false,
             'autoWidth': false,
-            'responsive': true,
             'deferRender': true,
-            'language': {
-                "paginate": {
-                  "previous": "前へ",
-                  "next" : "次へ"
-                }
-            },
+            "lengthChange": false,
+            'serverMethod': 'post',
             "ajax": {
                 type: 'POST',
-                url: '../../include/topic_functions/topics.php',
+                url: 'topics.php',
                 data: { 'title': title, 'status': status },
             },
             "columns": [
@@ -79,7 +67,7 @@ $(function () {
                 {
                     data: "no",
                     render: function (data, type, row) {
-                        return '<div class="row justify-content-center"><a href=edit-topic.html?id=' + data + ' class="btn btn-success" style="margin-right: 5px;"><i class="fas fa-pencil-alt"></i> 変更</a><button type="button" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash"></i> 削除</button></div>';
+                        return '<div class="row justify-content-center"><a href=edit-topic.html?id=' + data + ' class="btn btn-success margin-bottom-5px m-r-0" style="margin-right: 5px;"><i class="fas fa-pencil-alt mr-2"></i> 変更</a><a href="" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash mr-2"></i> 削除</a></div>';
                     }
                 },
             ],
@@ -96,10 +84,8 @@ $(function () {
 
         if (c == true) {
             $(topicTable).DataTable().row(row).remove().draw(false);
-            $.post('../../include/topic_functions/topics.php', { 'topicID': topicID }, function (data) {
-                // toastr.success('"' + topicTitle + '"トピックスの削除に成功しました。');
-                $("#messageDelete").text('"' + topicTitle + '"トピックスの削除に成功しました。');
-                $('#deleteSuccess').show();
+            $.post('topics.php', { 'topicID': topicID, 'topicTitle': topicTitle }, function (data) {
+                $("#flash-message").html(response);
                 $(topicTable).DataTable().ajax.reload(null, false);
             });
         }
@@ -167,9 +153,6 @@ $(function () {
         },
         unhighlight: function (element, errorClass, validClass) {
             $(element).removeClass('is-invalid');
-        },
-        submitHandler: function (form) {
-            form.submit();
         }
     });
 
@@ -192,6 +175,7 @@ $(function () {
         form_data.append('openDay', $(".openDay").val());
         form_data.append('closeDay', $(".closeDay").val());
         form_data.append('body', $("#body").val());
+        form_data.append('imgLink', $("#imgLink").val());
         form_data.append('titleLink', $("#titleLink").val());
         form_data.append('urlImage', $("#urlImage").val());
        
@@ -240,8 +224,8 @@ function onBtnclick() {
     }
     preBody = preBody.replace(/\n/g, '<br>');
 
-    if (!preImgLink.match("^http")) {
-        preImgLink = 'https://' + preImgLink;
+    if (!preImgLink.match("^http") && preImgLink != '') {
+        preImgLink = '//' + preImgLink;
     }
     else {
         preImgLink = preImgLink;
@@ -249,8 +233,8 @@ function onBtnclick() {
 
     var linkCode = '<a target="_blank" href="%link%">%title%</a>';
 
-    if (!preLink.match("^http")) {
-        preLink = 'https://' + preLink;
+    if (!preLink.match("^http") && preLink != '') {
+        preLink = '//' + preLink;
     }
      else {
         preLink = preLink;

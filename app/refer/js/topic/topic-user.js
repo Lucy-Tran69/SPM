@@ -1,22 +1,17 @@
 $(function () {
-     var is_busy = false;
+    var is_busy = false;
 
-     var page = 1;
+    var page = 1;
 
-     var stopped = false;
+    var stopped = false;
 
-    $topicTable = $('#topicTable');
+    var record_per_page = 5;
 
-    // $($topicTable).scroll(function () {
     $element = $('#topicsList');
-    $loadding = $('#loadding');
+    $button = $('#loadmore');
 
-    $('#loadmore').click(function () {
+    $button.click(function () {
         if (is_busy == true) {
-            return false;
-        }
-
-        if (stopped == true) {
             return false;
         }
 
@@ -24,25 +19,56 @@ $(function () {
 
         page++;
 
-        $loadding.removeClass('hidden');
+        $button.html('ロード中…');
 
         $.ajax(
             {
                 type: 'get',
-                dataType: 'text',
+                dataType: 'json',
                 url: '../topics/topicsUserList.php',
                 data: { page: page },
                 success: function (result) {
-                    $element.append(result);
+                    var html = '';
+                    var currentDate = new Date();
+                    if (result.length <= record_per_page) {
+                        $.each(result, function (key, obj){
+                           html += '<tr data-id="'+obj.no+'" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">' +
+                                        '<td><a href="javascript:void(0)">'+obj.open_day+'</a></td>' +
+                                        '<td><a href="javascript:void(0)">';
+
+                                 var opday = new Date(obj.open_day);
+                                 if (opday.setDate(opday.getDate() + 7) >= currentDate) {
+                                    html +='New!';
+                                }
+                                html += obj.title+'</a>' + '</td>' + '</tr>';
+                        });
+     
+                        $element.append(html);
+     
+                        $button.remove();
+                    } else {
+                        $.each(result, function (key, obj){
+                            if (key < result.length - 1){
+                                html += '<tr data-id="'+obj.no+'" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">' +
+                                        '<td><a href="javascript:void(0)">'+obj.open_day+'</a></td>' +
+                                        '<td><a href="javascript:void(0)">';
+
+                                 var opday = new Date(obj.open_day);
+                                 if (opday.setDate(opday.getDate() + 7) >= currentDate) {
+                                    html +='New!';
+                                }
+                                html += obj.title+'</a>' + '</td>' + '</tr>';
+                            }
+                        });
+                        $element.append(html);
+                    }
                 }
             })
-            .always(function () {
-                $loadding.addClass('hidden');
+            .always(function() {
+                $button.html('もっと見る');
                 is_busy = false;
             });
-        return false;
     });
-    // });
 
     $('.item-topic').click(function () {
         var id = $(this).data("id");
@@ -58,18 +84,52 @@ $(function () {
                     let image_link = result['image_link'];
                     let topicImage = result['image'];
 
-                    $('.modal-title').text(result['title']);
+                    $('#title').text(result['title']);
                     $('#openday').text(result['open_day']);
-                    $('#imgLink').attr("href", image_link);
                     if (!$.trim(topicImage) == '') {
                         $('#topicImage').attr("src", "../../app/refer/images/topics/" + topicImage);
                     }
-                    $('#topicBody').text(result['body']);
-                    $('#topicLink').attr("href", link_url);
-                    $('#topicLink').text(link_url);
-                    if (!$.trim(link_title) == '') {
-                        $('#topicLink').text(link_title);
+
+                    var opday = new Date(result['open_day']);
+                    var currentDate = new Date();
+                    if (opday.setDate(opday.getDate() + 7) >= currentDate) {
+                        $("#newTitle").text("New!");
                     }
+
+                    if (!image_link.match("^http") && image_link != '') {
+                        image_link = '//' + image_link;
+                    }
+                    else {
+                        image_link = image_link;
+                    }
+
+                     var linkCode = '<a target="_blank" href="%link%">%title%</a>';
+
+                     if (!link_url.match("^http") && link_url != '') {
+                        link_url = '//' + link_url;
+                    }
+                    else {
+                        link_url = link_url;
+                    }
+
+                    if (link_url != '' && link_title == '') {
+                        linkCode = linkCode.replace('%link%', link_url);
+                        linkCode = linkCode.replace('%title%', link_url);
+                    }
+                    else if (link_url != '' && link_title != '') 
+                    {
+                        linkCode = linkCode.replace('%link%', link_url);
+                        linkCode = linkCode.replace('%title%', link_title);
+                    } 
+                    else {
+                        linkCode = '';
+                    }
+
+                    $("#link").empty();
+                    $("#link").append(linkCode);
+
+                    $('#imgLink').attr("href", image_link);
+                    $('#topicBody').text(result['body']);
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     console.log('AJAX call failed.');

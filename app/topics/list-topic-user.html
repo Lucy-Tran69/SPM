@@ -8,7 +8,7 @@
     }
 </style>
 <div class="card">
-    <div class="card card-primary">
+    <div class="card-primary">
         <div class="card-header">
             <h3 class="card-title">トピックス</h3>
         </div>
@@ -25,9 +25,6 @@
                 <?php include 'topicsUserList.php'; ?>
             </tbody>
         </table>
-        <div id="loadding" class="hidden text-center">
-          ロード中… 
-        </div>
         <button id="loadmore" type="button" class="btn btn-block btn-primary"
             style="width: 120px; margin: 10px auto;">もっと見る</button>
     </div>
@@ -39,7 +36,10 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title"></h4>
+                <h4 class="modal-title">
+                     <b style="color: red;" id="newTitle"></b>
+                    <b id="title"></b>
+                </h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -58,7 +58,7 @@
                         <p id="topicBody"></p>
                     </div>
                     <div class="row">
-                        <p><a id="topicLink" target="_blank" href="#"></a></p>
+                        <p id="link"></p>
                     </div>
                 </div>
             </div>
@@ -68,3 +68,4 @@
         </div>
     </div>
 </div>
+
