@@ -2,17 +2,20 @@
 include_once "common/session.php";
 include_once "database/db.inc";
 
+define('UPLOAD_DIR', '../../app/refer/images/topics/');
+
 $conn  = getConnection();
 
 if ($conn->connect_error) {
 	die("Failed to connect to database. " . $conn->connect_error);
 }
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$no = isset($_POST["no"]) ? (int)$_POST["no"] : '';
 	$title = isset($_POST["title"]) ? strip_tags($_POST["title"]) : '';
 	$body = isset($_POST["body"]) ? strip_tags($_POST["body"]) : '';
 	$imgFileOld = isset($_POST["imgFileOld"]) ? $_POST["imgFileOld"] : '';
-	$imgFileNew = isset($_FILES["imgFile"]["name"]) ? $_FILES["imgFile"]["name"] : '';
+	$imgFileNew = isset($_FILES["imgFile"]) ? $_FILES["imgFile"] : '';
 	$titleLink = isset($_POST["titleLink"]) ? strip_tags($_POST["titleLink"]) : '';
 	$urlImage = isset($_POST["urlImage"]) ? remove_special_character($_POST["urlImage"]) : '';
 	$imageLink = isset($_POST["imgLink"]) ? remove_special_character($_POST["imgLink"]) : null;
@@ -42,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$checkOK = 0;
 	}
 
-	if (empty($imgFileOld) && empty($imgFileNew)) {
+	if (empty($imgFileOld) && empty($imgFileNew['name'])) {
 		array_push($errmsg, "アップロードファイルをご指定ください。");
 		$checkOK = 0;
 	}
@@ -67,15 +70,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$checkOK = 0;
 	}
 
-	if(!empty($imgFileNew)){
+	if(!empty($imgFileNew['name'])){
 		//upload image
-		$target_dir = "../../app/refer/images/topics/";
-		$target_file = $target_dir . basename($imgFileNew);
 		$uploadOk = 1;
-		$imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+		$imageFileType = strtolower(pathinfo($imgFileNew['name'], PATHINFO_EXTENSION));
 
-	// Check if image file is a actual image or fake image
-		$check = getimagesize($_FILES["imgFile"]["tmp_name"]);
+		// Check if image file is a actual image or fake image
+		$check = getimagesize($imgFileNew["tmp_name"]);
 		if ($check !== false) {
 			$uploadOk = 1;
 		} else {
@@ -84,22 +85,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$checkOK = 0;
 		}
 
-	// Check if file already exists
-		if (file_exists($target_file)) {
-			$msg->error('このファイルが既に存在しています。');
+		// // Check if file already exists
+		// if (file_exists($target_file)) {
+		// 	$msg->error('このファイルが既に存在しています。');
     
-			$uploadOk = 0;
-			$checkOK = 0;
-		}
+		// 	$uploadOk = 0;
+		// 	$checkOK = 0;
+		// }
 
-	// Check file size
-		if ($_FILES["imgFile"]["size"] > 102400000) {
+		// Check file size
+		if ($imgFileNew["size"] > 102400000) {
 			$msg->error('アップロードされたファイルサイズは100MBを超えています。100MB以下にしてください。');
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
 
-	// Allow certain file formats
+		// Allow certain file formats
 		if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
 			$msg->error('アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。');
 			$uploadOk = 0;
@@ -110,11 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	if ($checkOK === 1) {
 		$image = $imgFileOld;
 		
-		if(!empty($imgFileNew)) {
-			// $idFile = uniqid();
-
-			// $image = $idFile . '.' . $imageFileType;
-			$image = $imgFileNew;
+		if(!empty($imgFileNew['name'])) {
+			$image = $imgFileNew['name'];
 			// Check if $uploadOk is set to 0 by an error
 			if ($uploadOk === 0) {
 				$msg->error('指定されたファイルはアップロードできません。');
@@ -122,8 +120,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			} else {
 				// $destination = $target_dir . basename($image);
 				// move_uploaded_file($image, $destination);
-				if (!move_uploaded_file($_FILES["imgFile"]["tmp_name"], $target_file)) {
-					$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');
+				// if (!move_uploaded_file($_FILES["imgFile"]["tmp_name"], $target_file)) {
+				// 	$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');
+				// }
+				// check for which action should be taken if file already exist
+				if (file_exists(UPLOAD_DIR . $image)) {
+					$image = update_file_name($image);
+					if (!move_uploaded_file( $imgFileNew['tmp_name'], UPLOAD_DIR.$image )) {
+						$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');
+					}
+				
+					// Message: SUCCESS UPLOAD and RENAME
+				} else {
+					if (!move_uploaded_file( $imgFileNew['tmp_name'], UPLOAD_DIR.$image )) {
+						$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');
+					}
+				
+					// Message: SUCCESS UPLOAD
 				}
 			}
 		}
@@ -172,4 +185,28 @@ function remove_special_character($string) {
 	}
 
 	return $t;
+}
+
+// function to rename file
+function update_file_name($file)  {
+	$pos = strrpos($file,'.');
+	$ext = substr($file,$pos); 
+	$dir = strrpos($file,'/');
+	$dr  = substr($file,0,($dir+1)); 
+
+	$arr = explode('/',$file);
+	$fName = trim($arr[(count($arr) - 1)],$ext);
+
+	$exist = FALSE;
+	$idFile = uniqid();
+	while(!$exist){
+		if(file_exists($idFile)||file_exists($file)){
+			continue;
+		} else {
+			$exist = TRUE;
+			$file = $idFile.$ext;
+		}
+	}
+
+	return $file;
 }
