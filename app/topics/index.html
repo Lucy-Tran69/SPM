@@ -1,4 +1,7 @@
 <?php
+    include "common/check_view_permission.php";
+    $url = "topics";
+    check_view_permission($url);
     include_once "html/header.inc";
     include_once "html/menu.inc";
 ?>
@@ -59,7 +62,7 @@
 <div class="card">
     <div class="card-body table-responsive">
         <div class="row justify-content-end" style="margin-bottom: 20px; margin-right: 10px">
-            <button type="button" class="btn btn-primary" onclick="redirectAddOrEditTopic()">追加</button>
+            <button type="button" class="btn btn-primary" onclick="redirectAddOrEditTopic()"><i class="fas fa-plus mr-2"></i>追加</button>
         </div>
         <div class="table-responsive">
            <table id="topicsTable" class="table table-bordered table-striped">

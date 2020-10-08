@@ -12,51 +12,48 @@
 
 <?php include "html/header.inc";?>
 <?php include "html/menu.inc";?>
-
-<?php
-if (isset($_SESSION["loginAccount"])) {
-?>
 <input type="hidden" name="" id="page-name" value="取引先管理">
+<div class="card card-default">
+  <div class="card-body">
+    <div class="row justify-content-md-center">
+      <div class="col-md-6">
+        <form action="#" id="searchCustomer" method="POST" role="form">
+          <div class="form-group row">
+            <label class="col-sm-4 col-form-label text-right">取引先コード</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="cd" name="cd" placeholder="取引先コード" />
+            </div>             
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-4 col-form-label text-right">取引先名</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="name" name="name" placeholder="取引先名" />
+            </div>
+          </div>
+          <div class="form-group row">
+            <div class="offset-sm-4 col-sm-8">
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="status" class="custom-control-input" id="status" />
+                <label class="custom-control-label" for="status">無効を含む</label>
+              </div>
+            </div>
+          </div>
+          <div class="row justify-content-center">
+            <button type="submit" class="btn btn-primary mr-2">検索</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-12">
     <div class="card">
-      <div class="card card-default">
-        <div class="card-body">
-          <div class="row justify-content-md-center">
-            <div class="col-md-6">
-              <form action="#" id="searchCustomer" method="POST" role="form">
-                <div class="form-group row">
-                  <label class="col-sm-4 col-form-label text-right">取引先コード</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="cd" name="cd" placeholder="取引先コード" />
-                  </div>             
-                </div>
-                <div class="form-group row">
-                  <label class="col-sm-4 col-form-label text-right">取引先名</label>
-                  <div class="col-sm-8">
-                    <input type="text" class="form-control" id="name" name="name" placeholder="取引先名" />
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <div class="offset-sm-4 col-sm-8">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" name="status" class="custom-control-input" id="status" />
-                      <label class="custom-control-label" for="status">無効を含む</label>
-                    </div>
-                  </div>
-                </div>
-                <div class="row justify-content-center">
-                  <button type="submit" class="btn btn-primary mr-2">検索</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
       <!-- /.card-header -->
       <div class="card-body table-responsive-sm">
         <div class="row justify-content-end" style="margin-right: 10px; margin-bottom: 20px">
-          <button type="button" class="btn btn-primary" onclick="redirectAddOrEditCustomer()">追加</button>
+          <button type="button" class="btn btn-primary" onclick="redirectAddOrEditCustomer()"><i class="fas fa-plus mr-2"></i>追加</button>
         </div>
         <div class="table-responsive">
           <table id="customerTable" class="table table-bordered table-striped w-100">
@@ -79,17 +76,14 @@ if (isset($_SESSION["loginAccount"])) {
   </div>
   <!-- /.col -->
 </div>
-<?php
-} else {
-  //header("Location: ../../include/logout.php");
-}
-?>
+
 <?php include "html/foot.inc";?>
 
 <script type="text/javascript">
   $(function () {
     const customerTable = $('#customerTable');
-    var table = customerTable.DataTable({
+    var table = {
+      'start': 0,
       'processing': true,
       'searching': false,
       'ordering': false,
@@ -99,10 +93,6 @@ if (isset($_SESSION["loginAccount"])) {
       'autoWidth': false,
       'lengthChange': false,
       'scrollX': true,
-      'serverMethod': 'post',
-      'ajax': {
-        'url': '../../app/customer/customer.php',
-      },
       'columns': [
         { data: 'cd', "defaultContent": "", "title": '取引先コード' },
         { data: 'name', "defaultContent": "", "title": '取引先名' },
@@ -116,7 +106,18 @@ if (isset($_SESSION["loginAccount"])) {
           }
         },
       ],
-    });
+    };
+
+    table.ajax ={
+      url: 'customer.php',
+        type: 'POST',
+        data: function (d) {
+            delete d.columns;
+        },
+        datatype: "json",
+    };
+
+    $(customerTable).DataTable(table);
 
     $('#searchCustomer').on('submit', function (e) {
       e.preventDefault();
@@ -132,37 +133,21 @@ if (isset($_SESSION["loginAccount"])) {
       }
 
       $('#customerTable').DataTable().destroy();
-
-      $(customerTable).DataTable({
-        'processing': true,
-        'serverSide': true,
-        'searching': false,
-        'ordering': false,
-        'info': false,
-        'autoWidth': false,
-        'deferRender': true,
-        'lengthChange': false,
-        'scrollX': true,
-        'ajax': {
-          type: 'POST',
-          url: '../../app/customer/customer.php',
-          data: { 'cd': cd, 'name': name, 'status': status },
+      
+      table.ajax = {
+        url: 'customer.php',
+        type: 'POST',
+        data: function (d) {
+            d.cd = $('#cd').val();
+            d.name = $('#name').val();
+			      d.status = status;
+			
+            delete d.columns;
         },
-        'start': 0,
-        'columns': [
-          { data: 'cd', "defaultContent": "", "title": '取引先コード' },
-          { data: 'name', "defaultContent": "", "title": '取引先名' },
-          { data: 'NumberCustomerRole5', "defaultContent": "", "title": '在庫閲覧ユーザ数' },
-          { data: 'NumberCustomerRole6', "defaultContent": "", "title": '在庫・価格表閲覧ユーザ数' },
-          { data: 'invalid', "defaultContent": "", "title": 'ステータス' },
-          {
-            data: 'no',
-            render: function (data, type, row) {
-              return '<div class="row justify-content-center"><a href="edit-customer.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px; min-width: 85px;"><i class="fas fa-pencil-alt mr-2"></i>変更</a></div>';
-            }
-          },
-        ],
-      });
+        datatype: "json",
+      };
+
+      $(customerTable).DataTable(table);
     }
   });
 

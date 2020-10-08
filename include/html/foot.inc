@@ -67,4 +67,8 @@ $.widget.bridge('uibutton', $.ui.button)
   $("#logout-button").click(function(){
     $("#logout-form").submit();
   });
+
+  $(function () {
+    $.fn.dataTable.ext.errMode = 'throw';
+  });
 </script>

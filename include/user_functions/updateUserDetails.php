@@ -10,7 +10,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 {
     $account = $_POST["inputAccount"];
     $name = $_POST["inputName"];
-    $password = password_hash($_POST["inputPass"],PASSWORD_DEFAULT);
+    $password = !empty($_POST["inputPass"])?password_hash($_POST["inputPass"],PASSWORD_DEFAULT):null;
     $role = $_POST["inputRole"];
     $email = $_POST["inputEmail"];
     $start = $_POST["inputStart"];

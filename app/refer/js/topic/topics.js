@@ -1,6 +1,6 @@
 $(function () {
     const topicTable = $('#topicsTable');
-    var table = topicTable.DataTable({
+    var table = {
         'processing': true,
         'serverSide': true,
         'searching': false,
@@ -10,12 +10,9 @@ $(function () {
         'deferRender': true,
         "lengthChange": false,
         'serverMethod': 'post',
-        'ajax': {
-            'url': 'topics.php'
-        },
         'columns': [
             { data: 'insert_day', "defaultContent": "", "title": '作成日' },
-            { data: 'open_day', "defaultContent": "", "title": '公開日時' },
+            { data: 'open_day', "defaultContent": "", "title": '公開日' },
             { data: 'close_day', "defaultContent": "", "title": '終了日' },
             { data: 'title', "defaultContent": "", "title": 'タイトル' },
             {
@@ -25,7 +22,19 @@ $(function () {
                 }
             },
         ],
-    });
+    };
+
+     table.ajax = {
+        url: 'topics.php',
+        type: 'POST',
+        data: function (d) {
+            delete d.columns;
+        },
+        datatype: "json",
+        
+    };
+
+    topicTable.DataTable(table);
 
     $('#searchTopic').on('submit', function (e) {
         e.preventDefault();
@@ -33,8 +42,8 @@ $(function () {
     });
 
     function RequestData() {
-        let title = $('#title').val();
-        let status = '';
+        var title = $('#title').val();
+        var status = '';
 
         if ($('#status').is(":checked")) {
             status = $('#status').val();
@@ -44,32 +53,20 @@ $(function () {
             $(topicTable).DataTable().destroy();
         }
 
-        $(topicTable).DataTable({
-           'processing': true,
-            'serverSide': true,
-            'searching': false,
-            'ordering': false,
-            'info': false,
-            'autoWidth': false,
-            'deferRender': true,
-            "ajax": {
-                type: 'POST',
-                url: 'topics.php',
-                data: { 'title': title, 'status': status },
-            },
-            "columns": [
-                { data: 'insert_day', "defaultContent": "", "title": '作成日' },
-                { data: 'open_day', "defaultContent": "", "title": '公開日時' },
-                { data: 'close_day', "defaultContent": "", "title": '終了日' },
-                { data: 'title', "defaultContent": "", "title": 'タイトル' },
-                {
-                    data: "no",
-                    render: function (data, type, row) {
-                        return '<div class="row justify-content-center"><a href=edit-topic.html?id=' + data + ' class="btn btn-success margin-bottom-5px m-r-0" style="margin-right: 5px;"><i class="fas fa-pencil-alt mr-2"></i> 変更</a><a href="" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash mr-2"></i> 削除</a></div>';
-                    }
-                },
-            ],
-        });
+        table.ajax = {
+            url: 'topics.php',
+            type: 'POST',
+            data: function (d) {
+                d.title = title
+                d.status = status;
+                
+                delete d.columns;
+        },
+        datatype: "json",
+            
+        };
+            
+        $(topicTable).DataTable(table);
     }
 
     $('#topicsTable tbody').on('click', '.js-deleteTopic', function () {
@@ -78,7 +75,7 @@ $(function () {
         var topicID = $(topicTable).DataTable().row(row).data()["no"];
         var topicTitle = $(topicTable).DataTable().row(row).data()["title"];
 
-        let c = confirm('You want to delete "' + topicTitle + '"');
+        let c = confirm('この「"' + topicTitle + '"」トピックスを削除します。よろしいですか？');
 
         if (c == true) {
             $(topicTable).DataTable().row(row).remove().draw(false);
@@ -123,6 +120,38 @@ $(function () {
     //         return inputDate.toISOString().slice(0, 10) === value;
     //     }, 'Please enter a date in the format yyyy-mm-dd.');
 
+     $.validator.addMethod( "accept", function( value, element, param ) {
+
+        var typeParam = typeof param === "string" ? param.replace( /\s/g, "" ) : "image/*",
+        optionalValue = this.optional( element ),
+        i, file, regex;
+
+        if ( optionalValue ) {
+            return optionalValue;
+        }
+
+        if ( $( element ).attr( "type" ) === "file" ) {
+
+            typeParam = typeParam
+            .replace( /[\-\[\]\/\{\}\(\)\+\?\.\\\^\$\|]/g, "\\$&" )
+            .replace( /,/g, "|" )
+            .replace( /\/\*/g, "/.*" );
+
+            if ( element.files && element.files.length ) {
+                regex = new RegExp( ".?(" + typeParam + ")$", "i" );
+                for ( i = 0; i < element.files.length; i++ ) {
+                    file = element.files[ i ];
+
+                    if ( !file.type.match( regex ) ) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }, $.validator.format( "アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。" ));
+
     var formAddTopic = $('#addTopic');
     formAddTopic.validate({
         rules: {
@@ -132,14 +161,16 @@ $(function () {
             body: {
                 required: true,
             },
-            imgFile: {
-                required: true,
+             imgFile: {
+                accept: "image/png, image/jpeg, image/jpg, image/PNG, image/JPG, image/JPEG, image/gif"
             },
         },
         messages: {
             title: "タイトルを入力して下さい",
             body: "本文を入力して下さい",
-            imgFile: "画像を入力して下さい",
+            imgFile: {
+                extension: "アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。"
+            }
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -159,13 +190,14 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
-    formAddTopic.submit(function (event) {
+     formAddTopic.submit(function(e) {
         event.preventDefault();
-        if (!formAddTopic.valid()) {
+          if(!formAddTopic.valid()) 
+          {
             return false;
-        }
-        var file_data = $('#imgFile').prop('files')[0];
-        var form_data = new FormData();
+           }
+        var file_data = $('#imgFile').prop('files')[0];   
+        var form_data = new FormData();                  
         form_data.append('imgFile', file_data);
         form_data.append('no', $("#no").val());
         form_data.append('title', $("#title").val());
@@ -175,26 +207,25 @@ $(function () {
         form_data.append('imgLink', $("#imgLink").val());
         form_data.append('titleLink', $("#titleLink").val());
         form_data.append('urlImage', $("#urlImage").val());
-
+       
         $.ajax({
             url: "createTopic.php",
             type: "POST",
             contentType: false,
             processData: false,
             data: form_data,
-            dataType: "html",
-            success: function (res) {
-                debugger
+            dataType:"html",
+            success: function(response)  {
                 //check response is blank if success 
-                if (!$.trim(res)) {
+                if (!$.trim(response)) {
                     window.location.href = "index.html";
-                }
+                } 
                 // if error
                 else {
-                    $("#flash-message").html(res);
+                    $("#flash-message").html(response);        
                 }
             },
-            error: function (jqXHR, textStatus, errorThrown) {
+            error: function(jqXHR, textStatus, errorThrown)  {
                 // alert( "Bug" );
             },
         });
@@ -207,7 +238,6 @@ function redirectAddOrEditTopic() {
 }
 
 function onBtnclick() {
-    // debugger
     var preTitle = $("#title").val();
     var preOpenDay = $(".openDay").val();
     var preBody = $("#body").val();
@@ -234,18 +264,19 @@ function onBtnclick() {
     if (!preLink.match("^http") && preLink != '') {
         preLink = '//' + preLink;
     }
-    else {
+     else {
         preLink = preLink;
     }
-
+    
     if (preLink != '' && preLinkTitle == '') {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLink);
     }
-    else if (preLink != '' && preLinkTitle != '') {
+    else if (preLink != '' && preLinkTitle != '') 
+    {
         linkCode = linkCode.replace('%link%', preLink);
         linkCode = linkCode.replace('%title%', preLinkTitle);
-    }
+    } 
     else {
         linkCode = '';
     }
@@ -258,23 +289,38 @@ function onBtnclick() {
     $("#preBody").empty();
     $("#preBody").append(preBody);
     $("#preImgLink").attr("href", preImgLink);
-
+    
 
     var img = $('#imgFile').val();
     if (img == '') {
         $('#img').hide();
     }
+    else {
+        $('#img').show();
+    }
 
     $("#previewTopic").modal('show');
 }
 
-function preview_image(event) {
-    var reader = new FileReader();
-    reader.onload = function () {
-        var output = document.getElementById('output_image');
-        output.src = reader.result;
+function fileValidation(){
+    var fileInput = document.getElementById('imgFile');
+    var filePath = fileInput.value;
+    var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+    if(!allowedExtensions.exec(filePath)){
+        alert('アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。');
+        fileInput.value = '';
+        return false;
+    }else{
+        //Image preview
+        if (fileInput.files && fileInput.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var output = document.getElementById('output_image');
+                output.src = e.target.result;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        }
     }
-    reader.readAsDataURL(event.target.files[0]);
 }
 
 function redirectListTopic() {

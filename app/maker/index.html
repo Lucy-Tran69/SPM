@@ -51,6 +51,15 @@ tr:nth-child(even) {
 if (isset($_SESSION["loginAccount"])) {
 ?>
   <div class="content-wrapper">
+  <div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 class="m-0 text-dark" id="d-page-name">マスター管理　メーカ管理</h1>
+						</div><!-- /.col -->
+					</div><!-- /.row -->
+				</div><!-- /.container-fluid -->
+		</div>
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
@@ -58,9 +67,6 @@ if (isset($_SESSION["loginAccount"])) {
           <div class="col-12">
             <!-- Default box -->
             <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">マスター管理　メーカ管理</h3>
-              </div>
               <!-- /.card-header -->
               <div class="card-body">
                 <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
@@ -73,7 +79,7 @@ if (isset($_SESSION["loginAccount"])) {
                               <div class="form-check">
                                 <div style="margin-left: 25px;">
                                   <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?> />
-                                  <label id="checkLabel" class="form-check-label">無効を含む</label>
+                                  <label id="checkLabel" class="form-check-label"><b>無効を含む</b></label>
                                 </div>
                               </div>
                             </div>
@@ -110,7 +116,7 @@ if (isset($_SESSION["loginAccount"])) {
                             }
                           ?>
                         </td>
-                        <td class="align_button"><button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" name="" value="" onclick="updateMaker(this.id);"><i class="fas fa-pencil-alt"></i>変更</button></td>
+                        <td class="align_button"><button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" name="" value="" onclick="updateMaker(this.id);"><i class="fas fa-pencil-alt"></i>&nbsp;変更</button></td>
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
                       </tr>
                   <?php

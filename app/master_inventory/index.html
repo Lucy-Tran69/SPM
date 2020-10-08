@@ -1,0 +1,426 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+include "common/check_view_permission.php";
+$url = "master_inventory";
+check_view_permission($url);
+header("content-type: text/html; charset=UTF-8");
+//Get array of roles from session variable 
+?>
+<style>
+  .update_button {
+    width: 50%;
+  }
+
+  .align_button {
+    text-align: center;
+  }
+
+  .align_form {
+    text-align: -webkit-center;
+  }
+
+  .tableFixHead {
+    overflow-y: auto;
+    height: 500px;
+  }
+
+  .tableFixHead table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .tableFixHead th,
+  .tableFixHead td {
+    padding: 8px 16px;
+  }
+
+  thead {
+    text-align: center;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+</style>
+<?php include "html/sidebar.inc" ?>
+<?php include "master_inventory_functions/inventory.php" ?>
+<!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
+<?php
+if (isset($_SESSION["loginAccount"])) {
+?>
+  <div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <!-- Default box -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">マスター管理　ユーザ管理</h3>
+              </div>
+              <!-- /.card-header -->
+              <div class="card-body">
+                <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <label id="itemLabel">権限</label>
+                        <select name="selectedMaker" id="selectedMaker" class="form-control">
+                          <option value="">-</option>
+                          <?php
+                          if ($makerResultSet->num_rows > 0) {
+                            mysqli_data_seek($makerResultSet, 0);
+                            while ($row = $makerResultSet->fetch_assoc()) {
+                          ?>
+                              <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedMaker"]) && $_POST["selectedMaker"] == $row["no"]) {
+                                                                          echo "selected='selected'";
+                                                                        } ?>><?php echo $row["name"]; ?></option>
+                          <?php
+                            }
+                          }
+                          ?>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <label id="custLabel" class="searchTable_label">在庫在庫（在庫名）</label>
+                        <input type="text" id="searchCartridge" name="searchCartridge" value="<?php echo isset($_POST["searchCartridge"]) ? $_POST["searchCartridge"] : ""; ?>" class="form-control" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <div class="form-check">
+                          <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?> onchange="searchTableByInvalid();" />
+                          <label id="checkLabel" class="form-check-label">非表示を表示しない</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-xs-5">
+                        <div class="form-check">
+                          <input type="checkbox" name="searchInventory" id="searchInventory" class="form-check-input" value="0" <?php if (isset($_POST['searchInventory'])) echo "checked='checked'"; ?> onchange="searchTableByInventory();" />
+                          <label id="checkLabel" class="form-check-label">在庫未設定のみ表示</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="submit" value="検索" class="btn btn-primary" style="width: 100px; margin-left: 250px;">
+                  <input type="button" value="PDF" class="btn btn-primary" style="width: 100px; margin-left: 250px;" onclick="generatepdf();">
+                  <input type="button" value="CSV" class="btn btn-primary" style="width: 100px;" onclick="generatecsv();">
+                </form>
+              </div>
+              <div class="tableFixHead">
+                <table id="details_table" class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>メーカー名</th>
+                      <th>完成在庫(商品名)</th>
+                      <th>現在在庫状況</th>
+                      <th>公開予定在庫状況</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php
+                    if ($resultSet->num_rows > 0) {
+                      while ($row = $resultSet->fetch_assoc()) {
+                    ?>
+                        <tr>
+                          <td style="display: none;"><?php echo $row["id"] ?></td>
+                          <td><?php echo $row["mName"] ?></td>
+                          <td><?php echo $row["cName"] == null ? $markNew : $row["cName"] ?></td>
+                          <td><?php echo $row["display"] == null ? $markNew : $row["display"] ?></td>
+                          <td>
+                            <select id="inputMark" name="inputMark" class="form-control">
+                              <?php
+                              if ($markResultSet->num_rows > 0) {
+                                mysqli_data_seek($markResultSet, 0);
+                                while ($markrow = $markResultSet->fetch_assoc()) {
+                              ?>
+                                  <option value="<?php echo $markrow["no"]; ?>" <?php echo $markrow["display"] == $row["display"] ? "selected" : ""; ?>><?php echo $markrow["display"]; ?></option>
+                              <?php
+                                }
+                              }
+                              ?>
+                            </select>
+                          </td>
+                          <td style="display: none;"><?php echo $row["invalid"] ?></td>
+                        </tr>
+                    <?php
+                      }
+                    }
+                    // $resultStmt->free_result();
+                    // freeConnection($conn);
+                    ?>
+                  </tbody>
+                </table>
+              </div>
+              <input type="button" value="Confirm" class="btn btn-primary" style="width: 100px; align-self:flex-end;margin-right:125px;margin-bottom:5px;" onclick="confirmValues();" data-toggle="modal" data-target="#details" />
+              <!-- /.card-footer-->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  </body>
+  <?php include "html/footer.inc" ?>
+  <div class="modal fade" tabindex="-1" role="dialog" id="details">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body align_form">
+          <form action="" method="POST" class="form_style">
+            <div class="tableFixHead">
+              <table class="table table-bordered" id="confirm_table">
+                <thead>
+                  <tr>
+                    <th>メーカー名</th>
+                    <th>完成在庫(商品名)</th>
+                    <th>現在在庫状況</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  if ($resultSet->num_rows > 0) {
+                    mysqli_data_seek($resultSet, 0);
+                    while ($row = $resultSet->fetch_assoc()) {
+                  ?>
+                      <tr>
+                        <td><?php echo $row["mName"] ?></td>
+                        <td><?php echo $row["cName"] == null ? $markNew : $row["cName"] ?></td>
+                        <td></td>
+                      </tr>
+                  <?php
+                    }
+                  }
+                  // $resultStmt->free_result();
+                  // freeConnection($conn);
+                  ?>
+                </tbody>
+              </table>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="updateValues();">Save changes</button>
+        </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <form id="pdfForm" style="display: none;" action="../../include/master_inventory_functions/pdf/pdf.php" method="POST" role="form" target='_blank'>
+    <input type="checkbox" id="pdfInvalid" name="pdfInvalid" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>>
+    <input type="checkbox" id="pdfInventory" name="pdfInventory" value="0" <?php if (isset($_POST['searchInventory'])) echo "checked='checked'"; ?>>
+    <input type="hidden" name="UserId" id="UserId" value="<?php echo $_SESSION["loginUserId"];?>">
+    <select name="selectedMaker" id="selectedMaker" class="form-control">
+      <option value="">-</option>
+      <?php
+      if ($makerResultSet->num_rows > 0) {
+        mysqli_data_seek($makerResultSet, 0);
+        while ($row = $makerResultSet->fetch_assoc()) {
+      ?>
+          <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedMaker"]) && $_POST["selectedMaker"] == $row["no"]) {
+                                                      echo "selected='selected'";
+                                                    } ?>><?php echo $row["name"]; ?></option>
+      <?php
+        }
+      }
+      ?>
+    </select>
+    <input type="text" id="searchCartridge" name="searchCartridge" value="<?php echo isset($_POST["searchCartridge"]) ? $_POST["searchCartridge"] : ""; ?>" class="form-control" />
+  </form>
+  <form id="csvForm" style="display: none;" action="../../include/master_inventory_functions/csv/generateCSV.php" method="POST" role="form">
+    <input type="checkbox" id="csvInvalid" name="csvInvalid" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>>
+    <input type="checkbox" id="csvInventory" name="csvInventory" value="0" <?php if (isset($_POST['searchInventory'])) echo "checked='checked'"; ?>>
+    <select name="selectedMaker" id="selectedMaker" class="form-control">
+      <option value="">-</option>
+      <?php
+      if ($makerResultSet->num_rows > 0) {
+        mysqli_data_seek($makerResultSet, 0);
+        while ($row = $makerResultSet->fetch_assoc()) {
+      ?>
+          <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedMaker"]) && $_POST["selectedMaker"] == $row["no"]) {
+                                                      echo "selected='selected'";
+                                                    } ?>><?php echo $row["name"]; ?></option>
+      <?php
+        }
+      }
+      ?>
+    </select>
+    <input type="text" id="searchCartridge" name="searchCartridge" value="<?php echo isset($_POST["searchCartridge"]) ? $_POST["searchCartridge"] : ""; ?>" class="form-control" />
+  </form>
+
+  </html>
+<?php
+} else {
+  header("Location: ../../include/common/logout.php");
+}
+?>
+
+<script>
+  function confirmValues() {
+    var arr = [];
+    $('#details_table tbody tr').each(function() {
+      var id = $(this).find('td:eq(0)').html();
+      var name = $(this).find('td:eq(2)').html();
+      var value = $(this).find('td option:selected').html();
+      //alert(name+" "+value);
+      arr.push(value);
+    });
+
+    $('#confirm_table tbody tr').each(function() {
+      $(this).find('td:eq(2)').html(arr.shift());
+      //alert(name+" "+value);
+    });
+
+  }
+
+  function updateValues() {
+    var values = [];
+    var ids = [];
+    $('#details_table tbody tr').each(function() {
+      var id = $(this).find('td:eq(0)').html();
+      var name = $(this).find('td:eq(2)').html();
+      var value = $(this).find('td option:selected').val();
+      //alert(id+" "+value);
+      values.push(value);
+      ids.push(id);
+    });
+
+    for (var i = 0; i < ids.length; i++) {
+      $.ajax({
+        url: "../../include/master_inventory_functions/updateInventory.php",
+        type: "POST",
+        dataType: "text",
+        data: {
+          no: ids[i],
+          val: values[i]
+        },
+        success: function(response) {},
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus, errorThrown);
+        }
+      });
+    }
+
+    window.location.reload();
+  }
+
+  function searchTableByCartridge() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchCartridge");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("details_table");
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[2];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+
+  function searchTableByMaker() {
+    // Declare variables
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("selectedMaker");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("details_table");
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[1];
+      if (td) {
+        txtValue = td.textContent || td.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+
+  function searchTableByInvalid() {
+    // Declare variables
+    // var input, filter, table, tr, td, i, txtValue;
+    // input = document.getElementById("searchInvalid").checked;
+    // filter = input;
+    // table = document.getElementById("details_table");
+    // tr = table.getElementsByTagName("tr");
+
+    // // Loop through all table rows, and hide those who don't match the search query
+    // for (i = 0; i < tr.length; i++) {
+    //   td = tr[i].getElementsByTagName("td")[4];
+    //   if (td) {
+    //     txtValue = td.textContent || td.innerText;
+    //     if (txtValue == 1) {
+    //       if (filter == true) {
+    //         tr[i].style.display = "";
+    //       } else {
+    //         tr[i].style.display = "none";
+    //       }
+    //     }
+    //   }
+    // }
+    document.getElementById('searchForm').submit();
+  }
+
+  function searchTableByInventory() {
+    document.getElementById('searchForm').submit();
+  }
+
+  function generatepdf() {
+    // $.ajax({
+    //     url: "../../include/inventory_functions/pdf/pdf.php",
+    //     type: "POST",
+    //     success: function(response) {
+
+    //     },
+    //     error: function(jqXHR, textStatus, errorThrown) {
+    //       console.log(textStatus, errorThrown);
+    //     }
+    //   });
+
+    document.getElementById('pdfForm').submit();
+  }
+
+  function generatecsv() {
+    // $.ajax({
+    //     url: "../../include/inventory_functions/csv/generateCSV.php",
+    //     type: "POST",
+    //     success: function(response) {
+
+    //     },
+    //     error: function(jqXHR, textStatus, errorThrown) {
+    //       console.log(textStatus, errorThrown);
+    //     }
+    //   });
+
+    // window.location.href = "../../include/inventory_functions/csv/generateCSV.php";
+    document.getElementById('csvForm').submit();
+  }
+</script>

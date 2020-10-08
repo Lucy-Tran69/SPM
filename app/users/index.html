@@ -41,11 +41,11 @@ th, td {
 .tableFixHead {
   overflow-y: auto;
   height: 500px;
+  width: 100%;
 }
 
 .tableFixHead table {
   border-collapse: collapse;
-  width: 100%;
 }
 
 .tableFixHead th,
@@ -67,6 +67,15 @@ tr:nth-child(even) {
 if (isset($_SESSION["loginAccount"])) {
 ?>
   <div class="content-wrapper">
+  <div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 class="m-0 text-dark" id="d-page-name">マスター管理　ユーザ管理</h1>
+						</div><!-- /.col -->
+					</div><!-- /.row -->
+				</div><!-- /.container-fluid -->
+		</div>
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
@@ -74,16 +83,12 @@ if (isset($_SESSION["loginAccount"])) {
           <div class="col-12">
             <!-- Default box -->
             <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">マスター管理　ユーザ管理</h3>
-              </div>
-              <!-- /.card-header -->
-              <div class="card-body">
-                <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
+              <div class="card-body d-flex justify-content-center">
+                <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm" class="form-horizontal search-form col-lg-8 col-sm-12">
                   <div class="form-group">
-                    <div class="row">
-                      <div class="col-xs-5">
-                        <label id="itemLabel">権限</label>
+                    <div class="row">                      
+                        <label id="itemLabel" class="col-sm-2 col-form-label text-right">権限</label>
+                        <div class="col-sm-10">
                         <select name="selectedRole" id="selectedRole" class="form-control">
                           <option value="">-</option>
                           <?php
@@ -101,35 +106,44 @@ if (isset($_SESSION["loginAccount"])) {
                     </div>
                   </div>
                   <div class="form-group">
-                    <div class="row">
-                      <div class="col-xs-5">
-                        <label id="nameLabel" class="searchTable_label">氏名</label>
+                    <div class="row">                      
+                        <label id="nameLabel" class="col-sm-2 col-form-label text-right">氏名</label>
+                        <div class="col-sm-10">
                         <input type="text" id="searchName" name="searchName" value="<?php echo isset($_POST["searchName"])?$_POST["searchName"]:"";?>" class="form-control"/>
                       </div>
                     </div>
                   </div>
                   <div class="form-group">
                     <div class="row">
-                      <div class="col-xs-5">
-                        <label id="custLabel" class="searchTable_label">取引先名</label>
+                        <label id="custLabel" class="col-sm-2 col-form-label text-right">取引先名</label>
+                        <div class="col-sm-10">
                         <input type="text" name="searchCustomer" id="searchCustomer" value="<?php echo isset($_POST["searchCustomer"])?$_POST["searchCustomer"]:"";?>" class="form-control"/>
                       </div>
                     </div>
                   </div>
                   <div class="form-group">
                     <div class="row">
-                      <div class="col-xs-5">
-                        <div class="form-check">
+                      <div class="offset-sm-2 col-sm-10">
+                      <div class="form-check">
                           <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" value="<?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?> />
-                          <label id="checkLabel" class="form-check-label">ログインできないユーザ</label>
+                          <label id="checkLabel" class="form-check-label"><b>ログインできないユーザ</b></label>                                
+                      </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <input type="submit" value="検索" class="btn btn-primary" style="width: 100px; margin-left: 250px;">
-                  <button type="button" value="" class="btn btn-info" style="width: 100px; margin-left: 250px;" data-target="#insert" data-toggle="modal" onclick="setExpire('INSERT');"><i class="fas fa-plus"></i>&nbsp;追加</button>
+                  <div class="form-group row">
+                    <div class="offset-sm-4 col-sm-5">
+                        <input type="submit" value="検索" class="btn btn-primary" style="width: 100px;">
+                        <div style="float:right;">
+                            <button type="button" value="" class="btn btn-info" style="width: 100px;" data-target="#insert" data-toggle="modal" onclick="setExpire('INSERT');"><i class="fas fa-plus"></i>&nbsp;追加</button>
+                        </div>
+                    </div>
+                  </div>
                 </form>
-              </div>
+            </div>
+            <div class="card card-primary">
+            <div class="card-body d-flex justify-content-center">
               <div class="tableFixHead">
               <table id="details_table" class="table table-bordered">
                 <thead>
@@ -156,7 +170,7 @@ if (isset($_SESSION["loginAccount"])) {
                         <td><?php echo $row["cname"] ?></td>
                         <td><?php echo $row["effective_en_day"] ?></td>
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
-                        <td class="align_button"><button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"><i class="fas fa-pencil-alt"></i>変更</button></td>
+                        <td class="align_button"><button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"><i class="fas fa-pencil-alt"></i>&nbsp;変更</button></td>
                       </tr>
                   <?php
                     }
@@ -174,6 +188,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <li class="paginate_button page-item next" id="customerTable_next"><a href="#" aria-controls="customerTable" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>
               </ul> -->
               <!-- /.card-footer-->
+            </div>
             </div>
             <!-- /.card -->
           </div>
@@ -322,7 +337,7 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
-                <td><input type="date" id="insertStart" name="insertStart" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" required />~<
+                <td><input type="date" id="insertStart" name="insertStart" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" required />~
                 <input type="date" id="insertExpire" name="insertExpire" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" />
                 </td>
               </tr>

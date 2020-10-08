@@ -15,7 +15,7 @@
     }
 </style>
 
-<input type="hidden" name="" id="page-name" value="トピックス編集">
+<input type="hidden" name="" id="page-name" value="トピックス変更">
 
 <div class="row">
     <div class="col-md-12">
@@ -84,9 +84,9 @@
                                                 <input type="hidden" name="imgFileOld" id="imgFileOld"
                                                     value="<?php echo $row['image']; ?>">
                                                 <input type="file" class="custom-file-input file" name="imgFile"
-                                                    id="imgFile" value="<?php echo $row['image']; ?>" onchange="preview_image(event)">
+                                                    id="imgFile" value="<?php echo $row['image']; ?>" onchange="return fileValidation()" accept="image/png, image/jpeg, image/jpg, image/PNG, image/JPG, image/JPEG, image/gif">
                                                 <label class="custom-file-label"
-                                                    for="imgFile"><?php echo $row['image']; ?></label>
+                                                    for="imgFile" id="labelFile"><?php echo $row['image']; ?></label>
                                             </div>
                                             <label class="input-group-append" for="imgFile">
                                                 <span class="input-group-text">ファイル</span>
@@ -102,8 +102,16 @@
                                 </div>
                                  <div class="col-sm-11">
                                      <div class="form-group">
-                                            <label for="imgLink">登録済画像</label>
-                                            <span>topics/<?php echo $row['image']; ?></span>
+                                        <div class="row">
+                                          <label for="imgLink" style="margin-right: 40px;">登録済画像</label>
+                                          <?php if ($row['image'] != null) { ?>
+                                          <label id="displayFile" style="margin-right: 40px;">topics/<?php echo $row['image']; ?></label>
+                                          <?php } ?>
+                                          <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" name="deleteImage" class="custom-control-input" id="deleteImage"/>
+                                            <label class="custom-control-label" for="deleteImage">Do you want to delete file?</label>
+                                        </div>
+                                        </div>
                                     </div> 
                                 </div>
                             </div>
@@ -161,7 +169,7 @@
                 </div>
                 <div class="card-footer">
                     <div class="row justify-content-md-center">
-                        <button type="submit" class="btn btn-primary">登録</button>
+                        <button type="submit" class="btn btn-primary">更新</button>
                         <button type="button" class="btn btn-secondary" style="margin-left: 20px;"
                             onclick="onBtnclick()">プレビュー</button>
                         <button type="button" class="btn btn-default" style="margin-left: 20px;" onclick="redirectListTopic()">戻る</button>
@@ -193,13 +201,12 @@
                     <div class="row justify-content-end" style="margin-bottom: 10px;">
                         <span class="ju" id="preOpenday"></span>
                     </div>
-                    <div class="row mb-2 justify-content-center" id="img" style="margin-bottom: 10px;">
-                        <!-- <p id="preImg"></p> -->
+                    <div class="row mb-2 justify-content-center" style="margin-bottom: 10px;">
                         <a target="_blank" rel="noopener noreferrer" id="preImgLink">
-                            <img class="image-pre" id="output_image" style="height: 250px; width: 250px;" />
+                            <img class="image-pre" id="output_image" style="height: auto; width: 100%;" />
                         </a>
                     </div>
-                    <div class="row" style="margin-bottom: 10px;">
+                    <div class="row" style="margin-bottom: 10px; overflow-y: auto; max-height: 200px;">
                         <p id="preBody"></p>
                     </div>
                       <div class="row">
@@ -208,8 +215,8 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <button type="submit" class="btn btn-primary btn-modal-submit">更新</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-                <button type="submit" class="btn btn-primary btn-modal-submit">登録</button>
             </div>
         </div>
     </div>

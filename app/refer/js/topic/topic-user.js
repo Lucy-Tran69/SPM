@@ -34,13 +34,13 @@ $(function () {
                         $.each(result, function (key, obj){
                            html += '<tr data-id="'+obj.no+'" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">' +
                                         '<td><a href="javascript:void(0)">'+obj.open_day+'</a></td>' +
-                                        '<td><a href="javascript:void(0)">';
+                                        '<td>';
 
                                  var opday = new Date(obj.open_day);
                                  if (opday.setDate(opday.getDate() + 7) >= currentDate) {
-                                    html +='New!';
+                                    html +='<b style="color: red;">New!</b>';
                                 }
-                                html += obj.title+'</a>' + '</td>' + '</tr>';
+                                html += '<a href="javascript:void(0)">' + obj.title + '</a>' + '</td>' + '</tr>';
                         });
      
                         $element.append(html);
@@ -51,13 +51,13 @@ $(function () {
                             if (key < result.length - 1){
                                 html += '<tr data-id="'+obj.no+'" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">' +
                                         '<td><a href="javascript:void(0)">'+obj.open_day+'</a></td>' +
-                                        '<td><a href="javascript:void(0)">';
+                                        '<td>';
 
                                  var opday = new Date(obj.open_day);
                                  if (opday.setDate(opday.getDate() + 7) >= currentDate) {
-                                    html +='New!';
+                                    html +='<b style="color: red;">New!</b>';
                                 }
-                                html += obj.title+'</a>' + '</td>' + '</tr>';
+                                html += '<a href="javascript:void(0)">' + obj.title+'</a>' + '</td>' + '</tr>';
                             }
                         });
                         $element.append(html);

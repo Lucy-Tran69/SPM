@@ -9,7 +9,6 @@ $conn  = getConnection();
 if ($conn->connect_error) {
 	die("Failed to connect to database. " . $conn->connect_error);
 }
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$no = isset($_POST["no"]) ? (int)$_POST["no"] : '';
 	$title = isset($_POST["title"]) ? strip_tags($_POST["title"]) : '';
@@ -45,11 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$checkOK = 0;
 	}
 
-	if (empty($imgFileOld) && empty($imgFileNew['name'])) {
-		array_push($errmsg, "アップロードファイルをご指定ください。");
-		$checkOK = 0;
-	}
-
 	if (!empty($closeDay)) {
 		if (strtotime($openDay) > strtotime($closeDay)) {
 			$msg->error('公開日は終了日より未来の日付を指定してください。');
@@ -71,36 +65,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	}
 
 	if(!empty($imgFileNew['name'])){
-		//upload image
 		$uploadOk = 1;
 		$imageFileType = strtolower(pathinfo($imgFileNew['name'], PATHINFO_EXTENSION));
 
-		// Check if image file is a actual image or fake image
-		$check = getimagesize($imgFileNew["tmp_name"]);
-		if ($check !== false) {
-			$uploadOk = 1;
-		} else {
-			$msg->error('ファイル形式は画像形式ではありません。もう一度お試しください。');
-			$uploadOk = 0;
-			$checkOK = 0;
-		}
-
-		// // Check if file already exists
-		// if (file_exists($target_file)) {
-		// 	$msg->error('このファイルが既に存在しています。');
-    
-		// 	$uploadOk = 0;
-		// 	$checkOK = 0;
-		// }
-
-		// Check file size
+	// Check file size
 		if ($imgFileNew["size"] > 102400000) {
 			$msg->error('アップロードされたファイルサイズは100MBを超えています。100MB以下にしてください。');
 			$uploadOk = 0;
 			$checkOK = 0;
 		}
 
-		// Allow certain file formats
+	// Allow certain file formats
 		if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
 			$msg->error('アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。');
 			$uploadOk = 0;
@@ -108,38 +83,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		}
 	}
 
-	if ($checkOK === 1) {
-		$image = $imgFileOld;
-		
-		if(!empty($imgFileNew['name'])) {
-			$image = $imgFileNew['name'];
-			// Check if $uploadOk is set to 0 by an error
-			if ($uploadOk === 0) {
-				$msg->error('指定されたファイルはアップロードできません。');
-				// if everything is ok, try to upload file
-			} else {
-				// $destination = $target_dir . basename($image);
-				// move_uploaded_file($image, $destination);
-				// if (!move_uploaded_file($_FILES["imgFile"]["tmp_name"], $target_file)) {
-				// 	$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');
-				// }
-				// check for which action should be taken if file already exist
-				if (file_exists(UPLOAD_DIR . $image)) {
-					$image = update_file_name($image);
-					if (!move_uploaded_file( $imgFileNew['tmp_name'], UPLOAD_DIR.$image )) {
-						$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');
-					}
+		if ($checkOK == 1) {
+			$image = $imgFileOld;
+			
+			if(!empty($imgFileNew['name'])) {
 				
-					// Message: SUCCESS UPLOAD and RENAME
+				$image = $imgFileNew['name'];
+				if ($uploadOk === 0) {
+					$msg->error('指定されたファイルはアップロードできません。');
+					$checkOK = 0;
 				} else {
-					if (!move_uploaded_file( $imgFileNew['tmp_name'], UPLOAD_DIR.$image )) {
+					$image = update_file_name($image, $no);
+					if (!move_uploaded_file($imgFileNew['tmp_name'], UPLOAD_DIR.$image)) {
 						$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');
+						$checkOK = 0;
 					}
-				
-					// Message: SUCCESS UPLOAD
 				}
 			}
 		}
+
+	if ($checkOK === 1) {
+		
 
 		$sql = "UPDATE topics SET title=?, body=?, opday=?, clday=?, image=?, image_link=?, link_title=?, link_url=?, inuser=? WHERE no=?";
 		$stmt = $conn->prepare($sql);
@@ -149,11 +113,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$stmt->execute();	
 
 		if ($stmt->error) {
-			$msg->error($title.'トピックスの編集に失敗しました。');
+			$msg->error('「'.$title.'」トピックスの変更に失敗しました。');
 			$msg->display();
 		}
 		else {
-			$msg->success($title.'トピックスの編集に成功しました。');
+			$msg->success('「'.$title.'」トピックスの変更に成功しました。');
 		} 
 	
 		$stmt->close();
@@ -188,7 +152,7 @@ function remove_special_character($string) {
 }
 
 // function to rename file
-function update_file_name($file)  {
+function update_file_name($file, $no)  {
 	$pos = strrpos($file,'.');
 	$ext = substr($file,$pos); 
 	$dir = strrpos($file,'/');
@@ -198,7 +162,7 @@ function update_file_name($file)  {
 	$fName = trim($arr[(count($arr) - 1)],$ext);
 
 	$exist = FALSE;
-	$idFile = uniqid();
+	$idFile = 'topic'.$no;
 	while(!$exist){
 		if(file_exists($idFile)||file_exists($file)){
 			continue;

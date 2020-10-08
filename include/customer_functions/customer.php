@@ -1,9 +1,5 @@
 <?php
-
-    if (session_status() == PHP_SESSION_NONE) {
-        session_start();
-    }
-
+    include_once "common/session.php";
     include_once "database/db.inc";
 
     $err_msg = "";
@@ -28,7 +24,6 @@
         $cd = isset($_POST["cd"]) ? $_POST["cd"] : '';
         $name = isset($_POST["name"]) ? $_POST["name"] : '';
         $status = isset($_POST["status"]) ? $_POST["status"] : 0;
-       // echo json_encode ($status);die();
         $searchQuery = "";
         if(!empty($cd)){
             $searchCd = " customer.cd like '%$cd%' ";
@@ -69,10 +64,6 @@
         }
         
     }
-    
-    // $sel = mysqli_query($conn, "select count(*) as allcount from customer 
-    //                                 inner join users on users.customer = customer.no 
-    //                                inner join role on role.no = users.role " .$searchQuery);
 
     $sel = mysqli_query($conn, "select count(*) as allcount from customer ".$searchQuery);
 
@@ -81,12 +72,6 @@
 
 
     ## Fetch records
-    // $empQuery = "select customer.no ,customer.cd ,customer.name , customer.invalid, role.name as rname
-    //                                from customer 
-    //                                 inner join users on users.customer = customer.no 
-    //                                inner join role on role.no = users.role
-    //                             ".$searchQuery." order by name asc limit ".$row.",".$rowperpage;
-
     $empQuery = "select customer.no, customer.cd, customer.name, customer.invalid, A.NumberCustomerRole5, B.NumberCustomerRole6 from customer
                                 LEFT JOIN 
                                 (SELECT customer, COUNT(users.no) AS NumberCustomerRole5 FROM users WHERE role=5 GROUP BY users.customer) A
@@ -95,8 +80,6 @@
                                 (SELECT customer, COUNT(users.no) AS NumberCustomerRole6 FROM users WHERE role=6 GROUP BY users.customer) B
                                 on  customer.no = B.customer
                                 ".$searchQuery." ORDER BY customer.name ASC LIMIT ".$row.",".$rowperpage;
-    
-    //print_r($empQuery);die();
     
     $empRecords = mysqli_query($conn, $empQuery);
     $data = array();
@@ -118,7 +101,6 @@
         "aaData" => $data
     );
 
-    // header('Content-type: application/json');
     echo json_encode($response);
     $conn->close();
 ?>

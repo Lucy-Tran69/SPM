@@ -1,4 +1,5 @@
 <?php
+include_once "common/session.php";
 include_once "database/db.inc";
 
 $conn  = getConnection();

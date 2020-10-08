@@ -25,11 +25,12 @@ header("content-type: text/html; charset=UTF-8");
 .tableFixHead {
   overflow-y: auto;
   height: 500px;
+  width: 100%;
 }
 
 .tableFixHead table {
   border-collapse: collapse;
-  width: 100%;
+
 }
 
 .tableFixHead th,
@@ -52,6 +53,15 @@ tr:nth-child(even) {
 if (isset($_SESSION["loginAccount"])) {
 ?>
   <div class="content-wrapper">
+  <div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 class="m-0 text-dark" id="d-page-name">マスター管理　ユーザ管理</h1>
+						</div><!-- /.col -->
+					</div><!-- /.row -->
+				</div><!-- /.container-fluid -->
+		</div>
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
@@ -59,17 +69,13 @@ if (isset($_SESSION["loginAccount"])) {
           <div class="col-12">
             <!-- Default box -->
             <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">マスター管理　ユーザ管理</h3>
-              </div>
               <!-- /.card-header -->
-              <div class="card-body">
-              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
-                  <div class="form-group">
-                  <div class="row">
-                    <div class="col-xs-5">
-                  <label id="itemLabel">メーカ名</label>
-                  <select name="selectedMaker" id="selectedMaker" class="form-control">
+              <div class="card-body  d-flex justify-content-center">
+              <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm" class="form-horizontal search-form col-lg-8 col-sm-12">
+                <div class="form-group row">
+                  <label id="itemLabel" class="col-sm-2 col-form-label text-right">メーカ名</label>
+                  <div class="col-sm-10">
+                    <select name="selectedMaker" id="selectedMaker" class="form-control">
                     <option value="">-</option>
                         <?php
                         if ($makerResultSet->num_rows > 0) {
@@ -83,28 +89,25 @@ if (isset($_SESSION["loginAccount"])) {
                         ?>
                       </select>
                   </div>
-                  </div>
-                  </div>
-                    <div class="form-group">
-                    <div class="row">
-                    <div class="col-xs-5">
-                    <label id="nameLabel" class="searchTable_label">商品コード</label>
+                </div>
+                    <div class="form-group row">
+                    <label id="nameLabel" class="col-sm-2 col-form-label text-right">商品コード</label>
+                    <div class="col-sm-10">
                     <input type="text" id="searchCode" name="searchCode" value="<?php echo isset($_POST["searchCode"])?$_POST["searchCode"]:"";?>" class="form-control"/>
                     </div>
                     </div>
-                    </div>
                     <div class="form-group">
                     <div class="row">
-                    <div class="col-xs-5">
-                    <label id="custLabel" class="searchTable_label">商品名</label>
+                    <label id="custLabel" class="col-sm-2 col-form-label text-right">商品名</label>
+                    <div class="col-sm-10">
                     <input type="text" name="searchName" id="searchName" value="<?php echo isset($_POST["searchName"])?$_POST["searchName"]:"";?>" class="form-control"/>
                     </div>
                     </div>
                     </div>
                     <div class="form-group">
-                    <div class="row">
-                    <div class="col-xs-5">
-                    <label id="itemLabel">タイプ</label>
+                    <div class="row">                    
+                    <label id="itemLabel" class="col-sm-2 col-form-label text-right">タイプ</label>
+                    <div class="col-sm-10">
                     <select name="selectedType" id="selectedType" class="form-control">
                       <option value="0" <?php if(isset($_POST['selectedType'])){ if($_POST['selectedType']===0)echo "selected='selected'"; }?> default>すべて</option>
                       <option value="1" <?php if(isset($_POST['selectedType'])){ if($_POST['selectedType']==1)echo "selected='selected'"; }?>>モノクロ</option>
@@ -115,10 +118,12 @@ if (isset($_SESSION["loginAccount"])) {
                   </div>
                     <div class="form-group">
                     <div class="row">
-                    <div class="col-xs-5">
-                    <div class="form-check">
+                    <div class="offset-sm-2 col-sm-10">
+                    <div class="checkbox">
+                    <label id="checkLabel" class="col-sm-2 col-form-label text-right">
                     <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="<?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>" <?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>/>
-                    <label id="checkLabel" class="form-check-label">無効を含む</label>
+                    無効を含む
+                    </label>
                     </div>
                     </div>
                     </div>
@@ -127,6 +132,10 @@ if (isset($_SESSION["loginAccount"])) {
                 <button type="button" value="" class="btn btn-info" style="width: 100px; margin-left: 250px;" data-target="#insert" data-toggle="modal"><i class="fas fa-plus"></i>&nbsp;追加</button>
               </form>
               </div>
+            </div>
+              <div class="card card-primary">
+              <!-- /.card-header -->
+              <div class="card-body  d-flex justify-content-center">
               <div class="tableFixHead">
               <table id="details_table" class="table table-bordered">
                 <thead>
@@ -151,8 +160,8 @@ if (isset($_SESSION["loginAccount"])) {
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
                         <td style="display: none;"><?php echo $row["type"] ?></td>
                         <td class="align_button">
-                            <button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"><i class="fas fa-pencil-alt"></i>変更</button>
-                            <button class="btn btn-warning" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModalCopy(this.id);" data-toggle="modal" data-target="#copy"><i class="fas fa-copy"></i>コーピー</button>
+                            <button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"><i class="fas fa-pencil-alt"></i>&nbsp;変更</button>
+                            <button class="btn btn-warning" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModalCopy(this.id);" data-toggle="modal" data-target="#copy"><i class="fas fa-copy"></i>&nbsp;コーピー</button>
                         </td>
                       </tr>
                   <?php
@@ -515,7 +524,6 @@ if (isset($_SESSION["loginAccount"])) {
         console.log(textStatus, errorThrown);
       }
     });
-    // modal.style.display = "block";
   }
 
   function openModalCopy(cartid) {
@@ -553,105 +561,9 @@ if (isset($_SESSION["loginAccount"])) {
         console.log(textStatus, errorThrown);
       }
     });
-    // modal.style.display = "block";
   }
-
-  // function closeModal() {
-  //   modal.style.display = "none";
-  // }
-
-function searchTableByCode() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("searchName");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
-
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-
-function searchTableByName() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("searchCustomer");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
-
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[1];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
-
-function searchTableByMaker() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("selectedRole");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("details_table");
-  tr = table.getElementsByTagName("tr");
-
-  // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[2];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-}
 
 function searchTableByInvalid() {
-  // // Declare variables
-  // var input, filter, table, tr, td, i, txtValue;
-  // input = document.getElementById("searchInvalid").checked;
-  // filter = input;
-  // table = document.getElementById("details_table");
-  // tr = table.getElementsByTagName("tr");
-
-  // // Loop through all table rows, and hide those who don't match the search query
-  //   for (i = 0; i < tr.length; i++) {
-  //   td = tr[i].getElementsByTagName("td")[4];
-  //   if (td) {
-  //     txtValue = td.textContent || td.innerText;
-  //     if (txtValue==1) 
-  //     {
-  //       if(filter==true)
-  //       {
-  //         tr[i].style.display = "";
-  //       }
-  //       else
-  //       {
-  //         tr[i].style.display = "none";
-  //       }
-  //     }
-  //   }
-  // }
   document.getElementById('searchForm').submit();
 }
 
@@ -905,4 +817,37 @@ function validateCopy()
 
   return flag;
 }
+
+// var format = function(num)
+// {
+// 	var str = num.toString().replace("$", ""), parts = false, output = [], i = 1, formatted = null;
+// 	if(str.indexOf(".") > 0) 
+//   {
+// 		parts = str.split(".");
+// 		str = parts[0];
+// 	}
+// 	str = str.split("").reverse();
+// 	for(var j = 0, len = str.length; j < len; j++) 
+//   {
+// 		if(str[j] != ",") {
+// 			output.push(str[j]);
+// 			if(i%3 == 0 && j < (len - 1)) {
+// 				output.push(",");
+// 			}
+// 			i++;
+// 		}
+// 	}
+// 	formatted = output.reverse().join("");
+// 	return("￥" + formatted + ((parts) ? "." + parts[1].substr(0, 2) : ""));
+// };
+// $(function(){
+//     $("#inputPrice").blur(function(e){
+//         $(this).val(format($(this).val()));
+//     });
+// });
+// $(function(){
+//     $("#inputPrice").focus(function(e){
+//         $(this).val($(this).val().replace(/[￥,]/g,''));
+//     });
+// });
 </script>

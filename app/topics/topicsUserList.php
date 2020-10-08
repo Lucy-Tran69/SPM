@@ -23,9 +23,9 @@
     $date = date("Y-m-d H:i:s");
 
     ## Fetch records
-    $empQuery = "SELECT no, title, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day FROM topics WHERE invalid = 0 AND opday <= '$date' order by open_day desc limit  $start,".($limit + 1);
+    $empQuery = "SELECT no, title, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day FROM topics WHERE invalid = 0 AND opday <= '$date' AND (clday >= '$date' OR clday is null) order by open_day desc limit  $start,".($limit + 1);
 
-    $query = mysqli_query($conn, $empQuery) or die ('');
+    $query = mysqli_query($conn, $empQuery) or die ('エラーが発生しました。もう一度お試しください。');
     
     $result = array();
     while ($row = mysqli_fetch_array($query))
@@ -42,12 +42,13 @@
         { ?>
             <tr data-id="<?php echo $result[$i]['no']; ?>" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">
                 <td><a href="javascript:void(0)"><?php echo $result[$i]['open_day']; ?></a></td>
-                <td><a href="javascript:void(0)">
-                    <?php
+                <td> <?php
                         $openDay = date('Y-m-d H:i:s', strtotime($result[$i]['open_day']. ' + 7 days'));
                          if ($openDay >= $date) { ?>
-                            New!
+                            <b style="color: red;">New!</b>
                     <?php } ?>
+                    <a href="javascript:void(0)">
+                   
                     <?php echo $result[$i]['title']; ?>
                     </a>
                 </td>

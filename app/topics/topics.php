@@ -22,24 +22,26 @@
         $status = isset($_POST["status"]) ? $_POST["status"] : '';
         $topicID = isset($_POST["topicID"]) ? $_POST["topicID"] : '';
         $topicTitle = isset($_POST["topicTitle"]) ? $_POST["topicTitle"] : '';
+
+        $currentDate = date("Y-m-d H:i:s");
         
         if(!empty($title) && empty($status)){
-            $searchQuery = "and title like '%$title%'";
+            $searchQuery = " and title like '%$title%'";
         }
         if(empty($title) && !empty($status)){
-            $searchQuery = "and opday <= '$status'";
+            $searchQuery = " and opday <= '$status' and (clday >= '$status' or clday is null) ";
         }
         if(!empty($title) && !empty($status)) {
-            $searchQuery = "and title like '%$title%' and opday <= '$status'";
+            $searchQuery = " and title like '%$title%' and opday <= '$status' and (clday >= '$status' or clday is null) ";
         }
         if(!empty($topicID)) {
             $empQuery = "UPDATE topics SET invalid = 1 WHERE no = $topicID";
             
             if (mysqli_query($conn, $empQuery)) {
-                $msg->success($topicTitle.'トピックスの削除に成功しました。');
+                $msg->success('「'.$topicTitle.'」トピックスの削除に成功しました。');
             }
             else{
-                $msg->error($topicTitle.'トピックスの削除に失敗しました。');
+                $msg->error('「'.$topicTitle.'」トピックスの削除に失敗しました。');
             }
         }
     }
