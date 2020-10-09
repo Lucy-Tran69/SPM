@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$imageLink = isset($_POST["imgLink"]) ? remove_special_character($_POST["imgLink"]) : null;
 	$openDay = isset($_POST["openDay"]) ? $_POST["openDay"] : date('Y-m-d h:i:s');;
 	$closeDay = isset($_POST["closeDay"]) ? $_POST["closeDay"] : NULL;
+	$statusImage = isset($_POST["statusImage"]) ? $_POST["statusImage"] : '';
 
 	$insert_user = $_SESSION["loginUserId"];
 	$checkOK = 1;
@@ -85,14 +86,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 		if ($checkOK == 1) {
 			$image = $imgFileOld;
-			
+			$filePath = UPLOAD_DIR . basename($image);
+			//check delete image
+			if ($statusImage == 'true') {
+				if (file_exists($filePath)) {
+						unlink($filePath);
+					}
+				$image = null;
+			}
+
 			if(!empty($imgFileNew['name'])) {
-				
-				$image = $imgFileNew['name'];
 				if ($uploadOk === 0) {
 					$msg->error('指定されたファイルはアップロードできません。');
 					$checkOK = 0;
 				} else {
+					if (!empty($image)) {
+						if (file_exists($filePath)) {
+							unlink($filePath);
+						}
+					}
+				
+					$image = $imgFileNew['name'];
 					$image = update_file_name($image, $no);
 					if (!move_uploaded_file($imgFileNew['tmp_name'], UPLOAD_DIR.$image)) {
 						$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');

@@ -1,5 +1,8 @@
 <?php
     include_once "html/header.inc";
+    include "common/check_view_permission.php";
+    $url = "topics";
+    check_view_permission($url);
     include_once "html/menu.inc";
 ?>
 
@@ -7,7 +10,6 @@
     .custom-file-label::after {
         content: none;
     }
-}
 </style>
 
 <input type="hidden" name="" id="page-name" value="トピックス追加">

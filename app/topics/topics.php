@@ -2,7 +2,6 @@
     include_once "common/session.php";
     include_once "database/db.inc";
 
-    $err_msg = "";
     $conn  = getConnection();
 
     if($conn->connect_error) {
@@ -18,7 +17,7 @@
     $searchQuery = "";;
 
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $title = isset($_POST["title"]) ? $_POST["title"] : '';
+        $title = isset($_POST["title"]) ? check_keyword_search($_POST["title"]) : '';
         $status = isset($_POST["status"]) ? $_POST["status"] : '';
         $topicID = isset($_POST["topicID"]) ? $_POST["topicID"] : '';
         $topicTitle = isset($_POST["topicTitle"]) ? $_POST["topicTitle"] : '';
@@ -26,23 +25,19 @@
         $currentDate = date("Y-m-d H:i:s");
         
         if(!empty($title) && empty($status)){
+            $title = mysqli_real_escape_string($conn, $title);
             $searchQuery = " and title like '%$title%'";
         }
         if(empty($title) && !empty($status)){
             $searchQuery = " and opday <= '$status' and (clday >= '$status' or clday is null) ";
         }
         if(!empty($title) && !empty($status)) {
+            $title = mysqli_real_escape_string($conn, $title);
             $searchQuery = " and title like '%$title%' and opday <= '$status' and (clday >= '$status' or clday is null) ";
         }
         if(!empty($topicID)) {
             $empQuery = "UPDATE topics SET invalid = 1 WHERE no = $topicID";
-            
-            if (mysqli_query($conn, $empQuery)) {
-                $msg->success('「'.$topicTitle.'」トピックスの削除に成功しました。');
-            }
-            else{
-                $msg->error('「'.$topicTitle.'」トピックスの削除に失敗しました。');
-            }
+            mysqli_query($conn, $empQuery);
         }
     }
 
@@ -81,8 +76,18 @@
         "aaData" => $data
     );
 
-    // header('Content-type: application/json');
     echo json_encode($response);
-    // die();
     $conn->close();
+
+ function check_keyword_search($data) {
+    mb_internal_encoding('UTF-8');
+    mb_regex_encoding('UTF-8');
+    $data = mb_ereg_replace("^[\n\r\s\t　]+", '', $data);
+    $data = mb_ereg_replace("[\n\r\s\t　]+$", '', $data);
+    $data = trim($data);
+    $data = str_replace('_', '\\_', $data);
+    $data = str_replace('%', '\\%', $data);
+    return $data;
+}
 ?>
+

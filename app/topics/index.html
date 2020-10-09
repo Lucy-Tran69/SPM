@@ -1,8 +1,8 @@
 <?php
+    include_once "html/header.inc";
     include "common/check_view_permission.php";
     $url = "topics";
     check_view_permission($url);
-    include_once "html/header.inc";
     include_once "html/menu.inc";
 ?>
 
@@ -80,6 +80,29 @@
     </div>
     <!-- /.card-body -->
 </div>
+
+<!-- Modal -->
+<div id="confirmDelete" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">トピックス削除確認</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="deleteMessage"></p>
+      </div>
+      <div class="modal-footer">
+         <button id="agreeDelete" type="button" class="btn btn-primary btn-modal-submit">はい</button>
+         <button type="button" class="btn btn-secondary" data-dismiss="modal">いいえ</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <?php include_once "html/foot.inc" ?>
 <script type="text/javascript" src="../../app/refer/js/topic/topics.js"></script>
 

@@ -34,7 +34,6 @@
     }
    
    if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'){
-        sleep(1);
         die (json_encode($result));
     } else{
         $total = count($result);

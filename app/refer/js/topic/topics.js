@@ -34,10 +34,11 @@ $(function () {
         
     };
 
-    topicTable.DataTable(table);
+    $(topicTable).DataTable(table);
 
     $('#searchTopic').on('submit', function (e) {
         e.preventDefault();
+        $('#flash-message').remove();
         RequestData();
     });
 
@@ -69,21 +70,34 @@ $(function () {
         $(topicTable).DataTable(table);
     }
 
-    $('#topicsTable tbody').on('click', '.js-deleteTopic', function () {
+    $('#topicsTable tbody').on('click', '.js-deleteTopic', function (e) {
+        e.preventDefault();
         var row = $(this).closest('tr');
 
         var topicID = $(topicTable).DataTable().row(row).data()["no"];
         var topicTitle = $(topicTable).DataTable().row(row).data()["title"];
 
-        let c = confirm('この「"' + topicTitle + '"」トピックスを削除します。よろしいですか？');
+        var messages = '「'+topicTitle+'」トピックスを削除します。よろしいですか？';
 
-        if (c == true) {
+        $("#deleteMessage").text(messages);
+
+        $("#confirmDelete").modal('show');
+
+        $('#agreeDelete').on('click' , function() {
             $(topicTable).DataTable().row(row).remove().draw(false);
-            $.post('topics.php', { 'topicID': topicID, 'topicTitle': topicTitle }, function (data) {
-                $("#flash-message").html(response);
+            $.post('topics.php', { 'topicID': topicID, 'topicTitle': topicTitle }, function (data, response) {
+                var html = '';
+                if (response == "success") {
+                    html += '<div class="alert dismissable alert-success"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>「' + topicTitle + '」トピックスの削除に成功しました。</div>';             
+                }
+                else {
+                    html += '<div class="alert dismissable alert-danger"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>「' + topicTitle + '」トピックスの削除に失敗しました。</div>';
+                } 
+                $('#flash-message').html(html);
                 $(topicTable).DataTable().ajax.reload(null, false);
+                $("#confirmDelete").modal('hide');
             });
-        }
+        });
     });
 
     var date = new Date();
@@ -190,7 +204,7 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
-     formAddTopic.submit(function(e) {
+     formAddTopic.submit(function(event) {
         event.preventDefault();
           if(!formAddTopic.valid()) 
           {
@@ -226,7 +240,7 @@ $(function () {
                 }
             },
             error: function(jqXHR, textStatus, errorThrown)  {
-                // alert( "Bug" );
+                console.log(errorThrown);
             },
         });
     });
@@ -245,6 +259,10 @@ function onBtnclick() {
     var preLinkTitle = $("#titleLink").val();
     var preLink = $("#urlImage").val();
 
+    if (preTitle == '' && preBody == '') {
+        alert("Please input text before preview");
+    }
+    else {
     var opday = new Date(preOpenDay);
     var currentDate = new Date();
     if (opday.setDate(opday.getDate() + 7) >= currentDate) {
@@ -254,9 +272,15 @@ function onBtnclick() {
 
     if (!preImgLink.match("^http") && preImgLink != '') {
         preImgLink = '//' + preImgLink;
+        $('#preImgLink').css("pointer-events", "auto");
     }
     else {
         preImgLink = preImgLink;
+        $('#preImgLink').css("pointer-events", "auto");
+    }
+
+     if (preImgLink == '') {
+         $('#preImgLink').css("pointer-events", "none");
     }
 
     var linkCode = '<a target="_blank" href="%link%">%title%</a>';
@@ -300,6 +324,7 @@ function onBtnclick() {
     }
 
     $("#previewTopic").modal('show');
+    }
 }
 
 function fileValidation(){
@@ -326,3 +351,5 @@ function fileValidation(){
 function redirectListTopic() {
     window.location.href = "index.html";
 }
+
+

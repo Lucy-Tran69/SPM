@@ -22,16 +22,23 @@
     $status = 0;
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $cd = isset($_POST["cd"]) ? $_POST["cd"] : '';
+        $cd = test_input($cd);
+
         $name = isset($_POST["name"]) ? $_POST["name"] : '';
+        $name =  test_input($_POST["name"]);
+
         $status = isset($_POST["status"]) ? $_POST["status"] : 0;
-        $searchQuery = "";
+        
         if(!empty($cd)){
-            $searchCd = " customer.cd like '%$cd%' ";
+            $cd = mysqli_real_escape_string($conn, $cd);
+            $searchCd = " customer.cd like '%{$cd}%' ";
         }
         if(!empty($name)){
+            $name = mysqli_real_escape_string($conn, $name);
             $searchName = " customer.name like '%$name%' ";
         }
         if($status == 0) {
+            $status = mysqli_real_escape_string($conn, $status);
             $searchStatus = " customer.invalid = 0 ";
         }
        
@@ -62,7 +69,6 @@
             }
             $searchQuery = "where ".$searchQuery;
         }
-        
     }
 
     $sel = mysqli_query($conn, "select count(*) as allcount from customer ".$searchQuery);
@@ -103,4 +109,15 @@
 
     echo json_encode($response);
     $conn->close();
+
+    function test_input($data) {
+        $data = trim($data);
+        $data = str_replace('_', '\\_', $data);
+        $data = str_replace('%', '\\%', $data);
+        return $data;
+    }
+
+    function escapeSpecialChar($str){
+
+    }
 ?>

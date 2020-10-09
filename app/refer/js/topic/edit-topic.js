@@ -104,12 +104,18 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
-     formEditTopic.submit(function(e) {
-          event.preventDefault();
-          if(!formEditTopic.valid()) 
-          {
+     formEditTopic.submit(function(event) {
+        
+        event.preventDefault();
+        if(!formEditTopic.valid()) 
+        {
             return false;
-           }
+        }
+
+        var statusImage = 'false';
+        if ($('#deleteImage').is(":checked")) {
+           statusImage = 'true';
+        }
 
         var file_data = $('#imgFile').prop('files')[0];   
         var form_data = new FormData();                  
@@ -123,6 +129,7 @@ $(function () {
         form_data.append('titleLink', $("#titleLink").val());
         form_data.append('urlImage', $("#urlImage").val());
         form_data.append('imgFileOld', $("#imgFileOld").val());
+        form_data.append('statusImage', statusImage);
        
         $.ajax({
             url: "editTopic.php",
@@ -143,9 +150,21 @@ $(function () {
                 }
             },
             error: function(jqXHR, textStatus, errorThrown)  {
-                alert( "Bug" );
+                console.log(errorThrown);
             },
         });
+    });
+
+      $('#deleteImage').change(function() {
+        if($(this).is(":checked")) {
+            $('label[id*="labelFile"]').text('');
+            $('#imgFile').val('');
+            $('label[id*="displayFile"]').hide();
+        }
+        else {
+            $('label[id*="displayFile"]').show();
+            $('label[id*="labelFile"]').text($('#imgFileOld').val());
+        }
     });
 });
 
@@ -157,8 +176,12 @@ function onBtnclick() {
     var preLinkTitle = $("#titleLink").val();
     var preLink = $("#urlImage").val();
 
-    var opday = new Date(preOpenDay);
-    var currentDate = new Date();
+    if (preTitle == '' && preBody == '') {
+        alert("Please input text before preview");
+    }
+    else {
+      var opday = new Date(preOpenDay);
+      var currentDate = new Date();
     if (opday.setDate(opday.getDate() + 7) >= currentDate) {
         $("#newTitle").text("New!");
     }
@@ -167,9 +190,15 @@ function onBtnclick() {
 
      if (!preImgLink.match("^http") && preImgLink != '') {
         preImgLink = '//' + preImgLink;
+        $('#preImgLink').css("pointer-events", "auto");
     }
     else {
         preImgLink = preImgLink;
+        $('#preImgLink').css("pointer-events", "auto");
+    }
+
+    if (preImgLink == '') {
+        $('#preImgLink').css("pointer-events", "none");
     }
 
     $("#preTitle").text(preTitle);
@@ -182,16 +211,17 @@ function onBtnclick() {
 
     var img = $('#imgFile').val();
     var imgOld = $('#imgFileOld').val();
-    if (img == ''){
-       var output = document.getElementById('output_image');
+    var labelFile = $('label[id*="labelFile"]').text();
+    var output = document.getElementById('output_image');
+    if (img == '' && labelFile != ''){
         output.src = "../../app/refer/images/topics/" + imgOld;
     }
 
-    if (imgOld == '' && img == '') {
+    if (imgOld == '' && img == '' || labelFile == '') {
         $('#output_image').css('display','none');
     }
 
-    if (img != '') {
+    if (img != '' || labelFile != '') {
         $('#output_image').css('display','inline');
     }
 
@@ -221,6 +251,7 @@ function onBtnclick() {
     $("#pr-link").append(linkCode);
 
     $("#previewTopic").modal('show');
+    }
 }
 
 function redirectListTopic() {
@@ -248,9 +279,3 @@ function fileValidation(){
     }
 }
 
-function deleteImage() {
-    $('#imgFileOld').val(''); 
-    $('label[id*="labelFile"]').text('');
-    $('#imgFile').val('');
-    $('label[id*="displayFile"]').text('');
-}

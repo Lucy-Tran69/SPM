@@ -40,7 +40,7 @@ $(function () {
                                  if (opday.setDate(opday.getDate() + 7) >= currentDate) {
                                     html +='<b style="color: red;">New!</b>';
                                 }
-                                html += '<a href="javascript:void(0)">' + obj.title + '</a>' + '</td>' + '</tr>';
+                                html += '<a href="javascript:void(0)" class="topicTitle">' + obj.title + '</a>' + '</td>' + '</tr>';
                         });
      
                         $element.append(html);
@@ -70,8 +70,8 @@ $(function () {
             });
     });
 
-    $('.item-topic').click(function () {
-        var id = $(this).data("id");
+    $(document).on("click",".item-topic", function(e) {
+        var id = $(this).attr("data-id");
         $.ajax(
             {
                 type: 'post',
@@ -98,10 +98,16 @@ $(function () {
 
                     if (!image_link.match("^http") && image_link != '') {
                         image_link = '//' + image_link;
+                        $('#imgLink').css("pointer-events", "auto");
                     }
                     else {
                         image_link = image_link;
+                        $('#imgLink').css("pointer-events", "auto");
                     }
+
+                    if (image_link == '') {
+                       $('#imgLink').css("pointer-events", "none");
+                   }
 
                      var linkCode = '<a target="_blank" href="%link%">%title%</a>';
 
@@ -129,7 +135,10 @@ $(function () {
                     $("#link").append(linkCode);
 
                     $('#imgLink').attr("href", image_link);
-                    $('#topicBody').text(result['body']);
+
+                    var body = result['body'].replace(/\n/g, '<br>');
+                    $('#topicBody').empty();
+                    $('#topicBody').append(body);
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     console.log('AJAX call failed.');
