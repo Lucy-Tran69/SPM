@@ -11,13 +11,13 @@ if ($conn->connect_error) {
 }
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$no = isset($_POST["no"]) ? (int)$_POST["no"] : '';
-	$title = isset($_POST["title"]) ? strip_tags($_POST["title"]) : '';
-	$body = isset($_POST["body"]) ? strip_tags($_POST["body"]) : '';
+	$title = isset($_POST["title"]) ? trim(strip_tags($_POST["title"])) : '';
+	$body = isset($_POST["body"]) ? trim(strip_tags($_POST["body"])) : '';
 	$imgFileOld = isset($_POST["imgFileOld"]) ? $_POST["imgFileOld"] : '';
 	$imgFileNew = isset($_FILES["imgFile"]) ? $_FILES["imgFile"] : '';
-	$titleLink = isset($_POST["titleLink"]) ? strip_tags($_POST["titleLink"]) : '';
-	$urlImage = isset($_POST["urlImage"]) ? remove_special_character($_POST["urlImage"]) : '';
-	$imageLink = isset($_POST["imgLink"]) ? remove_special_character($_POST["imgLink"]) : null;
+	$titleLink = isset($_POST["titleLink"]) ? trim(strip_tags($_POST["titleLink"])) : '';
+	$urlImage = isset($_POST["urlImage"]) ? trim(remove_special_character($_POST["urlImage"])) : '';
+	$imageLink = isset($_POST["imgLink"]) ? trim(remove_special_character($_POST["imgLink"])) : null;
 	$openDay = isset($_POST["openDay"]) ? $_POST["openDay"] : date('Y-m-d h:i:s');;
 	$closeDay = isset($_POST["closeDay"]) ? $_POST["closeDay"] : NULL;
 	$statusImage = isset($_POST["statusImage"]) ? $_POST["statusImage"] : '';
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$image = $imgFileOld;
 			$filePath = UPLOAD_DIR . basename($image);
 			//check delete image
-			if ($statusImage == 'true') {
+			if ($statusImage == 'true' && !empty($image)) {
 				if (file_exists($filePath)) {
 						unlink($filePath);
 					}

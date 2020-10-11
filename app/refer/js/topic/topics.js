@@ -24,14 +24,14 @@ $(function () {
         ],
     };
 
-     table.ajax = {
+    table.ajax = {
         url: 'topics.php',
         type: 'POST',
         data: function (d) {
             delete d.columns;
         },
         datatype: "json",
-        
+
     };
 
     $(topicTable).DataTable(table);
@@ -60,13 +60,13 @@ $(function () {
             data: function (d) {
                 d.title = title
                 d.status = status;
-                
+
                 delete d.columns;
-        },
-        datatype: "json",
-            
+            },
+            datatype: "json",
+
         };
-            
+
         $(topicTable).DataTable(table);
     }
 
@@ -77,22 +77,22 @@ $(function () {
         var topicID = $(topicTable).DataTable().row(row).data()["no"];
         var topicTitle = $(topicTable).DataTable().row(row).data()["title"];
 
-        var messages = '「'+topicTitle+'」トピックスを削除します。よろしいですか？';
+        var messages = '「' + topicTitle + '」トピックスを削除します。よろしいですか？';
 
         $("#deleteMessage").text(messages);
 
         $("#confirmDelete").modal('show');
 
-        $('#agreeDelete').on('click' , function() {
+        $('#agreeDelete').on('click', function () {
             $(topicTable).DataTable().row(row).remove().draw(false);
             $.post('topics.php', { 'topicID': topicID, 'topicTitle': topicTitle }, function (data, response) {
                 var html = '';
                 if (response == "success") {
-                    html += '<div class="alert dismissable alert-success"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>「' + topicTitle + '」トピックスの削除に成功しました。</div>';             
+                    html += '<div class="alert dismissable alert-success"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>「' + topicTitle + '」トピックスの削除に成功しました。</div>';
                 }
                 else {
                     html += '<div class="alert dismissable alert-danger"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>「' + topicTitle + '」トピックスの削除に失敗しました。</div>';
-                } 
+                }
                 $('#flash-message').html(html);
                 $(topicTable).DataTable().ajax.reload(null, false);
                 $("#confirmDelete").modal('hide');
@@ -134,29 +134,29 @@ $(function () {
     //         return inputDate.toISOString().slice(0, 10) === value;
     //     }, 'Please enter a date in the format yyyy-mm-dd.');
 
-     $.validator.addMethod( "accept", function( value, element, param ) {
+    $.validator.addMethod("accept", function (value, element, param) {
 
-        var typeParam = typeof param === "string" ? param.replace( /\s/g, "" ) : "image/*",
-        optionalValue = this.optional( element ),
-        i, file, regex;
+        var typeParam = typeof param === "string" ? param.replace(/\s/g, "") : "image/*",
+            optionalValue = this.optional(element),
+            i, file, regex;
 
-        if ( optionalValue ) {
+        if (optionalValue) {
             return optionalValue;
         }
 
-        if ( $( element ).attr( "type" ) === "file" ) {
+        if ($(element).attr("type") === "file") {
 
             typeParam = typeParam
-            .replace( /[\-\[\]\/\{\}\(\)\+\?\.\\\^\$\|]/g, "\\$&" )
-            .replace( /,/g, "|" )
-            .replace( /\/\*/g, "/.*" );
+                .replace(/[\-\[\]\/\{\}\(\)\+\?\.\\\^\$\|]/g, "\\$&")
+                .replace(/,/g, "|")
+                .replace(/\/\*/g, "/.*");
 
-            if ( element.files && element.files.length ) {
-                regex = new RegExp( ".?(" + typeParam + ")$", "i" );
-                for ( i = 0; i < element.files.length; i++ ) {
-                    file = element.files[ i ];
+            if (element.files && element.files.length) {
+                regex = new RegExp(".?(" + typeParam + ")$", "i");
+                for (i = 0; i < element.files.length; i++) {
+                    file = element.files[i];
 
-                    if ( !file.type.match( regex ) ) {
+                    if (!file.type.match(regex)) {
                         return false;
                     }
                 }
@@ -164,7 +164,7 @@ $(function () {
         }
 
         return true;
-    }, $.validator.format( "アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。" ));
+    }, $.validator.format("アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。"));
 
     var formAddTopic = $('#addTopic');
     formAddTopic.validate({
@@ -175,7 +175,7 @@ $(function () {
             body: {
                 required: true,
             },
-             imgFile: {
+            imgFile: {
                 accept: "image/png, image/jpeg, image/jpg, image/PNG, image/JPG, image/JPEG, image/gif"
             },
         },
@@ -204,42 +204,41 @@ $(function () {
         $("#previewTopic").modal('hide');
     });
 
-     formAddTopic.submit(function(event) {
+    formAddTopic.submit(function (event) {
         event.preventDefault();
-          if(!formAddTopic.valid()) 
-          {
+        if (!formAddTopic.valid()) {
             return false;
-           }
-        var file_data = $('#imgFile').prop('files')[0];   
-        var form_data = new FormData();                  
+        }
+        var file_data = $('#imgFile').prop('files')[0];
+        var form_data = new FormData();
         form_data.append('imgFile', file_data);
         form_data.append('no', $("#no").val());
-        form_data.append('title', $("#title").val());
+        form_data.append('title', noscript($.trim($("#title").val())));
         form_data.append('openDay', $(".openDay").val());
         form_data.append('closeDay', $(".closeDay").val());
-        form_data.append('body', $("#body").val());
-        form_data.append('imgLink', $("#imgLink").val());
-        form_data.append('titleLink', $("#titleLink").val());
-        form_data.append('urlImage', $("#urlImage").val());
-       
+        form_data.append('body', noscript($.trim($("#body").val())));
+        form_data.append('imgLink', noscript($.trim($("#imgLink").val())));
+        form_data.append('titleLink', noscript($.trim($("#titleLink").val())));
+        form_data.append('urlImage', noscript($.trim($("#urlImage").val())));
+
         $.ajax({
             url: "createTopic.php",
             type: "POST",
             contentType: false,
             processData: false,
             data: form_data,
-            dataType:"html",
-            success: function(response)  {
+            dataType: "html",
+            success: function (response) {
                 //check response is blank if success 
                 if (!$.trim(response)) {
                     window.location.href = "index.html";
-                } 
+                }
                 // if error
                 else {
-                    $("#flash-message").html(response);        
+                    $("#flash-message").html(response);
                 }
             },
-            error: function(jqXHR, textStatus, errorThrown)  {
+            error: function (jqXHR, textStatus, errorThrown) {
                 console.log(errorThrown);
             },
         });
@@ -254,7 +253,7 @@ function redirectAddOrEditTopic() {
 function onBtnclick() {
     var preTitle = $("#title").val();
     var preOpenDay = $(".openDay").val();
-    var preBody = $("#body").val();
+    var preBody = noscript($("#body").val());
     var preImgLink = $("#imgLink").val();
     var preLinkTitle = $("#titleLink").val();
     var preLink = $("#urlImage").val();
@@ -263,83 +262,84 @@ function onBtnclick() {
         alert("Please input text before preview");
     }
     else {
-    var opday = new Date(preOpenDay);
-    var currentDate = new Date();
-    if (opday.setDate(opday.getDate() + 7) >= currentDate) {
-        $("#newTitle").text("New!");
-    }
-    preBody = preBody.replace(/\n/g, '<br>');
+        var opday = new Date(preOpenDay);
+        var currentDate = new Date();
+        if (opday.setDate(opday.getDate() + 7) >= currentDate) {
+            $("#newTitle").text("New!");
+        }
 
-    if (!preImgLink.match("^http") && preImgLink != '') {
-        preImgLink = '//' + preImgLink;
-        $('#preImgLink').css("pointer-events", "auto");
-    }
-    else {
-        preImgLink = preImgLink;
-        $('#preImgLink').css("pointer-events", "auto");
-    }
+        preBody = $.trim(preBody.replace(/<[^>]+>/g, ''));
+        preBody = preBody.replace(/\n/g, '<br>');
 
-     if (preImgLink == '') {
-         $('#preImgLink').css("pointer-events", "none");
-    }
+        if (!preImgLink.match("^http") && preImgLink != '') {
+            preImgLink = '//' + preImgLink;
+            $('#preImgLink').css("pointer-events", "auto");
+        }
+        else {
+            preImgLink = preImgLink;
+            $('#preImgLink').css("pointer-events", "auto");
+        }
 
-    var linkCode = '<a target="_blank" href="%link%">%title%</a>';
+        if (preImgLink == '') {
+            $('#preImgLink').css("pointer-events", "none");
+        }
 
-    if (!preLink.match("^http") && preLink != '') {
-        preLink = '//' + preLink;
-    }
-     else {
-        preLink = preLink;
-    }
-    
-    if (preLink != '' && preLinkTitle == '') {
-        linkCode = linkCode.replace('%link%', preLink);
-        linkCode = linkCode.replace('%title%', preLink);
-    }
-    else if (preLink != '' && preLinkTitle != '') 
-    {
-        linkCode = linkCode.replace('%link%', preLink);
-        linkCode = linkCode.replace('%title%', preLinkTitle);
-    } 
-    else {
-        linkCode = '';
-    }
+        var linkCode = '<a target="_blank" href="%link%">%title%</a>';
 
-    $("#pr-link").empty();
-    $("#pr-link").append(linkCode);
+        if (!preLink.match("^http") && preLink != '') {
+            preLink = '//' + preLink;
+        }
+        else {
+            preLink = preLink;
+        }
 
-    $("#preTitle").text(preTitle);
-    $("#preOpenday").text(preOpenDay);
-    $("#preBody").empty();
-    $("#preBody").append(preBody);
-    $("#preImgLink").attr("href", preImgLink);
-    
+        if (preLink != '' && preLinkTitle == '') {
+            linkCode = linkCode.replace('%link%', preLink);
+            linkCode = linkCode.replace('%title%', preLink);
+        }
+        else if (preLink != '' && preLinkTitle != '') {
+            linkCode = linkCode.replace('%link%', preLink);
+            linkCode = linkCode.replace('%title%', preLinkTitle);
+        }
+        else {
+            linkCode = '';
+        }
 
-    var img = $('#imgFile').val();
-    if (img == '') {
-        $('#img').hide();
-    }
-    else {
-        $('#img').show();
-    }
+        $("#pr-link").empty();
+        $("#pr-link").append(linkCode);
 
-    $("#previewTopic").modal('show');
+        $("#preTitle").text(preTitle);
+        $("#preOpenday").text(preOpenDay);
+        $("#preBody").empty();
+        $("#preBody").append(preBody);
+        $("#preImgLink").attr("href", preImgLink);
+
+
+        var img = $('#imgFile').val();
+        if (img == '') {
+            $('#img').hide();
+        }
+        else {
+            $('#img').show();
+        }
+
+        $("#previewTopic").modal('show');
     }
 }
 
-function fileValidation(){
+function fileValidation() {
     var fileInput = document.getElementById('imgFile');
     var filePath = fileInput.value;
     var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-    if(!allowedExtensions.exec(filePath)){
+    if (!allowedExtensions.exec(filePath)) {
         alert('アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。');
         fileInput.value = '';
         return false;
-    }else{
+    } else {
         //Image preview
         if (fileInput.files && fileInput.files[0]) {
             var reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 var output = document.getElementById('output_image');
                 output.src = e.target.result;
             };
@@ -352,4 +352,8 @@ function redirectListTopic() {
     window.location.href = "index.html";
 }
 
-
+function noscript(strCode) {
+    var html = $(strCode.bold());
+    html.find('script,noscript,style').remove();
+    return html.html();
+}
