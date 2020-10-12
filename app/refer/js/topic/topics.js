@@ -18,7 +18,7 @@ $(function () {
             {
                 data: "no",
                 render: function (data, type, row) {
-                    return '<div class="row justify-content-center"><a href=edit-topic.html?id=' + data + ' class="btn btn-success margin-bottom-5px m-r-0" style="margin-right: 5px;"><i class="fas fa-pencil-alt mr-2"></i> 変更</a><a href="" class="btn btn-danger js-deleteTopic"><i class="fas fa-trash mr-2"></i> 削除</a></div>';
+                    return '<div class="row justify-content-center w-200px"><a href=edit-topic.html?id=' + data + ' class="btn btn-success m-b-5px m-r-0 m-b-0" style="margin-right: 5px;"><i class="fas fa-pencil-alt mr-2"></i> 変更</a><a href="" class="btn btn-danger js-deleteTopic m-l-5 m-b-5px res-button-del"><i class="fas fa-trash mr-2"></i> 削除</a></div>';
                 }
             },
         ],

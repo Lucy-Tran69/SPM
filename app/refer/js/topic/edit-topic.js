@@ -156,13 +156,13 @@ $(function () {
 
     $('.form-group').on('change', '#deleteImage', function (e) {
         if ($(this).is(":checked")) {
-            $('label[id*="labelFile"]').text('');
+            $('#labelFile').text('');
             $('#imgFile').val('');
-            $('label[id*="displayFile"]').hide();
+            $('#displayFile').hide();
         }
         else {
-            $('label[id*="displayFile"]').show();
-            $('label[id*="labelFile"]').text($('#imgFileOld').val());
+            $('#displayFile').show();
+            $('#labelFile').text($('#imgFileOld').val());
         }
     });
 
@@ -193,7 +193,7 @@ function onBtnclick() {
             $("#newTitle").text("New!");
         }
 
-        preBody = $.trim(preBody.replace(/<(\w+)[^>]*>.*<\/\1>/gi, ''));
+        preBody = $.trim(preBody.replace(/<[^>]+>/g, ''));
         preBody = preBody.replace(/\n/g, '<br>');
 
         if (!preImgLink.match("^http") && preImgLink != '') {
