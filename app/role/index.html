@@ -5,15 +5,19 @@
     check_view_permission($url);
     include_once "html/menu.inc";
     include_once "getNameMenu.php";
-    include_once "roles.php";
+    
 ?>
 
 <style type="text/css" media="all">
-    @media only screen and (max-width: 576px) {
-        .text-left {
-            text-align: left!important;
-        }
-    }
+	@media only screen and (max-width: 576px) {
+		.text-left {
+			text-align: left!important;
+		}
+	}
+
+	[contenteditable] {
+		outline: 0px solid transparent;
+	}
 </style>
 
 <input type="hidden" name="" id="page-name" value="権限管理">
@@ -22,14 +26,14 @@
     <div class="card-body">
         <div class="row justify-content-md-center">
             <div class="col-md-6">
-                <form action="#" id="searchTopic" method="POST" role="form">
+                <form action="#" id="searchRole" method="POST" role="form">
                     <div class="form-group">
                     	<div class="row">
                     		<div class="col-sm-3 text-right text-left mt-2">
                     			<label>メニュー</label>
                     		</div>
                     		<div class="col-sm-9">
-                    			<select name="cars" id="cars" class="form-control">
+                    			<select name="menu" id="menu" class="form-control">
                     				<option value="">選択</option>
                     				<?php foreach ($result as $value){ ?>
                     					<option value="<?php echo $value['no']; ?>"><?php echo $value['name']; ?></option>
@@ -44,11 +48,11 @@
                     			<label>所属</label>
                     		</div>
                     		<div class="col-sm-9">
-                				<input type="radio" id="all" name="part" value="all" checked="checked">
+                				<input type="radio" id="all" name="outSide" value="0" checked="checked">
                 				<label class="font-weight-normal" for="all">すべて</label><br>
-                				<input type="radio" id="inCompany" name="part" value="inCompany">
+                				<input type="radio" id="inCompany" name="outSide" value="1">
                 				<label class="font-weight-normal" for="inCompany">社内</label><br>
-                				<input type="radio" id="outCompany" name="part" value="outCompany">
+                				<input type="radio" id="outCompany" name="outSide" value="2">
                 				<label class="font-weight-normal" for="outCompany">社外</label>
                     		</div>
                     	</div>
@@ -60,8 +64,7 @@
                     		</div>
                            <div class="col-sm-9">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="status" class="custom-control-input" id="status"
-                                value="<?php echo date('Y-m-d h:i:s', time()); ?>" />
+                                <input type="checkbox" name="status" class="custom-control-input" id="status" value="1" />
                                 <label class="custom-control-label font-weight-normal" for="status">無効を含む</label>
                             </div>
                         </div>
@@ -81,45 +84,27 @@
             <button type="button" class="btn btn-primary" onclick="redirectAddOrEditTopic()"><i class="fas fa-plus mr-2"></i>追加</button>
         </div>
         <div class="table-responsive">
-           <table id="topicsTable" class="table table-bordered table-striped">
-            <thead>
-                <tr class="text-center">
-                    <th>権限名</th>
-                    <th>所属</th>
-                    <th>表示順</th>
-                    <th class="width-100px"></th>
-                </tr>
-            </thead>
-            <tbody>
-            	<?php foreach ($data as $value){ ?>
-            		<tr>
-            			<td class="text-center"><?php echo $value['name']?></td>
-            			<td class="text-center"><?php echo $value['outside_name']?></td>
-            			<td class="text-right"><?php echo $value['sort_order']?></td>
-            			<td class="width-100px">
-            				<div class="row justify-content-center w-200px">
-            					<a href="" class="btn btn-success m-b-5px m-r-0 m-b-0"><i class="fas fa-pencil-alt mr-2"></i>変更</a>
-            				</div>
-            			</td>
-            		</tr>
-            	<?php }?>
-            	
-            <!-- 	<tr>
-            		<td class="text-center"></td>
-            		<td class="text-center"></td>
-            		<td class="text-right">	
-            			<div class="row justify-content-end w-200px">
-            				<a href="" class="btn btn-secondary"></i>確定</a>
-            			</div>
-            		</td>
-            		<td class="width-100px">
-            		</td>
-            	</tr> -->
-            </tbody>
-        </table>
+        	<table id="topicsTable" class="table table-bordered table-striped">
+        		<thead>
+        			<tr class="text-center">
+        				<th>権限名</th>
+        				<th>所属</th>
+        				<th>表示順</th>
+        				<th class="width-100px"></th>
+        			</tr>
+        		</thead>
+        		<tbody id="roleList">
+        			<?php include "roles.php"; ?>
+        		</tbody>
+        	</table>
         </div>
     </div>
-    <!-- /.card-body -->
 </div>
 
+
 <?php include_once "html/foot.inc" ?>
+<script type="text/javascript" src="../../app/refer/js/role/role.js"></script>
+
+</body>
+
+</html>
