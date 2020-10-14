@@ -87,3 +87,7 @@ $(function () {
 
 	// });
 });
+
+function redirectAddRole() {
+	window.location.href = "add-role.html";
+}

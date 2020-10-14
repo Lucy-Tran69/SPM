@@ -5,7 +5,6 @@
     check_view_permission($url);
     include_once "html/menu.inc";
     include_once "getNameMenu.php";
-    
 ?>
 
 <style type="text/css" media="all">
@@ -58,17 +57,17 @@
                     	</div>
                     </div>
                     <div class="form-group">
-                        <div class="row">
-                          <div class="col-sm-3 text-right text-left">
+                    	<div class="row">
+                    		<div class="col-sm-3 text-right text-left">
                     			<label>無効</label>
                     		</div>
-                           <div class="col-sm-9">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="status" class="custom-control-input" id="status" value="1" />
-                                <label class="custom-control-label font-weight-normal" for="status">無効を含む</label>
-                            </div>
-                        </div>
-                    </div>
+                    		<div class="col-sm-9">
+                    			<div class="custom-control custom-checkbox">
+                    				<input type="checkbox" name="status" class="custom-control-input" id="status" value="1" />
+                    				<label class="custom-control-label font-weight-normal" for="status">無効を含む</label>
+                    			</div>
+                    		</div>
+                    	</div>
                     </div>
                     <div class="row justify-content-center">
                         <input type="submit" class="btn btn-primary" value="検索" />
@@ -81,7 +80,7 @@
 <div class="card">
     <div class="card-body table-responsive">
         <div class="row justify-content-end" style="margin-bottom: 20px; margin-right: 10px">
-            <button type="button" class="btn btn-primary" onclick="redirectAddOrEditTopic()"><i class="fas fa-plus mr-2"></i>追加</button>
+            <button type="button" class="btn btn-primary" onclick="redirectAddRole()"><i class="fas fa-plus mr-2"></i>追加</button>
         </div>
         <div class="table-responsive">
         	<table id="topicsTable" class="table table-bordered table-striped">

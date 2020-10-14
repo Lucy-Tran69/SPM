@@ -1,0 +1,107 @@
+<?php
+    include_once "html/header.inc";
+    include "common/check_view_permission.php";
+    $url = "role";
+    check_view_permission($url);
+    include_once "html/menu.inc";
+    include_once "getNameMenu.php";
+    include_once "add-role.php";
+?>
+
+<input type="hidden" name="" id="page-name" value="Add role">
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <form action="" role="form" id="addRole" method="POST" novalidate="novalidate">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="roleName">権限名</label>
+                        <input type="text" name="roleName" class="form-control" id="roleName" placeholder="権限名">
+                    </div>
+                    <div class="form-group">
+                    	<label for="outSide">所属</label>
+                    	<div class="form-group">
+                    		<div class="row outSideCompany">
+                    			<div class="col-sm-1 text-center">
+                    				<input type="radio" id="inCompany" name="outSide" value="1" checked>
+		                			<label class="font-weight-normal" for="inCompany">社内</label><br>
+                    			</div>
+                    			<div class="col-sm-1">
+                    				<input type="radio" id="outCompany" name="outSide" value="2">
+		                			<label class="font-weight-normal" for="outCompany">社外</label>
+                    			</div>
+                    		</div>
+                    	</div>
+                    </div>
+                     <div class="form-group">
+                        <label for="sortOrder">表示順</label>
+                        <input type="number" name="sortOrder" class="form-control" id="sortOrder" placeholder="表示順">
+                    </div>
+                    <div class="form-group">
+                    	<div class="col-md-12">
+                    		<div class="row">
+                    			<label class="mr-2">無効</label>
+                    			<div class="custom-control custom-checkbox">
+                    				<input type="checkbox" name="status" class="custom-control-input" id="status" value="1" />
+                    				<label class="custom-control-label font-weight-normal" for="status"></label>
+                    			</div>
+                    		</div>
+                    	</div>
+                    </div>
+                </div>
+                <div class="ml-3 mr-3" id="inSideCompany">
+                	<div class="card">
+                		<div class="card-primary">
+                			<div class="card-header">
+                				<h3 class="card-title">表示メニュー選択</h3>
+                			</div>
+                			<div class="card-body">
+            					<?php foreach ($result as $value){ 
+            						if ($value['outside'] == 1) { 
+            							?>
+            							<div class="custom-control custom-checkbox">
+            								<input type="checkbox" name="menu[]" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" />
+            								<label class="custom-control-label font-weight-normal" for="menu<?php echo $value['no']; ?>"><?php echo $value['name']; ?></label>
+            							</div>
+            						<?php } 
+            					}?>
+                			</div>
+                		</div>
+                	</div>
+                </div>
+                 <div class="ml-3 mr-3" id="outSideCompany">
+                	<div class="card">
+                		<div class="card-primary">
+                			<div class="card-header">
+                				<h3 class="card-title">表示メニュー選択</h3>
+                			</div>
+                			<div class="card-body">
+                				<?php foreach ($result as $value){ 
+                					if ($value['outside'] == 2) { 
+                						?>
+                						<div class="custom-control custom-checkbox">
+                							<input type="checkbox" name="menu" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" />
+                							<label class="custom-control-label font-weight-normal" for="menu<?php echo $value['no']; ?>"><?php echo $value['name']; ?></label>
+                						</div>
+                					<?php } 
+                				}?>
+                			</div>
+                		</div>
+                	</div>
+                </div>
+             
+                <div class="card-footer">
+                    <div class="row justify-content-md-center">
+                        <button type="submit" class="btn btn-primary">追加</button>
+                        <button type="button" class="btn btn-default" style="margin-left: 20px;" onclick="redirectListRole()">戻る</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<?php include_once "html/foot.inc" ?>
+<script type="text/javascript" src="../../app/refer/js/role/add-role.js"></script>
