@@ -5,7 +5,6 @@
     check_view_permission($url);
     include_once "html/menu.inc";
     include_once "getNameMenu.php";
-    include_once "add-role.php";
 ?>
 
 <input type="hidden" name="" id="page-name" value="Add role">
@@ -61,7 +60,7 @@
             						if ($value['outside'] == 1) { 
             							?>
             							<div class="custom-control custom-checkbox">
-            								<input type="checkbox" name="menu[]" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" />
+            								<input type="checkbox" name="menu" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" />
             								<label class="custom-control-label font-weight-normal" for="menu<?php echo $value['no']; ?>"><?php echo $value['name']; ?></label>
             							</div>
             						<?php } 

@@ -1,4 +1,5 @@
 <?php
+    include_once "common/session.php";
     include_once "database/db.inc";
 
     $conn  = getConnection();
@@ -29,13 +30,21 @@
         }
 
         //check duplicate sort order
-        $checkDupSortOrder = "select count(*) as count_row from role where sort_order = '$sortOrder'";
-        $numDupSortOrder = mysqli_query($conn,$checkDupSortOrder);
+        $checkDupSortOrder = "select count(*) as count_row from role where sort_order = ?";
+        $stmtCheckDup = $conn->prepare($checkDupSortOrder);
 
-        $row = mysqli_fetch_assoc($numDupSortOrder);
+        $stmtCheckDup->bind_param('i', $sortOrder);
+
+        $stmtCheckDup->execute();
+
+        if(!$stmtCheckDup->error) {
+            $rs = $stmtCheckDup->get_result();
+            $row = $rs->fetch_array(MYSQLI_ASSOC);
+        }
+       
         $num = $row['count_row'];
         if($num > 0){
-            $msg->error('この表示順は既に存在しています。');
+            $msg->error('表示順は既に存在しています。');
             $checkOK = 0;
         }
 
@@ -47,39 +56,28 @@
         }
 
         if ($checkOK == 1) {
-            //check temp increment NO
-            $no = "select no from role order by no desc limit 1";
-            $lastNo = mysqli_query($conn,$no);
-            $rowNo = mysqli_fetch_assoc($lastNo);
-            $NO = $rowNo['no'] + 1;
-
-            $sql = "insert into role(no, name, outside, sort_order, invalid, inuser) values(?,?,?,?,?,?)";
+            $sql = "insert into role(name, outside, sort_order, invalid, inuser) values(?,?,?,?,?)";
             $stmt = $conn->prepare($sql);
 
-            $stmt->bind_param('isiiii', $NO, $roleName, $outSide, $sortOrder, $status, $insert_user);
+            $stmt->bind_param('siiii', $roleName, $outSide, $sortOrder, $status, $insert_user);
 
             $stmt->execute();
 
-            // $lastId = mysqli_insert_id($conn);
+            $lastId = mysqli_insert_id($conn);
+
+            if (!empty($menu)) {
+               $roleMenu = "insert into role_menu(role, menu, inuser) values(?,?,?)";
+               foreach ($menu as $value) {
+                 $stm = $conn->prepare($roleMenu);
+                 $stm->bind_param('iii', $lastId, $value, $insert_user);
+                 $stm->execute();
+                }
+            }
 
             if ($stmt->error) {
                 $msg->error('権限の追加に失敗しました。');
             } else {
-                foreach ($menu as $value) {
-                   $roleMenu = "insert into role_menu(role, menu, inuser) values(?,?,?)";
-                   $stm = $conn->prepare($roleMenu);
-
-                   $stm->bind_param('iii', $NO, $value, $insert_user);
-
-                   $stm->execute();
-                }
-                if ($stm->error) {
-                    $msg->error('権限の追加に失敗しました。');
-                }
-               else {
-                    $msg->success('権限の追加に成功しました。');
-                    echo("<script>location.href = 'index.html';</script>");
-               }
+                $msg->success('権限の追加に成功しました。');
             }
             $conn->close();
         }

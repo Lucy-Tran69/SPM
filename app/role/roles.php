@@ -1,4 +1,5 @@
 <?php
+    include_once "common/session.php";
     include_once "database/db.inc";
 
     $conn  = getConnection();
@@ -61,11 +62,21 @@
         }
 
         if (!empty($sortOrder)) {
+            $empQuery = "update role set sort_order = ? where no = ?";
+            $stmSort = $conn->prepare($empQuery);
             foreach ($sortOrder as $value) {
                 $sort = $value['sortOrder'];
                 $no = $value['no'];
-                $empQuery = "update role set sort_order = $sort where no = $no";
-                mysqli_query($conn, $empQuery);
+
+                $stmSort->bind_param('ii', $sort, $no);
+                $stmSort->execute();
+            }
+
+            if($stmSort->error) {
+                $msg->error('Update sort order Failed!');
+            }
+            else {
+                $msg->success('Update sort order successfully!');
             }
         }
     }
@@ -94,7 +105,7 @@
             <td class="text-right sort" contenteditable='true'><?php echo $value['sort_order']?></td>
             <td class="width-100px">
                 <div class="row justify-content-center w-200px">
-                    <a href="" class="btn btn-success m-b-5px m-r-0 m-b-0"><i class="fas fa-pencil-alt mr-2"></i>変更</a>
+                    <a href="edit-role.html?no=<?php echo $value['no']?>" class="btn btn-success m-b-5px m-r-0 m-b-0"><i class="fas fa-pencil-alt mr-2"></i>変更</a>
                 </div>
             </td>
         </tr>
