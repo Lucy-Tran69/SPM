@@ -146,6 +146,7 @@ $(function () {
                 // if error
                 else {
                     $("#flash-message").html(response);
+                    $(window).scrollTop(0);
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {

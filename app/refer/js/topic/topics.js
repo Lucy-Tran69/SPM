@@ -96,6 +96,7 @@ $(function () {
                 $('#flash-message').html(html);
                 $(topicTable).DataTable().ajax.reload(null, false);
                 $("#confirmDelete").modal('hide');
+                $(window).scrollTop(0);
             });
         });
     });
@@ -236,6 +237,7 @@ $(function () {
                 // if error
                 else {
                     $("#flash-message").html(response);
+                    $(window).scrollTop(0);
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {

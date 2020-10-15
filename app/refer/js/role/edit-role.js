@@ -26,8 +26,8 @@ $(function () {
 	// 	return value > param;
 	// });
 
-	 var formAddRole = $('#addRole');
-    formAddRole.validate({
+	 var formEditRole = $('#editRole');
+    formEditRole.validate({
         rules: {
             roleName: {
                 required: true,
@@ -53,43 +53,47 @@ $(function () {
         }
     });
 
-    formAddRole.submit(function (event) {
+    formEditRole.submit(function (event) {
         event.preventDefault();
-        if (!formAddRole.valid()) {
+        if (!formEditRole.valid()) {
             return false;
         }
 
         var outSide = '';
+        var menu = [];
+
         if ($('#inCompany').is(":checked")) {
         	outSide = $('#inCompany').val();
+            $("input[name=menuIn]:checked").each ( function() {
+                menu.push($(this).val());
+            });
         }
 
         if ($('#outCompany').is(":checked")) {
         	outSide = $('#outCompany').val();
+             $("input[name=menuOut]:checked").each ( function() {
+                menu.push($(this).val());
+            });
         }
 
          if ($('#status').is(":checked")) {
         	var status = $('#status').val();
         }
 
-        var menu = [];
-		$("input[name=menu]:checked").each ( function() {
-		    menu.push($(this).val());
-		});
-
         $.ajax({
-            url: "addRole.php",
+            url: "editRole.php",
             type: "POST",
             data: {
+                no : $('#no').val(),
             	roleName : $('#roleName').val(),
             	outSide : outSide,
-            	sortOrder : $('#sortOrder').val(),
+            	sortOrderOld : $('#sortOrderOld').val(),
+                sortOrderNew : $('#sortOrderNew').val(),
             	status : status,
             	menu : menu
             },
             dataType: "html",
             success: function (response) {
-            	// debugger
                 //check response is blank if success 
                 if (!$.trim(response)) {
                     window.location.href = "index.html";
@@ -106,6 +110,10 @@ $(function () {
         });
     });
 });
+
+function redirectListRole() {
+	window.location.href = "index.html";
+}
 
 function redirectListRole() {
 	window.location.href = "index.html";

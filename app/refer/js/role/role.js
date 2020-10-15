@@ -1,6 +1,7 @@
 $(function () {
 	$('#searchRole').submit(function (e){
 		e.preventDefault();
+		$('#flash-message').remove();
 		var menu = $('#menu').val();
 		var outSide = $("input[type='radio']:checked").val();
 		var status = $('input[name="status"]:checked').val();
@@ -27,7 +28,6 @@ $(function () {
 	});
 
 	$(document).on("click",".change-sort-order", function(e) {
-		// debugger
 		e.preventDefault();
 		var data = [];
 
@@ -60,32 +60,12 @@ $(function () {
 			},
 			success : function(res) {
 				$('#roleList').html(res);
+				location.reload();
+				$(window).scrollTop(0);
 			}
 		});
 		}
 	});
-
-	// $('.sort').on("keyup", function(e) {
-	// 	debugger
-		
-	// 	var row = $(this).closest('td');
-	// 	var $tr = $(this).closest("tr");
-	// 	var sortValue = $tr.find('.sort').text();
-
-	// 	if (sortValue == '') {
-	// 		alert("Please input sort order!");
-	// 	}
-
-	// 	var data = [];
-	// 	var id = $($tr).attr("data-id");
-	// 	$('#topicsTable > tbody  > tr td:nth-child(3)').not(row).each(function(){
-	// 		data.push($(this).text().trim());
-	// 	});
-
-
-	// 	console.log(data);
-
-	// });
 });
 
 function redirectAddRole() {
