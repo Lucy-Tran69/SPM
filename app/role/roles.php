@@ -22,7 +22,7 @@
         $sortOrder = isset($_POST["sortOrder"]) ? $_POST["sortOrder"] : '';
 
         if(!empty($menu)){
-            $searchMenu = "role_menu.menu = $menu";
+            $searchMenu = "role_menu.menu = $menu ";
             $join = "inner join role_menu on role.no = role_menu.role ";
         }
 
@@ -31,7 +31,7 @@
                 $searchOutSide = "";
             }
             else {
-                $searchOutSide = "outside.no = $outSide";
+                $searchOutSide = "outside.no = $outSide ";
             }
         }
 
@@ -53,12 +53,6 @@
                 }
                 $searchQuery = $searchQuery.$searchOutSide ;
             }
-
-
-            if(!empty($searchQuery))
-                {
-                    $searchQuery = $searchQuery." and ";
-                }
         }
 
         if (!empty($sortOrder)) {
@@ -73,17 +67,25 @@
             }
 
             if($stmSort->error) {
-                $msg->error('Update sort order Failed!');
+                $msg->error('表示順の更新に失敗しました。');
             }
             else {
-                $msg->success('Update sort order successfully!');
+                $msg->success('表示順の更新に成功しました。');
             }
         }
     }
 
-    $searchQuery = $searchQuery."role.invalid = $status ";
+    if ($status != 1) {
+        if(!empty($searchQuery))
+        {
+            $searchQuery = $searchQuery." and ";
+        }
+        $searchQuery = $searchQuery."role.invalid = $status ";
+    }
 
-    $searchQuery = "where ".$searchQuery;
+    if (!empty($searchQuery)) {
+        $searchQuery = "where ".$searchQuery;
+    }
 
     $sql = " select role.no as no, role.name as name, role.sort_order as sort_order, outside.name as outside_name from role inner join outside on role.outside = outside.no ".$join.$searchQuery."order by sort_order asc";
 
@@ -104,7 +106,7 @@
             <td class="text-center"><?php echo $value['outside_name']?></td>
             <td class="text-right sort" contenteditable='true'><?php echo $value['sort_order']?></td>
             <td class="width-100px">
-                <div class="row justify-content-center w-200px">
+                <div class="row justify-content-center w-200px custom-button">
                     <a href="edit-role.html?no=<?php echo $value['no']?>" class="btn btn-success m-b-5px m-r-0 m-b-0"><i class="fas fa-pencil-alt mr-2"></i>変更</a>
                 </div>
             </td>
@@ -112,15 +114,18 @@
     <?php   }
 
     $conn->close();
-?>
-        <tr>
-            <td class="text-center"></td>
-            <td class="text-center"></td>
-            <td class="text-right"> 
-                <div class="row justify-content-end w-200px">
-                    <input type="button" class="btn btn-secondary change-sort-order" value="確定" />
-                </div>
-            </td>
-            <td class="width-100px">
-            </td>
-        </tr>
+if (!empty($data)) {
+    ?>
+    <tr>
+        <td class="text-center"></td>
+        <td class="text-center"></td>
+        <td class="text-right"> 
+            <div class="row justify-content-end w-200px">
+                <input type="button" class="btn btn-secondary change-sort-order" value="確定" />
+            </div>
+        </td>
+        <td class="width-100px">
+        </td>
+    </tr>
+
+    <?php } ?>

@@ -8,7 +8,15 @@
     include_once "getRoleByNo.php";
 ?>
 
-<input type="hidden" name="" id="page-name" value="Edit role">
+<style type="text/css" media="all">
+    @media only screen and (max-width: 576px) {
+        .text-left {
+            text-align: left!important;
+        }
+    }
+</style>
+
+<input type="hidden" name="" id="page-name" value="権限変更">
 
 <div class="row">
     <div class="col-md-12">
@@ -24,7 +32,7 @@
                     	<label for="outSide">所属</label>
                     	<div class="form-group">
                     		<div class="row outSideCompany">
-                    			<div class="col-sm-1 text-center">
+                    			<div class="col-sm-1 text-center text-left">
                     				<input type="radio" id="inCompany" name="outSide" value="1" <?php echo $role['outside'] == 1 ? 'checked' : ''; ?>>
 		                			<label class="font-weight-normal" for="inCompany">社内</label><br>
                     			</div>
@@ -67,7 +75,7 @@
                                 foreach ($result as $value){ 
                                     if ($value['outside'] == 1) {  ?>
                                         <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" name="menuIn" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" <?php echo in_array($value['no'], $menu_arr) ? 'checked' : ''; ?>/>
+                                            <input type="checkbox" name="menu" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" <?php echo in_array($value['no'], $menu_arr) ? 'checked' : ''; ?>/>
                                             <label class="custom-control-label font-weight-normal" for="menu<?php echo $value['no']; ?>"><?php echo $value['name']; ?></label>
                                         </div>
                                     <?php   }
@@ -91,7 +99,7 @@
                                 foreach ($result as $value){ 
                                     if ($value['outside'] == 2) {  ?>
                                         <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" name="menuOut" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" <?php echo in_array($value['no'], $menu_arr) ? 'checked' : ''; ?>/>
+                                            <input type="checkbox" name="menu" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" <?php echo in_array($value['no'], $menu_arr) ? 'checked' : ''; ?>/>
                                             <label class="custom-control-label font-weight-normal" for="menu<?php echo $value['no']; ?>"><?php echo $value['name']; ?></label>
                                         </div>
                                     <?php   }
@@ -103,7 +111,7 @@
              
                 <div class="card-footer">
                     <div class="row justify-content-md-center">
-                        <button type="submit" class="btn btn-primary">追加</button>
+                        <button type="submit" class="btn btn-primary">変更</button>
                         <button type="button" class="btn btn-default" style="margin-left: 20px;" onclick="redirectListRole()">戻る</button>
                     </div>
                 </div>

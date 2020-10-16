@@ -17,6 +17,23 @@
 	[contenteditable] {
 		outline: 0px solid transparent;
 	}
+
+    .custom-button {
+        word-break: keep-all !important;
+        white-space: nowrap !important;
+    }
+
+    .min-width-400px {
+        min-width: 400px;
+    }
+
+    .min-width-200px {
+        min-width: 200px;
+    }
+
+    .min-width-100px {
+        min-width: 100px;
+    }
 </style>
 
 <input type="hidden" name="" id="page-name" value="権限管理">
@@ -59,7 +76,6 @@
                     <div class="form-group">
                     	<div class="row">
                     		<div class="col-sm-3 text-right text-left">
-                    			<label>無効</label>
                     		</div>
                     		<div class="col-sm-9">
                     			<div class="custom-control custom-checkbox">
@@ -86,10 +102,10 @@
         	<table id="topicsTable" class="table table-bordered table-striped">
         		<thead>
         			<tr class="text-center">
-        				<th>権限名</th>
-        				<th>所属</th>
-        				<th>表示順</th>
-        				<th class="width-100px"></th>
+        				<th class="min-width-400px">権限名</th>
+        				<th class="min-width-200px">所属</th>
+        				<th class="min-width-200px">表示順</th>
+        				<th class="min-width-100px"></th>
         			</tr>
         		</thead>
         		<tbody id="roleList">

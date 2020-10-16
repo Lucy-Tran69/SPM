@@ -41,6 +41,8 @@
             $rs = $stmtCheckDup->get_result();
             $row = $rs->fetch_array(MYSQLI_ASSOC);
         }
+
+        $stmtCheckDup->close();
        
         $num = $row['count_row'];
         if($num > 0){
@@ -67,11 +69,12 @@
 
             if (!empty($menu)) {
                $roleMenu = "insert into role_menu(role, menu, inuser) values(?,?,?)";
+               $stm = $conn->prepare($roleMenu);
                foreach ($menu as $value) {
-                 $stm = $conn->prepare($roleMenu);
                  $stm->bind_param('iii', $lastId, $value, $insert_user);
                  $stm->execute();
                 }
+                $stm->close();
             }
 
             if ($stmt->error) {
@@ -79,6 +82,7 @@
             } else {
                 $msg->success('権限の追加に成功しました。');
             }
+            $stmt->close();
             $conn->close();
         }
         else {

@@ -3,7 +3,7 @@ $(function () {
 		e.preventDefault();
 		$('#flash-message').remove();
 		var menu = $('#menu').val();
-		var outSide = $("input[type='radio']:checked").val();
+		var outSide = $('input[type="radio"]:checked').val();
 		var status = $('input[name="status"]:checked').val();
 		$.ajax({
 			type : "POST",
@@ -43,7 +43,7 @@ $(function () {
 		data = data.sort();
 		for (var i = 0; i < data.length -1 ; i++) {
 			if (data[i+1]['sortOrder'] == data[i]['sortOrder']) {
-				alert("Sort order is duplicate. Please input again!");
+				alert("表示順は既に存在しています。もう一度お試しください。");
 				duplicate = 1;
 				return true;
 			}

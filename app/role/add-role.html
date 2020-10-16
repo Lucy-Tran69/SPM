@@ -5,9 +5,18 @@
     check_view_permission($url);
     include_once "html/menu.inc";
     include_once "getNameMenu.php";
+    include_once "getMaxSortOrder.php";
 ?>
 
-<input type="hidden" name="" id="page-name" value="Add role">
+<style type="text/css" media="all">
+    @media only screen and (max-width: 576px) {
+        .text-left {
+            text-align: left!important;
+        }
+    }
+</style>
+
+<input type="hidden" name="" id="page-name" value="権限新規追加">
 
 <div class="row">
     <div class="col-md-12">
@@ -22,7 +31,7 @@
                     	<label for="outSide">所属</label>
                     	<div class="form-group">
                     		<div class="row outSideCompany">
-                    			<div class="col-sm-1 text-center">
+                    			<div class="col-sm-1 text-center text-left">
                     				<input type="radio" id="inCompany" name="outSide" value="1" checked>
 		                			<label class="font-weight-normal" for="inCompany">社内</label><br>
                     			</div>
@@ -35,7 +44,7 @@
                     </div>
                      <div class="form-group">
                         <label for="sortOrder">表示順</label>
-                        <input type="number" name="sortOrder" class="form-control" id="sortOrder" placeholder="表示順">
+                        <input type="number" name="sortOrder" class="form-control" id="sortOrder" placeholder="表示順" value="<?php echo $sortOrder; ?>">
                     </div>
                     <div class="form-group">
                     	<div class="col-md-12">

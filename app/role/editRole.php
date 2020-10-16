@@ -53,6 +53,7 @@
           }
 
           $sortOrder = $sortOrderNew;
+          $stmtCheckDup->close();
         }
        
 
@@ -74,17 +75,26 @@
             $stmt->execute();
 
             if (!empty($menu)) {
-                 $del = "delete from role_menu where role=?";
-                 $stmDel = $conn->prepare($del);
-                 $stmDel->bind_param('i', $no);
-                 $stmDel->execute();
+                 // $del = "delete from role_menu where role=?";
+                 // $stmDel = $conn->prepare($del);
+                 // $stmDel->bind_param('i', $no);
+                 // $stmDel->execute();
 
-                 $roleMenu = "insert into role_menu(role, menu, inuser) values(?,?,?)";
-                 foreach ($menu as $value) {
-                        $stm = $conn->prepare($roleMenu);
-                        $stm->bind_param('iii', $no, $value, $insert_user);
-                        $stm->execute();
-                  }
+                 // $roleMenu = "insert into role_menu(role, menu, inuser) values(?,?,?)";
+                 // $stm = $conn->prepare($roleMenu);
+                 // foreach ($menu as $value) {
+                 //      $stm->bind_param('iii', $no, $value, $insert_user);
+                 //      $stm->execute();
+                 //  }
+                 //  $stm->close();
+print_r($menu);
+               $del = "select menu from role_menu where menu not in ? and role=?";
+                 $stmDel = $conn->prepare($del);
+                 $stmDel->bind_param('si',$menu, $no);
+                 $stmDel->execute();
+                 $rsMenu = $stmDel->get_result();
+                $row = $rsMenu->fetch_array(MYSQLI_ASSOC);
+                print_r($row);
             }
 
             if ($stmt->error) {
@@ -92,6 +102,7 @@
             } else {
                 $msg->success('権限の追加に成功しました。');
             }
+            $stmt->close();
             $conn->close();
         }
         else {

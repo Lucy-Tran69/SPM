@@ -64,21 +64,19 @@ $(function () {
 
         if ($('#inCompany').is(":checked")) {
         	outSide = $('#inCompany').val();
-            $("input[name=menuIn]:checked").each ( function() {
-                menu.push($(this).val());
-            });
         }
 
         if ($('#outCompany').is(":checked")) {
         	outSide = $('#outCompany').val();
-             $("input[name=menuOut]:checked").each ( function() {
-                menu.push($(this).val());
-            });
         }
 
          if ($('#status').is(":checked")) {
         	var status = $('#status').val();
         }
+
+         $("input[name=menu]:checked").each ( function() {
+                menu.push($(this).val());
+         });
 
         $.ajax({
             url: "editRole.php",

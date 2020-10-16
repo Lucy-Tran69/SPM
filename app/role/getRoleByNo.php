@@ -36,6 +36,7 @@
                         'menu' => $row['menu']));
                 }
             }
+            $stmtRole->close();
             $conn->close();
         }
     }
