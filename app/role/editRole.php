@@ -75,26 +75,59 @@
             $stmt->execute();
 
             if (!empty($menu)) {
-                 // $del = "delete from role_menu where role=?";
-                 // $stmDel = $conn->prepare($del);
-                 // $stmDel->bind_param('i', $no);
-                 // $stmDel->execute();
+                $imMenu = implode(",",$menu);
+                
+                // Lấy những Id menu đã xóa
+                $sql = "SELECT menu FROM role_menu WHERE menu not in ($imMenu) and role=$no";
+                $query = mysqli_query($conn, $sql) or die ('エラーが発生しました。もう一度お試しください。');
 
-                 // $roleMenu = "insert into role_menu(role, menu, inuser) values(?,?,?)";
-                 // $stm = $conn->prepare($roleMenu);
-                 // foreach ($menu as $value) {
-                 //      $stm->bind_param('iii', $no, $value, $insert_user);
-                 //      $stm->execute();
-                 //  }
-                 //  $stm->close();
-print_r($menu);
-               $del = "select menu from role_menu where menu not in ? and role=?";
-                 $stmDel = $conn->prepare($del);
-                 $stmDel->bind_param('si',$menu, $no);
-                 $stmDel->execute();
-                 $rsMenu = $stmDel->get_result();
-                $row = $rsMenu->fetch_array(MYSQLI_ASSOC);
-                print_r($row);
+                $idDelArr = array();
+                while ($row = mysqli_fetch_array($query))
+                {
+                    array_push($idDelArr, $row["menu"]);
+                }
+
+                // Lấy những Id menu đã tồn tại
+                $sql = "SELECT menu FROM role_menu WHERE menu in ($imMenu) and role=$no";
+                $query = mysqli_query($conn, $sql) or die ('エラーが発生しました。もう一度お試しください。');
+
+                $idInsArr = array();
+                while ($row = mysqli_fetch_array($query))
+                {
+                    array_push($idInsArr, $row["menu"]);
+                }
+
+                // Thực hiện xóa bỏ những id menu đã xóa
+                $idDel= implode(",",$idDelArr);
+                $sqlDel = "DELETE from role_menu where menu in (?) and role=?";
+                $stmtDel = $conn->prepare($sqlDel);
+                foreach ($idDelArr as $value) {
+                    $stmtDel->bind_param('ii', $value, $no);
+                    $stmtDel->execute();
+                }
+
+                // Thêm mới những id menu chưa tồn tại, những id menu nào tồn tại rồi không thêm vào nữa
+                $sqlIns = "INSERT INTO role_menu(role, menu, inuser) VALUES(?,?,?)";
+                $stmtIns = $conn->prepare($sqlIns);
+                foreach($idInsArr as $key){
+                    $keyToDelete = array_search($key, $menu);
+                    unset($menu[$keyToDelete]);
+                }
+
+                foreach ($menu as $value) {
+                    $stmtIns->bind_param('iii', $no, $value, $insert_user);
+                    $stmtIns->execute();
+                }
+                
+                $stmtDel->close();
+                $stmtIns->close();
+            } else {
+                // Xóa bỏ tất cả id menu
+                $del = "delete from role_menu where role=?";
+                $stmDel = $conn->prepare($del);
+                $stmDel->bind_param('i', $no);
+                $stmDel->execute();
+                $stmDel->close();
             }
 
             if ($stmt->error) {
