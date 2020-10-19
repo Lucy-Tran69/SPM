@@ -21,6 +21,7 @@
         while ($row = mysqli_fetch_array($query))
         {
             $data = array(
+                "no" => $id,
                 "title" => $row['title'],
                 "open_day" => $row['open_day'],
                 "image" => $row['image'],

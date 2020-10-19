@@ -139,6 +139,13 @@ $(function () {
                     var body = result['body'].replace(/\n/g, '<br>');
                     $('#topicBody').empty();
                     $('#topicBody').append(body);
+
+                    $('.title').val(result['title']);
+                    $('.openDay').val(result['open_day']);
+                    $('.image').val(topicImage);
+                    $('.body').val(result['body']);
+                    $('.linkTitle').val(link_title);
+                    $('.linkURL').val(link_url);
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     console.log('AJAX call failed.');
@@ -147,3 +154,7 @@ $(function () {
             });
     });
 });
+
+function generatePdf() {
+    $('#pdfTopicForm').submit();
+}

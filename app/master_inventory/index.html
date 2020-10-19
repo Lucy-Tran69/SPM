@@ -21,14 +21,19 @@ header("content-type: text/html; charset=UTF-8");
     text-align: -webkit-center;
   }
 
+  .showPointer{
+    cursor: pointer;
+  }
+
   .tableFixHead {
     overflow-y: auto;
     height: 500px;
+    width: 100%;
   }
 
   .tableFixHead table {
     border-collapse: collapse;
-    width: 100%;
+    
   }
 
   .tableFixHead th,
@@ -51,6 +56,15 @@ header("content-type: text/html; charset=UTF-8");
 if (isset($_SESSION["loginAccount"])) {
 ?>
   <div class="content-wrapper">
+  <div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 class="m-0 text-dark" id="d-page-name">在庫管理</h1>
+						</div><!-- /.col -->
+					</div><!-- /.row -->
+				</div><!-- /.container-fluid -->
+		</div>
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
@@ -58,17 +72,14 @@ if (isset($_SESSION["loginAccount"])) {
           <div class="col-12">
             <!-- Default box -->
             <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">マスター管理　ユーザ管理</h3>
-              </div>
               <!-- /.card-header -->
               <div class="card-body">
                 <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
                   <div class="form-group">
                     <div class="row">
-                      <div class="col-xs-5">
-                        <label id="itemLabel">権限</label>
-                        <select name="selectedMaker" id="selectedMaker" class="form-control">
+                        <label id="itemLabel" class="col-sm-3 col-form-label text-right">メーカ</label>
+                        <div class="col-sm-7">
+                        <select name="selectedMaker" id="selectedMaker" class="form-control menu">
                           <option value="">-</option>
                           <?php
                           if ($makerResultSet->num_rows > 0) {
@@ -88,44 +99,47 @@ if (isset($_SESSION["loginAccount"])) {
                   </div>
                   <div class="form-group">
                     <div class="row">
-                      <div class="col-xs-5">
-                        <label id="custLabel" class="searchTable_label">在庫在庫（在庫名）</label>
+                      <label id="custLabel" class="col-sm-3 col-form-label text-right">完成在庫(商品名)</label>
+                      <div class="col-sm-7">
                         <input type="text" id="searchCartridge" name="searchCartridge" value="<?php echo isset($_POST["searchCartridge"]) ? $_POST["searchCartridge"] : ""; ?>" class="form-control" />
                       </div>
                     </div>
                   </div>
                   <div class="form-group">
                     <div class="row">
-                      <div class="col-xs-5">
+                    <div class="offset-sm-3 col-sm-9">
                         <div class="form-check">
-                          <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?> onchange="searchTableByInvalid();" />
-                          <label id="checkLabel" class="form-check-label">非表示を表示しない</label>
+                          <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>/>
+                          <label id="checkLabel" class="form-check-label showPointer" onclick="$('#searchInvalid').click();"><b>非表示を表示しない</b></label>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div class="form-group">
                     <div class="row">
-                      <div class="col-xs-5">
+                    <div class="offset-sm-3 col-sm-9">
                         <div class="form-check">
-                          <input type="checkbox" name="searchInventory" id="searchInventory" class="form-check-input" value="0" <?php if (isset($_POST['searchInventory'])) echo "checked='checked'"; ?> onchange="searchTableByInventory();" />
-                          <label id="checkLabel" class="form-check-label">在庫未設定のみ表示</label>
+                          <input type="checkbox" name="searchInventory" id="searchInventory" class="form-check-input" value="0" <?php if (isset($_POST['searchInventory'])) echo "checked='checked'"; ?> />
+                          <label id="checkLabel" class="form-check-label showPointer" onclick="$('#searchInventory').click();"><b>在庫未設定のみ表示</b></label>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <input type="submit" value="検索" class="btn btn-primary" style="width: 100px; margin-left: 250px;">
-                  <input type="button" value="PDF" class="btn btn-primary" style="width: 100px; margin-left: 250px;" onclick="generatepdf();">
-                  <input type="button" value="CSV" class="btn btn-primary" style="width: 100px;" onclick="generatecsv();">
+                  <input type="submit" value="検索" class="btn btn-primary offset-sm-4" style="width: 100px;">
+                  <button class="btn btn-warning" style="width: 100px;margin-left: 250px;" onclick="generatepdf();"><i class="fas fa-file-pdf"></i>&nbsp;PDF</button>
+                  <button class="btn btn-success" style="width: 100px;"onclick="generatecsv();"><i class="fas fa-table"></i>&nbsp;CSV</button>
                 </form>
               </div>
-              <div class="tableFixHead">
+            </div>
+              <div class="card card-primary">
+              <div class="card-body d-flex justify-content-center">
+              <div id="scrollTarget" class="tableFixHead">
                 <table id="details_table" class="table table-bordered">
                   <thead>
                     <tr>
                       <th>メーカー名</th>
                       <th>完成在庫(商品名)</th>
-                      <th>現在在庫状況</th>
+                      <th>現在在庫状況(<?php echo $last_updated;?>)</th>
                       <th>公開予定在庫状況</th>
                     </tr>
                   </thead>
@@ -134,8 +148,8 @@ if (isset($_SESSION["loginAccount"])) {
                     if ($resultSet->num_rows > 0) {
                       while ($row = $resultSet->fetch_assoc()) {
                     ?>
-                        <tr>
-                          <td style="display: none;"><?php echo $row["id"] ?></td>
+                        <tr id="<?php echo $i; ?>">
+                          <td style="display: none;"><?php echo $row["id"]; ?></td>
                           <td><?php echo $row["mName"] ?></td>
                           <td><?php echo $row["cName"] == null ? $markNew : $row["cName"] ?></td>
                           <td><?php echo $row["display"] == null ? $markNew : $row["display"] ?></td>
@@ -146,16 +160,16 @@ if (isset($_SESSION["loginAccount"])) {
                                 mysqli_data_seek($markResultSet, 0);
                                 while ($markrow = $markResultSet->fetch_assoc()) {
                               ?>
-                                  <option value="<?php echo $markrow["no"]; ?>" <?php echo $markrow["display"] == $row["display"] ? "selected" : ""; ?>><?php echo $markrow["display"]; ?></option>
+                                  <option value="<?php echo $markrow["no"]; ?>" <?php echo $markrow["no"] == $row["mark"] ? "selected" : ""; ?>><?php echo $markrow["display"]; ?></option>
                               <?php
                                 }
                               }
                               ?>
                             </select>
                           </td>
-                          <td style="display: none;"><?php echo $row["invalid"] ?></td>
+                          <td style="display: none;"><?php echo $row["mark"]; ?></td>
                         </tr>
-                    <?php
+                    <?php 
                       }
                     }
                     // $resultStmt->free_result();
@@ -164,12 +178,16 @@ if (isset($_SESSION["loginAccount"])) {
                   </tbody>
                 </table>
               </div>
-              <input type="button" value="Confirm" class="btn btn-primary" style="width: 100px; align-self:flex-end;margin-right:125px;margin-bottom:5px;" onclick="confirmValues();" data-toggle="modal" data-target="#details" />
+              </div>
+              <div class="card-footer" style="text-align: center;">
+              <input type="button" value="確認" class="btn btn-outline-success" style="width: 200px;" onclick="confirmValues();" data-toggle="modal" data-target="#details" />
+              </div>
               <!-- /.card-footer-->
             </div>
             <!-- /.card -->
           </div>
         </div>
+      </div>
       </div>
     </section>
     <!-- /.content -->
@@ -215,8 +233,8 @@ if (isset($_SESSION["loginAccount"])) {
             </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="updateValues();">Save changes</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          <button type="button" class="btn btn-primary" onclick="updateValues();">確定</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -243,7 +261,7 @@ if (isset($_SESSION["loginAccount"])) {
     </select>
     <input type="text" id="searchCartridge" name="searchCartridge" value="<?php echo isset($_POST["searchCartridge"]) ? $_POST["searchCartridge"] : ""; ?>" class="form-control" />
   </form>
-  <form id="csvForm" style="display: none;" action="../../include/master_inventory_functions/csv/generateCSV.php" method="POST" role="form">
+  <form id="csvForm" style="display: none;" action="../../include/master_inventory_functions/csv/generateCSV.php" method="POST" role="form" target="_blank">
     <input type="checkbox" id="csvInvalid" name="csvInvalid" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>>
     <input type="checkbox" id="csvInventory" name="csvInventory" value="0" <?php if (isset($_POST['searchInventory'])) echo "checked='checked'"; ?>>
     <select name="selectedMaker" id="selectedMaker" class="form-control">
@@ -292,17 +310,23 @@ if (isset($_SESSION["loginAccount"])) {
   function updateValues() {
     var values = [];
     var ids = [];
+    var prev = [];
     $('#details_table tbody tr').each(function() {
       var id = $(this).find('td:eq(0)').html();
       var name = $(this).find('td:eq(2)').html();
       var value = $(this).find('td option:selected').val();
+      var before = $(this).find('td:eq(5)').html();
       //alert(id+" "+value);
       values.push(value);
       ids.push(id);
+      prev.push(before);
     });
 
-    for (var i = 0; i < ids.length; i++) {
-      $.ajax({
+    var i;
+    for (i = 0; i < ids.length;i++) {
+      if(values[i]!=prev[i])
+      {
+        $.ajax({
         url: "../../include/master_inventory_functions/updateInventory.php",
         type: "POST",
         dataType: "text",
@@ -310,117 +334,24 @@ if (isset($_SESSION["loginAccount"])) {
           no: ids[i],
           val: values[i]
         },
-        success: function(response) {},
+        success: function(response) {
+
+        },
         error: function(jqXHR, textStatus, errorThrown) {
           console.log(textStatus, errorThrown);
         }
       });
+      }
     }
 
     window.location.reload();
   }
 
-  function searchTableByCartridge() {
-    // Declare variables
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("searchCartridge");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("details_table");
-    tr = table.getElementsByTagName("tr");
-
-    // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[2];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
-      }
-    }
-  }
-
-  function searchTableByMaker() {
-    // Declare variables
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("selectedMaker");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("details_table");
-    tr = table.getElementsByTagName("tr");
-
-    // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[1];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
-      }
-    }
-  }
-
-  function searchTableByInvalid() {
-    // Declare variables
-    // var input, filter, table, tr, td, i, txtValue;
-    // input = document.getElementById("searchInvalid").checked;
-    // filter = input;
-    // table = document.getElementById("details_table");
-    // tr = table.getElementsByTagName("tr");
-
-    // // Loop through all table rows, and hide those who don't match the search query
-    // for (i = 0; i < tr.length; i++) {
-    //   td = tr[i].getElementsByTagName("td")[4];
-    //   if (td) {
-    //     txtValue = td.textContent || td.innerText;
-    //     if (txtValue == 1) {
-    //       if (filter == true) {
-    //         tr[i].style.display = "";
-    //       } else {
-    //         tr[i].style.display = "none";
-    //       }
-    //     }
-    //   }
-    // }
-    document.getElementById('searchForm').submit();
-  }
-
-  function searchTableByInventory() {
-    document.getElementById('searchForm').submit();
-  }
-
   function generatepdf() {
-    // $.ajax({
-    //     url: "../../include/inventory_functions/pdf/pdf.php",
-    //     type: "POST",
-    //     success: function(response) {
-
-    //     },
-    //     error: function(jqXHR, textStatus, errorThrown) {
-    //       console.log(textStatus, errorThrown);
-    //     }
-    //   });
-
     document.getElementById('pdfForm').submit();
   }
 
   function generatecsv() {
-    // $.ajax({
-    //     url: "../../include/inventory_functions/csv/generateCSV.php",
-    //     type: "POST",
-    //     success: function(response) {
-
-    //     },
-    //     error: function(jqXHR, textStatus, errorThrown) {
-    //       console.log(textStatus, errorThrown);
-    //     }
-    //   });
-
-    // window.location.href = "../../include/inventory_functions/csv/generateCSV.php";
     document.getElementById('csvForm').submit();
   }
 </script>

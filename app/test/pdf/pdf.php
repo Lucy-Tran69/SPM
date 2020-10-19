@@ -90,8 +90,9 @@ foreach ($content as $key1 => $item) {
     $pdf->Ln();
 }
 
-$pdf->Output();
+$pdf->Output('I','ファイル名.pdf',true);
 $pdf->Close();
+
 
 
 ?>

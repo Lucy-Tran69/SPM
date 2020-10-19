@@ -64,8 +64,6 @@
             $sortOrder = $rowSortOrder['sort_order'] + 1;
         }
 
-        // print_r($sortOrder);die();
-
         if ($checkOK == 1) {
             $sql = "update role set name=?, outside=?, sort_order=?, invalid=?, inuser=? where no=?";
             $stmt = $conn->prepare($sql);
@@ -74,10 +72,10 @@
 
             $stmt->execute();
 
-            if (!empty($menu)) {
+         if (!empty($menu)) {
                 $imMenu = implode(",",$menu);
                 
-                // Lấy những Id menu đã xóa
+                // get id menu deleted
                 $sql = "SELECT menu FROM role_menu WHERE menu not in ($imMenu) and role=$no";
                 $query = mysqli_query($conn, $sql) or die ('エラーが発生しました。もう一度お試しください。');
 
@@ -87,7 +85,7 @@
                     array_push($idDelArr, $row["menu"]);
                 }
 
-                // Lấy những Id menu đã tồn tại
+                // get id menu existed
                 $sql = "SELECT menu FROM role_menu WHERE menu in ($imMenu) and role=$no";
                 $query = mysqli_query($conn, $sql) or die ('エラーが発生しました。もう一度お試しください。');
 
@@ -97,7 +95,7 @@
                     array_push($idInsArr, $row["menu"]);
                 }
 
-                // Thực hiện xóa bỏ những id menu đã xóa
+                // delete id menu deleted
                 $idDel= implode(",",$idDelArr);
                 $sqlDel = "DELETE from role_menu where menu in (?) and role=?";
                 $stmtDel = $conn->prepare($sqlDel);
@@ -106,7 +104,7 @@
                     $stmtDel->execute();
                 }
 
-                // Thêm mới những id menu chưa tồn tại, những id menu nào tồn tại rồi không thêm vào nữa
+                // add id menu not exist, existed is not added
                 $sqlIns = "INSERT INTO role_menu(role, menu, inuser) VALUES(?,?,?)";
                 $stmtIns = $conn->prepare($sqlIns);
                 foreach($idInsArr as $key){
@@ -122,7 +120,7 @@
                 $stmtDel->close();
                 $stmtIns->close();
             } else {
-                // Xóa bỏ tất cả id menu
+                // delete all id menu
                 $del = "delete from role_menu where role=?";
                 $stmDel = $conn->prepare($del);
                 $stmDel->bind_param('i', $no);
