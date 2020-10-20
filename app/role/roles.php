@@ -14,10 +14,51 @@
     $searchOutSide = "";
     $status = 0;
     $join = "";
-print_r($_SESSION['status']);
-    if($_SERVER['REQUEST_METHOD'] == 'POST' || !empty($_SESSION['menu']) || !empty($_SESSION['outSide']) || !empty($_SESSION['status'])) {
+    
+    if(isset($_SESSION['search']) && count($_SESSION['search'])>0) {
+        // print_r($_SESSION['search']);
+        $menu = isset($_SESSION['search']["menu"]) ? $_SESSION['search']["menu"] : '';
+        $outSide = isset($_SESSION['search']["outSide"]) ? $_SESSION['search']["outSide"] : '';
+        $status = isset($_SESSION['search']["status"]) ? $_SESSION['search']["status"] : 0;
+
+        if(!empty($menu)){
+            $searchMenu = "role_menu.menu = $menu ";
+            $join = "inner join role_menu on role.no = role_menu.role ";
+        }
+
+        if(!empty($outSide)){
+            if ($outSide == 0){
+                $searchOutSide = "";
+            }
+            else {
+                $searchOutSide = "outside.no = $outSide ";
+            }
+        }
+
+        if (!empty($searchMenu) || !empty($searchOutSide)) {
+            if (!empty($searchMenu))
+            {
+                if(!empty($searchQuery))
+                {
+                    $searchQuery = $searchQuery." and ";
+                }
+                $searchQuery = $searchQuery.$searchMenu ;
+            }
+
+            if (!empty($searchOutSide))
+            {
+                if(!empty($searchQuery))
+                {
+                    $searchQuery = $searchQuery." and ";
+                }
+                $searchQuery = $searchQuery.$searchOutSide ;
+            }
+        }
+    }
+
+    if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $menu = isset($_POST["menu"]) ? $_POST["menu"] : '';
-        print_r($_SESSION['menu']);
+        // print_r($_SESSION['menu']);
         $outSide = isset($_POST["outSide"]) ? $_POST["outSide"] : '';
         $status = isset($_POST["status"]) ? $_POST["status"] : 0;
         $sortOrder = isset($_POST["sortOrder"]) ? $_POST["sortOrder"] : '';
@@ -76,9 +117,7 @@ print_r($_SESSION['status']);
         }
 
         // $_SESSION['menu'] = $menu;
-        $_SESSION['menu'] = $menu;
-        $_SESSION['outSide'] = $outSide;
-        $_SESSION['status'] = $status;
+        $_SESSION['search'] = array('menu' => $menu, 'outSide' => $outSide, 'status' => $status);
     }
 
     if ($status != 1) {
