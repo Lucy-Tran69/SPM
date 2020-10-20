@@ -1,7 +1,24 @@
 <?php
     include_once "html/header.inc";
     include_once "html/menu.inc";
+    include "getItemInventory.php";
 ?>
+<?php
+include "common/check_view_permission.php";
+$url = "inventory";
+check_view_permission($url);
+?>
+
+<style>
+  .title_nowrap_align_middle {
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: center;
+    }
+  #inventoryTable_paginate{
+    margin-left: 425px;
+  }
+</style>
 
 <!-- topic user -->
 <?php include "../../app/topics/list-topic-user.html"?>
@@ -9,18 +26,23 @@
 <input type="hidden" name="" id="page-name" value="在庫表">
 <div class="card card-default">
     <div class="card-body d-flex justify-content-center">
-        <form class="form-horizontal search-form col-lg-8 col-sm-12">
+        <form id="searchCommodity" class="form-horizontal search-form col-lg-8 col-sm-12">
             <div class="form-group row">
                 <label for="maker" class="col-sm-2 col-form-label text-right">メーカー</label>
                 <div class="col-sm-10">
                     <!-- select -->
                     <select id="maker" class="form-control">
-                        <option>選択</option>
-                        <option>メーカー 1</option>
-                        <option>メーカー 2</option>
-                        <option>メーカー 3</option>
-                        <option>メーカー 4</option>
-                        <option>メーカー 5</option>
+                      <option value="">選択</option>
+                      <?php
+                        if ($makerResultSet->num_rows > 0) {
+                          while ($row = $makerResultSet->fetch_assoc()) {
+                      ?>
+                      <option value="<?php echo $row['name']; ?>"><?php echo $row['name'];?>
+                      </option>
+                      <?php
+                            }
+                          }
+                      ?>
                     </select>
                 </div>
             </div>
@@ -42,83 +64,17 @@
     <div class="col-12">
       <div class="card">
         <!-- /.card-header -->
-        <div class="card-body">
-          <table id="noPriceInventoryTable" class="table table-bordered table-striped">
-            <thead>
+        <div class="card-body table-responsive">
+          <table id="inventoryTable" class="table table-bordered table-striped w-100">
+            <thead style="text-align: center;">
               <tr>
-                <th>区分</th>
-              <th>メーカー名</th>
-              <th>商品名(型番)</th>
-              <th>在庫(2020/08/30)</th>
+                <th class="title_nowrap_align_middle">区分</th>
+                <th class="title_nowrap_align_middle">メーカー名</th>
+                <th class="title_nowrap_align_middle">商品名(型番)</th>
+                <th id="inventoryTable-last-th" class="title_nowrap_align_middle">在庫</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>カラー</td>
-                <td>maker2</td>
-                <td>AX001</td>
-                <td>〇</td>
-              </tr>
-              <tr>
-                <td>モノクロ</td>
-                <td>maker2</td>
-                <td>BX001</td>
-                <td>〇</td>
-              </tr>
-              <tr>
-                <td>モノクロ</td>
-                <td>maker2</td>
-                <td>DX1234</td>
-                <td>〇</td>
-              </tr>
-              <tr>
-                <td>カラー</td>
-                <td>maker2</td>
-                <td>TT0000</td>
-                <td>〇</td>
-              </tr>
-              <tr>
-                <td>モノクロ</td>
-                <td>maker2</td>
-                <td>TT0000</td>
-                <td>〇</td>
-              </tr>
-              <tr>
-                <td>モノクロ</td>
-                <td>maker1</td>
-                <td>AB12345</td>
-                <td>〇</td>
-              </tr>
-              <tr>
-                <td>カラー</td>
-                <td>maker1</td>
-                <td>PX1200</td>
-                <td>△</td>
-              </tr>
-              <tr>
-                <td>モノクロ</td>
-                <td>maker3</td>
-                <td>CX001</td>
-                <td>リターン</td>
-              </tr>
-              <tr>
-                <td>カラー</td>
-                <td>maker1</td>
-                <td>PQ1200</td>
-                <td>リターン</td>
-              </tr>
-              <tr>
-                <td>カラー</td>
-                <td>maker2</td>
-                <td>AX001</td>
-                <td>〇</td>
-              </tr>
-              <tr>
-                <td>モノクロ</td>
-                <td>maker1</td>
-                <td>AB12345</td>
-                <td>リターン</td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -134,23 +90,45 @@
 <!-- topic user js -->
 <script type="text/javascript" src="../../app/refer/js/topic/topic-user.js"></script>
 
-<script>
+<script type="text/javascript">
     $(function () {
-        const noPriceInventoryTable = $('#noPriceInventoryTable');
-        var table1 = noPriceInventoryTable.DataTable({
-        'searching': false,
-        'ordering': false,
-        'info': false,
-        'lengthChange': false,
-        'language': {
-            "paginate": {
-            "previous": "前へ",
-            "next": "次へ"
-            }
-        }
+        const inventoryTable = $('#inventoryTable');
+        var table = $('#inventoryTable').DataTable({
+          'searching': false,
+          'ordering': false,
+          'info': false,
+          'lengthChange': false,
+          'serverSide': true,
+          'processing': true,
+          'columns':[
+          { data: 'print_type', "defaultContent": ""},
+          { data: 'maker', "defaultContent": ""},
+          { data: 'name', "defaultContent": ""},
+          { data: 'display', "defaultContent": ""}
+          ],
+          'ajax': {
+            url: 'inventory.php',
+            type: 'POST',
+            data: function (d) {
+              d.maker = $('#maker').val();
+              d.freeword = $('#freeword').val();
+              delete d.columns;
+            },
+            datatype: "json",
+          },
+          "drawCallback": function(settings) {
+            var response = settings.json;
+            if(response){
+              $('#inventoryTable-last-th').text('在庫 (' + response.newestDate + ')');    
+            }    
+          }
+        });
+
+        $('#searchCommodity').on('submit', function (e) {
+          e.preventDefault();
+          $('#inventoryTable').DataTable().ajax.reload();
         });
     });
-    
 </script>
 
 </body>

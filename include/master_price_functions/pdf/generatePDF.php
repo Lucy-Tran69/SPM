@@ -1,11 +1,16 @@
 <?php
 include_once('database/db.inc');
 require_once('libs/japanese.php');
-
+if (session_status() == PHP_SESSION_NONE) 
+{
+    session_start();
+}
 $invalid = isset($_POST["searchInvalid"])?$_POST["searchInvalid"]:null;
 $err_msg = "";
 $conn  = getConnection();
 $display=FALSE;
+$user = $_SESSION["loginUserId"];
+$cust="";
 if($conn->connect_error)
 {
     die("Failed to connect to database. ".$conn->connect_error);
@@ -28,6 +33,7 @@ if($conn->connect_error)
             $searchMaker = " and maker.no = ".$maker;
         }
         if(!empty($customer)){
+            $cust = $customer;
             $searchCustomer = " and customer.no = ".$customer;
         }
         if(!empty($support)){
@@ -55,53 +61,53 @@ if($conn->connect_error)
         }
     }
 $stmt;
-$result;
+$result="";
 if($invalid==null && !empty($searchCustomer))
 {
     $stmt = $conn->prepare("SELECT  distinct maker.name as maker,
-    commodity.name as code,
-    IF(commodity.green=1,'●','') as green,
-    '' as blank,
-    commodity.price as original,
-    a.price as sp,
-    commodity.num as qty,
-    commodity.printer_support as support,
-    commodity.note
-    from selling_price a
-    INNER JOIN commodity on a.commodity=commodity.no
-    INNER JOIN inventory on inventory.commodity=commodity.no
-    INNER JOIN maker on commodity.maker=maker.no
-    INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
-    INNER JOIN print_type on print_type.no=commodity.print_type
-    INNER JOIN customer on a.customer=customer.no		
-    WHERE a.seq = (select max(seq) from selling_price WHERE approvalday IS NOT NULL".$searchCustomer.")
-    AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 AND inventory_mark.hidden=0 ".$searchQuery."
-    GROUP BY a.customer,a.commodity,a.num
-    ORDER BY code ASC");
+                        commodity.name as code,
+                        IF(commodity.green=1,'●','') as green,
+                        '' as blank,
+                        commodity.price as original,
+                        a.price as sp,
+                        commodity.num as qty,
+                        commodity.printer_support as support,
+                        commodity.note
+                        from selling_price a
+                        INNER JOIN commodity on a.commodity=commodity.no
+                        INNER JOIN inventory on inventory.commodity=commodity.no
+                        INNER JOIN maker on commodity.maker=maker.no
+                        INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
+                        INNER JOIN print_type on print_type.no=commodity.print_type
+                        INNER JOIN customer on a.customer=customer.no		
+                        WHERE a.seq = (select max(seq) from selling_price b WHERE (b.approvalday IS NOT NULL OR b.seq=0) ".$searchCustomer." )
+                        AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 AND inventory_mark.hidden=0".$searchQuery."
+                        GROUP BY a.customer,a.commodity,a.num
+                        ORDER BY code ASC");
     $result = execute($stmt,$conn);
 }
-else if(!empty($invalid) && !empty($searchCustomer))
+else if($invalid!==null && !empty($searchCustomer))
 {
     $stmt = $conn->prepare("SELECT  distinct maker.name as maker,
-    commodity.name as code,
-    IF(commodity.green=1,'●','') as green,
-    '' as blank,
-    commodity.price as original,
-    a.price as sp,
-    commodity.num as qty,
-    commodity.printer_support as support,
-    commodity.note
-    from selling_price a
-    INNER JOIN commodity on a.commodity=commodity.no
-    INNER JOIN inventory on inventory.commodity=commodity.no
-    INNER JOIN maker on commodity.maker=maker.no
-    INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
-    INNER JOIN print_type on print_type.no=commodity.print_type
-    INNER JOIN customer on a.customer=customer.no		
-    WHERE a.seq = (select max(seq) from selling_price WHERE ".$searchCustomer." AND approvalday IS NOT NULL)
-    AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 AND inventory_mark.hidden=0 ".$searchQuery."
-    GROUP BY a.customer,a.commodity,a.num
-    ORDER BY code ASC");
+                        commodity.name as code,
+                        IF(commodity.green=1,'●','') as green,
+                        '' as blank,
+                        commodity.price as original,
+                        a.price as sp,
+                        commodity.num as qty,
+                        commodity.printer_support as support,
+                        commodity.note
+                        from selling_price a
+                        INNER JOIN commodity on a.commodity=commodity.no
+                        INNER JOIN inventory on inventory.commodity=commodity.no
+                        INNER JOIN maker on commodity.maker=maker.no
+                        INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
+                        INNER JOIN print_type on print_type.no=commodity.print_type
+                        INNER JOIN customer on a.customer=customer.no		
+                        WHERE a.seq = (select max(seq) from selling_price b WHERE (b.approvalday IS NOT NULL OR b.seq=0) ".$searchCustomer." )
+                        AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 ".$searchQuery."
+                        GROUP BY a.customer,a.commodity,a.num
+                        ORDER BY code ASC");
     $result = execute($stmt,$conn);
 }
 
@@ -112,36 +118,161 @@ $result = $stmt->get_result();
 $resultSet = $result;
 } 
 
+$oldstmt = $conn->prepare("SELECT  distinct a.seq as SEQ,
+                    date(a.approvalday) as APDAY,
+                    date_add(date(a.approvalday),interval 1 day) as APDAY1
+                    from selling_price a
+                    INNER JOIN commodity on a.commodity=commodity.no
+                    INNER JOIN inventory on inventory.commodity=commodity.no
+                    INNER JOIN maker on commodity.maker=maker.no
+                    INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
+                    INNER JOIN print_type on print_type.no=commodity.print_type
+                    INNER JOIN customer on a.customer=customer.no		
+                    WHERE a.seq = (select max(seq) from selling_price b WHERE (b.approvalday IS NOT NULL OR b.seq=0) ".$searchCustomer." )
+                    AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 ".$searchQuery."");
+
+    $oldresult = execute($oldstmt,$conn);
+    if($oldresult==TRUE)
+    {
+        $oldresult = $oldstmt->get_result();
+        $oldresultSet = $oldresult;
+    }
+
+
+$name;
+$no;
+$tel;
+$cd;
+$address;
+$zip;
+$appDay;
+$appDay1;
+$seq;
+$fax;
+$customerStmt = $conn->prepare("select name,no,tel,cd,address,zip,fax from customer where no=".$cust);
+$customerResult = execute($customerStmt, $conn);
+if ($customerResult == TRUE) {
+    $customerResult = $customerStmt->get_result();
+    $customerResultSet = $customerResult;
+}
+
+while($row = $customerResultSet->fetch_assoc())
+{
+    $name=$row["name"];
+    $no=$row["no"];
+    $tel=$row["tel"];
+    $cd=$row["cd"];
+    $address=$row["address"];
+    $zip=$row["zip"];
+    $fax=$row["fax"];
+}
+
+while($row = $oldresultSet->fetch_assoc())
+{
+    $seq=$row["SEQ"];
+    $appDay=$row["APDAY"];
+    $appDay1=$row["APDAY1"];
+}
 class PDF extends PDF_Japanese
 {
-    public $tel;
+    var $tel;
+    var $name;
+    var $no;
+    var $cd;
     var $widths;
     var $aligns;
-    public function __construct($o,$custom) {
+    var $count;
+    var $address;
+    var $zip;
+    var $seq;
+    var $apday;
+    var $apday1;
+    var $fax;
+    public function __construct($o,$n,$num,$telp,$code,$address,$zip,$seq,$ap,$ap1,$fax) {
         parent::__construct($o);
-        $this->tel = $custom;
+        $this->name=$n;
+        $this->no=$num;
+        $this->tel = $telp;
+        $this->cd=$code;
+        $this->count=0;
+        $this->address=$address;
+        $this->zip=$zip;
+        $this->seq=$seq;
+        $this->apday=$ap;
+        $this->apday1=$ap1;
+        $this->fax=$fax;
     }
     function Header()
     {
-
-        $this->SetFont('SJIS','',14);
        
         //set 
         $this->SetTextColor(0,0,0);
 
         // 表のタイトル
-        $top = "在庫表";
-        $this->Cell(0, 10,mb_convert_encoding($top, 'SJIS'),0,0,'C', false);
-        $this->Ln();
-        $this->Cell(0, 10,mb_convert_encoding("エヌシーアイ販売(株)　CS業務担当", 'SJIS'),0,0,'R', false);
-        $this->Ln();
-        $this->Cell(0, 10,mb_convert_encoding("TEL :".$this->tel." FAX :".$this->tel, 'SJIS'),0,0,'R', false);
-        
-        //line break
-        $this->Ln();
-        $title = "在庫状況表示：　○/在庫あり　△/在庫少量　リターン/リターン再生対応";
-        $this->Cell(0, 10,mb_convert_encoding($title, 'SJIS'),0,0,'C', false);
-        
+        if($this->count==0)
+        {
+            $this->SetFont('SJIS','B',18);
+            $this->count=1;
+            $top = "価格表";
+            $this->Cell(0, 10,mb_convert_encoding($top, 'SJIS'),0,0,'C', false);
+            $this->SetFont('SJIS','',10 );
+            $this->Cell(0, 10,mb_convert_encoding("発行日: ".trim($this->apday), 'SJIS'),0,0,'R', false);
+            $this->Ln();
+            
+            $this->SetFont('SJIS','BU',13);
+            $this->Cell(0, 6,mb_convert_encoding(trim($this->name)."御中", 'SJIS'),0,0,'L', false);
+            $this->SetFont('SJIS','',10);
+            $this->Cell(-59, 6,mb_convert_encoding("神戸本社", 'SJIS'),0,0,'R', false);
+            $this->Ln();
+            
+            $this->Cell(0, 6,mb_convert_encoding("CODE              : [ ".substr(trim($this->cd),0,10)." ]  ", 'SJIS'),0,0,'L', false);
+            $this->Cell(-54, 6,mb_convert_encoding("〒651-1516", 'SJIS'),0,0,'R', false);
+            $this->Ln();
+
+            $this->Cell(0, 6,mb_convert_encoding("管理NO           : ".substr(trim($this->no.$this->seq),0,3), 'SJIS'),0,0,'L', false);
+            $this->Cell(-12, 6,mb_convert_encoding("兵庫県神戸市北区赤松台1丁目2番33号", 'SJIS'),0,0,'R', false);
+            $this->Ln();
+
+            $this->Cell(0, 6,mb_convert_encoding("適応日             : ".trim($this->apday1), 'SJIS'),0,0,'L', false);
+            $this->Cell(-7, 6,mb_convert_encoding("TEL : 078-986-0701 FAX : 078-986-0701", 'SJIS'),0,0,'R', false);
+            $this->Ln();
+
+            $this->Cell(0, 6,mb_convert_encoding("見積有効期限：次回発行までとなります", 'SJIS'),0,0,'L', false);
+            
+            $this->Cell(-56, 6,mb_convert_encoding("東京営業所", 'SJIS'),0,0,'R', false);
+            $this->Ln();
+
+            $this->Cell(0, 6,mb_convert_encoding("〒".trim($this->zip), 'SJIS'),0,0,'L', false);
+            $this->Cell(-54, 6,mb_convert_encoding("〒136-0072", 'SJIS'),0,0,'R', false);
+            $this->Ln();
+
+            $this->Cell(0, 6,mb_convert_encoding(trim($this->address), 'SJIS'),0,0,'L', false);
+            
+            $this->Cell(0, 6,mb_convert_encoding("東京都江東区大島2丁目31番8号　渡辺ビル2F", 'SJIS'),0,0,'R', false);
+            $this->Ln();
+
+            $this->Cell(0, 6,mb_convert_encoding("TEL : ".trim($this->tel)." FAX : ".trim($this->fax), 'SJIS'),0,0,'L', false);
+            $this->Cell(-6, 6,mb_convert_encoding("TEL : 03-3345-5651 FAX : 03-3345-5661", 'SJIS'),0,0,'R', false);
+            $this->Ln();
+
+            $this->SetFont('SJIS','',10);
+            $this->Line(80,30,116,30);//承認　担当
+            $this->Text(85,28.5,mb_convert_encoding("承認",'SJIS'));
+            $this->Text(103,28.5,mb_convert_encoding("担当",'SJIS'));
+            $this->Rect(80,25,18,25);
+            $this->Rect(98,25,18,25);
+            $this->SetFont('SJIS','',40);
+            $this->SetTextColor(255,0,0);
+            $this->SetAlpha(0.5);
+            $this->SetDrawColor(255,0,0);
+            $this->SetLineWidth(0.75);
+            $this->Text(168,40,mb_convert_encoding("印",'SJIS'));
+            $this->Rect(165,25,20,20);
+            $this->SetTextColor(0,0,0);
+            $this->SetAlpha(1);
+            $this->SetDrawColor(0,0,0);
+            $this->SetLineWidth(0.2);
+        }
         //line break
         $this->Ln();
         $this->SetFont('SJIS','B',8);
@@ -278,28 +409,95 @@ function NbLines($w,$txt)
     return $nl;
 }
 
+protected $extgstates = array();
+
+    // alpha: real value from 0 (transparent) to 1 (opaque)
+    // bm:    blend mode, one of the following:
+    //          Normal, Multiply, Screen, Overlay, Darken, Lighten, ColorDodge, ColorBurn,
+    //          HardLight, SoftLight, Difference, Exclusion, Hue, Saturation, Color, Luminosity
+    function SetAlpha($alpha, $bm='Normal')
+    {
+        // set alpha for stroking (CA) and non-stroking (ca) operations
+        $gs = $this->AddExtGState(array('ca'=>$alpha, 'CA'=>$alpha, 'BM'=>'/'.$bm));
+        $this->SetExtGState($gs);
+    }
+
+    function AddExtGState($parms)
+    {
+        $n = count($this->extgstates)+1;
+        $this->extgstates[$n]['parms'] = $parms;
+        return $n;
+    }
+
+    function SetExtGState($gs)
+    {
+        $this->_out(sprintf('/GS%d gs', $gs));
+    }
+
+    function _enddoc()
+    {
+        if(!empty($this->extgstates) && $this->PDFVersion<'1.4')
+            $this->PDFVersion='1.4';
+        parent::_enddoc();
+    }
+
+    function _putextgstates()
+    {
+        for ($i = 1; $i <= count($this->extgstates); $i++)
+        {
+            $this->_newobj();
+            $this->extgstates[$i]['n'] = $this->n;
+            $this->_put('<</Type /ExtGState');
+            $parms = $this->extgstates[$i]['parms'];
+            $this->_put(sprintf('/ca %.3F', $parms['ca']));
+            $this->_put(sprintf('/CA %.3F', $parms['CA']));
+            $this->_put('/BM '.$parms['BM']);
+            $this->_put('>>');
+            $this->_put('endobj');
+        }
+    }
+
+    function _putresourcedict()
+    {
+        parent::_putresourcedict();
+        $this->_put('/ExtGState <<');
+        foreach($this->extgstates as $k=>$extgstate)
+            $this->_put('/GS'.$k.' '.$extgstate['n'].' 0 R');
+        $this->_put('>>');
+    }
+
+    function _putresources()
+    {
+        $this->_putextgstates();
+        parent::_putresources();
+    }
+
 }
 
-$pdf = new PDF('P',1234567);
+$pdf = new PDF('P',$name,$no,$tel,$cd,$address,$zip,$seq,$appDay,$appDay1,$fax);
 $pdf->AddSJISFont();
 $pdf->AddPage();
 
-$pdf->SetFont('SJIS','',8);
-
+//line break
+// $pdf->Ln();
 //insert image
 // $pdf->Image('printer.jpg', 30, 0, 0, 50);
-
+$pdf->SetFont('SJIS','',8);
 //line break
 // $pdf->Ln();
 $pdf->SetWidths(array(22,22,22,22,22,22,22,22,22));
 //Fill data
-foreach ($result as $row) {
-    // foreach($row as $column)
-    // {
-    //     $pdf->MultiCell(22, 15, mb_convert_encoding($column, 'SJIS'), 1, 'C');
-    // }
-    // $pdf->Ln();
-    $pdf->Row(array($row["maker"],$row["code"],$row["green"],$row["blank"],$row["original"],$row["sp"],$row["qty"],$row["support"],$row["note"]));
+if($result==true)
+{
+    foreach ($result as $row) {
+        // foreach($row as $column)
+        // {
+        //     $pdf->MultiCell(22, 15, mb_convert_encoding($column, 'SJIS'), 1, 'C');
+        // }
+        // $pdf->Ln();
+        $pdf->aligns=array('L','L','C','L','R','R','C','L','L');
+        $pdf->Row(array($row["maker"],$row["code"],$row["green"],$row["blank"],$row["original"],$row["sp"],$row["qty"],$row["support"],$row["note"]));
+    }
 }
 
 $pdf->Output();

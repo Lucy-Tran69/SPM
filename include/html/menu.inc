@@ -23,7 +23,24 @@
       array_push($other_menu, $item);
     }
   } 
+?>
 
+<?php
+//setting menu icon
+
+$icon = array('users'            => '<i class="mr-2 nav-icon fas fa-users-cog"></i>',
+  			  'maker'			 => '<i class="mr-2 nav-icon fas fa-industry"></i>',
+  			  'commodity'		 => '<i class="mr-2 nav-icon fas fa-print"></i>',
+  			  'customer'		 => '<i class="mr-2 nav-icon far fa-building"></i>',
+  			  'role'			 => '<i class="mr-2 nav-icon fas fa-user-tag"></i>',
+  			  'inventory'		 => '<i class="mr-2 nav-icon fas fa-warehouse"></i>',
+  			  'price'            => '<i class="mr-2 nav-icon fas fa-yen-sign"></i>',
+  			  'topics'           => '<i class="mr-2 nav-icon fas fa-bullhorn"></i>',
+  			  'master_inventory' => '<i class="mr-2 nav-icon fas fa-laptop-house"></i>',
+  			  'master_price'	 => '<i class="mr-2 nav-icon far fa-clipboard"></i>',
+  			  'price_approval'   => '<i class="mr-2 nav-icon fas fa-stamp"></i>',
+			  'office'           => '<i class="mr-2 nav-icon fas fa-store-alt"></i>',
+			);
 ?>
 
 
@@ -38,7 +55,7 @@
 					<a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
 				</li>
 				<li class="nav-item d-none d-sm-inline-block">
-					<a href="#" class="nav-link">Home</a>
+					<a href="../" class="nav-link">ホーム</a>
 				</li>
 				<li class="nav-item d-none d-sm-inline-block">
 					<!-- <a href="#" class="nav-link">Contact</a> -->
@@ -55,7 +72,7 @@
 		<!-- Main Sidebar Container -->
 		<aside class="main-sidebar elevation-4  sidebar-dark-primary">
 			<!-- Brand Logo -->
-			<a href="/" class="brand-link">
+			<a href="../" class="brand-link">
 				<img src="../images/head_logo.png" alt="Logo" class="brand-image  elevation-3" style="opacity: .8">
 				<span class="brand-text font-weight-light">NCI</span>
 			</a>
@@ -78,8 +95,15 @@
 						<li class="nav-header">マスター管理</li>  
 						<?php foreach ($master_menu as $key => $value) { ?>  
 							<li class="nav-item">
-							<a href="<?php echo "../".$value["value"]."/"; ?>" class="nav-link">
-								<i class="nav-icon fas fa-angle-right"></i>
+							<a href="<?php echo "../".$value["value"]."/"; ?>" class="nav-link" id= "<?php echo $value["value"]; ?>">
+								<!-- <i class="nav-icon fas fa-angle-right"></i> -->
+								<?php
+								if (isset($icon[$value["value"]])) {
+									echo $icon[$value["value"]];
+								} else {
+									echo '<i class="mr-2 nav-icon fas fa-angle-right"></i>';
+								}
+								?>
 								<p>
 								<?php echo $value["display"]; ?>  
 								</p>
@@ -92,8 +116,15 @@
 						<li class="nav-header  pt-1">一般管理</li>  
 						<?php foreach ($other_menu as $key => $value) { ?>  
 							<li class="nav-item">
-							<a href="<?php echo "../".$value["value"]."/"; ?>" class="nav-link">
-								<i class="nav-icon fas fa-angle-right"></i>
+							<a href="<?php echo "../".$value["value"]."/"; ?>" class="nav-link" id= "<?php echo $value["value"]; ?>">
+								<!-- <i class="nav-icon fas fa-angle-right"></i> -->
+								<?php
+								if (isset($icon[$value["value"]])) {
+									echo $icon[$value["value"]];
+								} else {
+									echo '<i class="mr-2 nav-icon fas fa-angle-right"></i>';
+								}
+								?>
 								<p>
 								<?php echo $value["display"] ?>  
 								</p>
@@ -132,7 +163,7 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1 class="m-0 text-dark" id="d-page-name">Dashboard</h1>
+							<h1 class="m-0 text-dark" id="d-page-name"></h1>
 						</div><!-- /.col -->
 					</div><!-- /.row -->
 				</div><!-- /.container-fluid -->

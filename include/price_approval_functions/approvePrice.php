@@ -13,7 +13,7 @@ if ($conn->connect_error)
 {
     die("Failed to connect to database. " . $conn->connect_error);
 }
-$stmt = $conn->prepare("UPDATE selling_price SET approver=".$user.",approvalday=sysdate() 
+$stmt = $conn->prepare("UPDATE selling_price SET status=0, approver=".$user.",approvalday=sysdate(),upday=sysdate(),upuser=".$user." 
                                 WHERE customer=".$cust." AND commodity=".$commodity." AND seq=".$seq."");
 
 $result = execute($stmt,$conn);

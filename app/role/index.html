@@ -5,6 +5,20 @@
     check_view_permission($url);
     include_once "html/menu.inc";
     include_once "getNameMenu.php";
+
+    $menu = '';
+    $outSide = '';
+    $status = '';
+    if (!empty($_SESSION['menu'])) {
+        $menu = $_SESSION['menu'];
+    }
+     if (!empty($_SESSION['outSide'])) {
+        $outSide = $_SESSION['outSide'];
+    }
+     if (!empty($_SESSION['status'])) {
+        $status = $_SESSION['status'];
+    }
+    print_r($status);
 ?>
 
 <style type="text/css" media="all">
@@ -52,7 +66,7 @@
                     			<select name="menu" id="menu" class="form-control">
                     				<option value="">選択</option>
                     				<?php foreach ($result as $value){ ?>
-                    					<option value="<?php echo $value['no']; ?>"><?php echo $value['name']; ?></option>
+                    					<option value="<?php if(!empty($menu)) echo $value['no']; ?>"><?php echo $value['name']; ?></option>
                     				<?php }?>
                     			</select>
                     		</div>
@@ -79,7 +93,12 @@
                     		</div>
                     		<div class="col-sm-9">
                     			<div class="custom-control custom-checkbox">
+                                    <?php if (!empty($status)) { ?>
+                                        <input type="checkbox" name="status" class="custom-control-input" id="status" value="<?php echo $status; ?>" checked/>
+                                    <?php }
+                                    else { ?>
                     				<input type="checkbox" name="status" class="custom-control-input" id="status" value="1" />
+                                    <?php } ?>
                     				<label class="custom-control-label font-weight-normal" for="status">無効を含む</label>
                     			</div>
                     		</div>

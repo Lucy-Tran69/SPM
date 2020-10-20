@@ -21,19 +21,6 @@ $(function () {
         $('#openDay').datetimepicker('maxDate', e.date);
     });
 
-    // /*add method validate date format*/
-    // $.validator.addMethod('dateFormat', function (value, element) {
-    //         let regEx = /^\d{4}-\d{2}-\d{2}$/;
-    //         if (!value.match(regEx)) return false;
-
-    //         let inputDate = new Date(value);
-    //         let currentDate = new Date();
-
-    //         if (!inputDate.getTime() && inputDate.getTime() !== 0) return false;
-
-    //         return inputDate.toISOString().slice(0, 10) === value;
-    //     }, 'Please enter a date in the format yyyy-mm-dd.');
-
     $.validator.addMethod("accept", function (value, element, param) {
 
         var typeParam = typeof param === "string" ? param.replace(/\s/g, "") : "image/*",
@@ -142,6 +129,7 @@ $(function () {
                 //check response is blank if success 
                 if (!$.trim(response)) {
                     window.location.href = "index.html";
+                    $(window).scrollTop(0);
                 }
                 // if error
                 else {
@@ -262,10 +250,6 @@ function onBtnclick() {
     }
 }
 
-function redirectListTopic() {
-    window.location.href = "index.html";
-}
-
 function fileValidation() {
     var fileInput = document.getElementById('imgFile');
     var filePath = fileInput.value;
@@ -286,7 +270,6 @@ function fileValidation() {
         }
     }
 }
-
 
 function noscript(strCode) {
     var html = $(strCode.bold());

@@ -24,7 +24,7 @@
             <form action="" role="form" id="addRole" method="POST" novalidate="novalidate">
                 <div class="card-body">
                     <div class="form-group">
-                        <label for="roleName">権限名</label>
+                        <label for="roleName required">権限名</label>
                         <input type="text" name="roleName" class="form-control" id="roleName" placeholder="権限名">
                     </div>
                     <div class="form-group">
@@ -102,7 +102,7 @@
                 <div class="card-footer">
                     <div class="row justify-content-md-center">
                         <button type="submit" class="btn btn-primary">追加</button>
-                        <button type="button" class="btn btn-default" style="margin-left: 20px;" onclick="redirectListRole()">戻る</button>
+                        <input type="button" value="戻る" class="btn btn-default" onclick="javascript:window.history.back();" style="margin-left: 20px;"/>
                     </div>
                 </div>
             </form>

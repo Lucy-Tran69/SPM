@@ -22,6 +22,10 @@ header("content-type: text/html; charset=UTF-8");
   text-align:-webkit-center;
 }
 
+.showPointer{
+    cursor:pointer;
+  }
+
 .tableFixHead {
   overflow-y: auto;
   height: 500px;
@@ -57,7 +61,7 @@ if (isset($_SESSION["loginAccount"])) {
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1 class="m-0 text-dark" id="d-page-name">マスター管理　ユーザ管理</h1>
+							<h1 class="m-0 text-dark" id="d-page-name">カートリッジ管理</h1>
 						</div><!-- /.col -->
 					</div><!-- /.row -->
 				</div><!-- /.container-fluid -->
@@ -119,17 +123,18 @@ if (isset($_SESSION["loginAccount"])) {
                     <div class="form-group">
                     <div class="row">
                     <div class="offset-sm-2 col-sm-10">
-                    <div class="checkbox">
-                    <label id="checkLabel" class="col-sm-2 col-form-label text-right">
-                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="<?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>" <?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>/>
-                    無効を含む
+                    <div class="form-check">
+                    <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" value="<?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>" <?php if(isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>/>
+                    <label id="checkLabel" class="showPointer" onclick="toggleInvalid();" >無効を含む
                     </label>
                     </div>
                     </div>
                     </div>
                     </div>
-                <input type="submit" value="検索" class="btn btn-primary" style="width: 100px; margin-left: 250px;">
-                <button type="button" value="" class="btn btn-info" style="width: 100px; margin-left: 250px;" data-target="#insert" data-toggle="modal"><i class="fas fa-plus"></i>&nbsp;追加</button>
+                    <div class="offset-sm-4">
+                      <input type="submit" value="検索" class="btn btn-primary" style="width: 100px;">
+                      <button type="button" value="" class="btn btn-info" style="width: 100px; margin-left: 250px;" data-target="#insert" data-toggle="modal"><i class="fas fa-plus"></i>&nbsp;追加</button>
+                    </div>
               </form>
               </div>
             </div>
@@ -142,8 +147,8 @@ if (isset($_SESSION["loginAccount"])) {
                   <tr>
                     <th>商品コード</th>
                     <th>商品名</th>
-                    <th>メーカー</th>
-                    <th>メモ</th>
+                    <th>メーカ名</th>
+                    <th>備考欄</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -156,12 +161,12 @@ if (isset($_SESSION["loginAccount"])) {
                         <td><?php echo $row["code"] ?></td>
                         <td><?php echo $row["name"] ?></td>
                         <td><?php echo $row["maker"] ?></td>
-                        <td><?php echo $row["memo"] ?></td>
+                        <td><?php echo $row["note"] ?></td>
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
                         <td style="display: none;"><?php echo $row["type"] ?></td>
-                        <td class="align_button">
+                        <td class="align_button" style="min-width: 250px;">
                             <button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"><i class="fas fa-pencil-alt"></i>&nbsp;変更</button>
-                            <button class="btn btn-warning" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModalCopy(this.id);" data-toggle="modal" data-target="#copy"><i class="fas fa-copy"></i>&nbsp;コーピー</button>
+                            <button class="btn btn-warning" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModalCopy(this.id);" data-toggle="modal" data-target="#copy"><i class="fas fa-copy"></i>&nbsp;コピー</button>
                         </td>
                       </tr>
                   <?php
@@ -235,7 +240,7 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
-                <td><input type="text" id="inputPrice" name="inputPrice" required/>円</td>
+                <td><input type="text" id="inputPrice" name="inputPrice" required/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
@@ -268,8 +273,8 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="Submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          <button type="Submit" class="btn btn-primary">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -328,7 +333,7 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
-                <td><input type="text" id="copyPrice" name="copyPrice" required/>円</td>
+                <td><input type="text" id="copyPrice" name="copyPrice" required/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
@@ -361,8 +366,8 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="Submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          <button type="Submit" class="btn btn-primary">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -421,7 +426,7 @@ if (isset($_SESSION["loginAccount"])) {
               </tr>
               <tr>
                 <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
-                <td><input type="text" id="insertPrice" name="insertPrice" required/>円</td>
+                <td><input type="text" id="insertPrice" name="insertPrice" required/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
@@ -454,8 +459,8 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="Submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          <button type="Submit" class="btn btn-primary">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -477,10 +482,11 @@ if (isset($_SESSION["loginAccount"])) {
   var regexAlnum = new RegExp("^[a-zA-Z0-9]+$");
   var regexJapanese = /[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]/g;
   // var regexJapaneseAlnum = /[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]|[\u0030-\u0039]|[\u0041-\u005A]|[\u0061-\u007A]/g; 
-  var pHiragana = "[\\u3041-\\u3096\\u309D-\\u309F]|\\uD82C\\uDC01|\\uD83C\\uDE00";
-  var pKatakana = "[\\u30A1-\\u30FA\\u30FD-\\u30FF\\u31F0-\\u31FF\\u32D0-\\u32FE\\u3300-\\u3357\\uFF66-\\uFF6F\\uFF71-\\uFF9D]|\\uD82C\\uDC00";
-  var pHan = "[\\u2E80-\\u2E99\\u2E9B-\\u2EF3\\u2F00-\\u2FD5\\u3005\\u3007\\u3021-\\u3029\\u3038-\\u303B\\u3400-\\u4DB5\\u4E00-\\u9FD5\\uF900-\\uFA6D\\uFA70-\\uFAD9]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1]|\\uD87E[\\uDC00-\\uDE1D]";
-  var regexJapaneseAlnum = new RegExp("^([\\w-]|" + pHiragana + "|" + pKatakana + "|" + pHan + ")+$");
+  // var pPunctuation = "[\\x3000-\\x303F]";
+  // var pHiragana = "[\\u3041-\\u3096\\u309D-\\u309F]|\\uD82C\\uDC01|\\uD83C\\uDE00";
+  // var pKatakana = "[\\u30A1-\\u30FA\\u30FD-\\u30FF\\u31F0-\\u31FF\\u32D0-\\u32FE\\u3300-\\u3357\\uFF66-\\uFF6F\\uFF71-\\uFF9D]|\\uD82C\\uDC00";
+  // var pHan = "[\\u2E80-\\u2E99\\u2E9B-\\u2EF3\\u2F00-\\u2FD5\\u3005\\u3007\\u3021-\\u3029\\u3038-\\u303B\\u3400-\\u4DB5\\u4E00-\\u9FD5\\uF900-\\uFA6D\\uFA70-\\uFAD9]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1]|\\uD87E[\\uDC00-\\uDE1D]";
+  var regexJapaneseAlnum = new RegExp("/[一-龠]+|[ぁ-ゔ]+|[ァ-ヴー]+|[a-zA-Z0-9]+|[ａ-ｚＡ-Ｚ０-９]+|[々〆〤]+/u");
   function openModal(cartid) {
     $.ajax({
       url: "../../include/commodity_functions/getSelectedCommodity.php",
@@ -584,26 +590,26 @@ function validateUpdate()
   {
     flag=false;
     $("#alertInputFail").show();
-    $("#alertInputFailText").text('Name contains invalid characters'); 
+    $("#alertInputFailText").text('商品名に無効な文字が含まれています'); 
   }
   if((new TextEncoder().encode(name)).length>=1024)
   {
     flag=false;
     $("#alertInputFail").show();
-    $("#alertInputFailText").text('Name is too long'); 
+    $("#alertInputFailText").text('商品名が長すぎます'); 
   }
 
   if(regexJapaneseAlnum.test(code.value)==false)
   {
     flag=false;
     $("#alertInputFail").show();
-    $("#alertInputFailText").text('Code contains invalid characters'); 
+    $("#alertInputFailText").text('商品コードに無効な文字が含まれています'); 
   }
   if((new TextEncoder().encode(code)).length>=128)
   {
     flag=false;
     $("#alertInputFail").show();
-    $("#alertInputFailText").text('Code is too long'); 
+    $("#alertInputFailText").text('商品コードが長すぎます'); 
   }
 
   var x = price.value;
@@ -611,13 +617,13 @@ function validateUpdate()
   {
     flag=false;
     $("#alertInputFail").show();
-    $("#alertInputFailText").text('Price contains invalid characters'); 
+    $("#alertInputFailText").text('参考価格に無効な文字が含まれています'); 
   }
   if((new TextEncoder().encode(price)).length>=218)
   {
     flag=false;
     $("#alertInputFail").show();
-    $("#alertInputFailText").text('Price is too long'); 
+    $("#alertInputFailText").text('参考価格が長すぎます'); 
   }
 
   if(printers!=null && printers!="")
@@ -626,7 +632,7 @@ function validateUpdate()
     {
       flag=false;
       $("#alertInputFail").show();
-      $("#alertInputFailText").text('Printer support is too long'); 
+      $("#alertInputFailText").text('対応プリンタが長すぎます'); 
     }
   }
 
@@ -636,7 +642,7 @@ function validateUpdate()
     {
       flag=false;
       $("#alertInputFail").show();
-      $("#alertInputFailText").text('Note is too long'); 
+      $("#alertInputFailText").text('備考欄が長すぎます'); 
     }
   }
 
@@ -647,7 +653,7 @@ function validateUpdate()
       var x = (new TextEncoder().encode(memo)).length;
       flag=false;
       $("#alertInputFail").show();
-      $("#alertInputFailText").text('Memo is too long'); 
+      $("#alertInputFailText").text('メモが長すぎます'); 
     }
   }
 
@@ -667,39 +673,39 @@ function validateInsert()
   {
     flag=false;
     $("#alertInsertFail").show();
-    $("#alertInsertFailText").text('Name contains invalid characters'); 
+    $("#alertInsertFailText").text('商品名に無効な文字が含まれています'); 
   }
   if((new TextEncoder().encode(name)).length>=1024)
   {
     flag=false;
     $("#alertInsertFail").show();
-    $("#alertInsertFailText").text('Name is too long'); 
+    $("#alertInsertFailText").text('商品名が長すぎます'); 
   }
 
   if(regexJapaneseAlnum.test(code.value)==false)
   {
     flag=false;
     $("#alertInsertFail").show();
-    $("#alertInsertFailText").text('Code contains invalid characters'); 
+    $("#alertInsertFailText").text('商品コードに無効な文字が含まれています'); 
   }
   if((new TextEncoder().encode(code)).length>=128)
   {
     flag=false;
     $("#alertInsertFail").show();
-    $("#alertInsertFailText").text('Code is too long'); 
+    $("#alertInsertFailText").text('商品コードが長すぎます'); 
   }
 
   if(regexJapaneseAlnum.test(price.value)==false)
   {
     flag=false;
     $("#alertInsertFail").show();
-    $("#alertInsertFailText").text('Price contains invalid characters'); 
+    $("#alertInsertFailText").text('参考価格に無効な文字が含まれています'); 
   }
   if((new TextEncoder().encode(price)).length>=218)
   {
     flag=false;
     $("#alertInsertFail").show();
-    $("#alertInsertFailText").text('Price is too long'); 
+    $("#alertInsertFailText").text('参考価格が長すぎます'); 
   }
 
   if(printers!=null && printers!="")
@@ -708,7 +714,7 @@ function validateInsert()
     {
       flag=false;
       $("#alertInsertFail").show();
-      $("#alertInsertFailText").text('Printer support is too long'); 
+      $("#alertInsertFailText").text('対応プリンタが長すぎます'); 
     }
   }
 
@@ -718,7 +724,7 @@ function validateInsert()
     {
       flag=false;
       $("#alertInsertFail").show();
-      $("#alertInsertFailText").text('Note is too long'); 
+      $("#alertInsertFailText").text('備考欄が長すぎます'); 
     }
   }
 
@@ -729,7 +735,7 @@ function validateInsert()
       var x = (new TextEncoder().encode(memo)).length;
       flag=false;
       $("#alertInsertFail").show();
-      $("#alertInsertFailText").text('Memo is too long'); 
+      $("#alertInsertFailText").text('メモが長すぎます'); 
     }
   }
 
@@ -749,39 +755,39 @@ function validateCopy()
   {
     flag=false;
     $("#alertCopyFail").show();
-    $("#alertCopyFailText").text('Name contains invalid characters'); 
+    $("#alertCopyFailText").text('商品名に無効な文字が含まれています'); 
   }
   if((new TextEncoder().encode(name)).length>=1024)
   {
     flag=false;
     $("#alertCopyFail").show();
-    $("#alertCopyFailText").text('Name is too long'); 
+    $("#alertCopyFailText").text('商品名が長すぎます'); 
   }
 
   if(regexJapaneseAlnum.test(code.value)==false)
   {
     flag=false;
     $("#alertCopyFail").show();
-    $("#alertCopyFailText").text('Code contains invalid characters'); 
+    $("#alertCopyFailText").text('商品コードに無効な文字が含まれています'); 
   }
   if((new TextEncoder().encode(code)).length>=128)
   {
     flag=false;
     $("#alertCopyFail").show();
-    $("#alertCopyFailText").text('Code is too long'); 
+    $("#alertCopyFailText").text('商品コードが長すぎます'); 
   }
 
   if(regexJapaneseAlnum.test(price.value)==false)
   {
     flag=false;
     $("#alertCopyFail").show();
-    $("#alertCopyFailText").text('Price contains invalid characters'); 
+    $("#alertCopyFailText").text('参考価格に無効な文字が含まれています'); 
   }
   if((new TextEncoder().encode(price)).length>=218)
   {
     flag=false;
     $("#alertCopyFail").show();
-    $("#alertCopyFailText").text('Price is too long'); 
+    $("#alertCopyFailText").text('参考価格が長すぎます'); 
   }
 
   if(printers!=null && printers!="")
@@ -790,7 +796,7 @@ function validateCopy()
     {
       flag=false;
       $("#alertCopyFail").show();
-      $("#alertCopyFailText").text('Printer support is too long'); 
+      $("#alertCopyFailText").text('対応プリンタが長すぎます'); 
     }
   }
 
@@ -800,7 +806,7 @@ function validateCopy()
     {
       flag=false;
       $("#alertCopyFail").show();
-      $("#alertCopyFailText").text('Note is too long'); 
+      $("#alertCopyFailText").text('備考欄が長すぎます'); 
     }
   }
 
@@ -811,43 +817,15 @@ function validateCopy()
       var x = (new TextEncoder().encode(memo)).length;
       flag=false;
       $("#alertCopyFail").show();
-      $("#alertCopyFailText").text('Memo is too long'); 
+      $("#alertCopyFailText").text('メモが長すぎます'); 
     }
   }
 
   return flag;
 }
 
-// var format = function(num)
-// {
-// 	var str = num.toString().replace("$", ""), parts = false, output = [], i = 1, formatted = null;
-// 	if(str.indexOf(".") > 0) 
-//   {
-// 		parts = str.split(".");
-// 		str = parts[0];
-// 	}
-// 	str = str.split("").reverse();
-// 	for(var j = 0, len = str.length; j < len; j++) 
-//   {
-// 		if(str[j] != ",") {
-// 			output.push(str[j]);
-// 			if(i%3 == 0 && j < (len - 1)) {
-// 				output.push(",");
-// 			}
-// 			i++;
-// 		}
-// 	}
-// 	formatted = output.reverse().join("");
-// 	return("￥" + formatted + ((parts) ? "." + parts[1].substr(0, 2) : ""));
-// };
-// $(function(){
-//     $("#inputPrice").blur(function(e){
-//         $(this).val(format($(this).val()));
-//     });
-// });
-// $(function(){
-//     $("#inputPrice").focus(function(e){
-//         $(this).val($(this).val().replace(/[￥,]/g,''));
-//     });
-// });
+function toggleInvalid()
+{
+  $("#searchInvalid").click();
+}
 </script>

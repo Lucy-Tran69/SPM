@@ -14,7 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
     $upday = date('Y-m-d H:i:s');
 	$id = $_POST["id"];
 	$cd = $_POST["cd"];
-   	$checkOK = 1;
+	$checkOK = 1;
+	$cd = removeWhitespaceAtBeginAndEndOfString($_POST["cd"]);
+	$cd = mysqli_real_escape_string($conn, $cd);
    	if (empty($cd)) {
 		   $msg->error('取引先コードを入力してください。');
     	$checkOK = 0;
@@ -23,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 		  $msg->error('取引先コードは8文字以内で入力してください。');
     	$checkOK = 0;
   	} else {
-	    $cd = test_input($_POST["cd"]);
+	    $cd = removeWhitespaceAtBeginAndEndOfString($_POST["cd"]);
 	    // check if name only contains letters and whitespace
 	    if (!preg_match("/^[a-z A-Z 0-9]*$/",$cd)) {
 			$msg->error('数字・文字のみ（特殊文字を含めない）を入力してください。');
@@ -31,7 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
     	}
   	}
 
-  	$name = $_POST["name"];
+	$name = $_POST["name"];
+	$name = removeWhitespaceAtBeginAndEndOfString($_POST["name"]);
+	$name = mysqli_real_escape_string($conn, $name);
   	if (empty($name)) {
 		  $msg->error('取引先名を入力してください。');
     	$checkOK = 0;
@@ -40,7 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
   		$checkOK = 0;
   	}
 
-  	$tel = $_POST["tel"];
+	$tel = $_POST["tel"];
+	$tel = removeWhitespaceAtBeginAndEndOfString($_POST["tel"]);
+	$tel = mysqli_real_escape_string($conn, $tel);
   	if (empty($tel)) {
 		  $msg->error('電話番号を入力してください。');
     	$checkOK = 0;
@@ -49,7 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
   		$checkOK = 0;
   	}
 
-  	$zip = $_POST["zip"];
+	$zip = $_POST["zip"];
+	$zip = removeWhitespaceAtBeginAndEndOfString($_POST["zip"]);
+	$zip = mysqli_real_escape_string($conn, $zip);
   	if (empty($zip)) {
 		  $msg->error('郵便番号を入力してください。');
     	$checkOK = 0;
@@ -58,7 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
   		$checkOK = 0;
   	}
 
-  	$address = $_POST["address"];
+	$address = $_POST["address"];
+	$address = removeWhitespaceAtBeginAndEndOfString($_POST["address"]);
+	$address = mysqli_real_escape_string($conn, $address);
   	if (empty($address)) {
 		  $msg->error('住所を入力してください。');
     	$checkOK = 0;
@@ -67,7 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
   		$checkOK = 0;
   	}
 
-  	$charge = $_POST["charge"];
+	$charge = $_POST["charge"];
+	$charge = removeWhitespaceAtBeginAndEndOfString($_POST["charge"]);
+	$charge = mysqli_real_escape_string($conn, $charge);
   	if (empty($charge)) {
 		  $msg->error('担当者名を入力してください。');
     	$checkOK = 0;
@@ -76,8 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
   		$checkOK = 0;
   	}
 
-  	$sale = $_POST["sale"];
-  	if (empty($sale)) {
+  	$sales = $_POST["sale"];
+  	if (empty($sales)) {
 		  $msg->error('営業担当を選択してください。');
     	$checkOK = 0;
   	}
@@ -86,7 +98,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
   	if (empty($supervisor)) {
 		$msg->error('承認者を選択してください。');
     	$checkOK = 0;
-  	}
+	  }
+	  
+	$displaylimit = isset($_POST["displaylimit"]) ? $_POST["displaylimit"] : 1;
 
   	$invalid = isset($_POST["invalid"]) ? $_POST["invalid"] : 0;
 
@@ -101,13 +115,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
     }
 
   	if ($checkOK == 1) {
-	    $sql = "update customer set cd = '$cd', name = '$name', tel = '$tel', zip = '$zip', address = '$address', charge = '$charge', sales = $sale, supervisor = $supervisor, invalid= $invalid, 
-	    			upday =  '$upday' , upuser = $insert_user 
-	      			where no = $id";
-	    if (mysqli_query($conn, $sql)) {
+	    $sql = "UPDATE customer SET cd = ?, name = ?, tel = ?, zip = ?, address = ?, charge = ?, sales = ?, supervisor = ?, invalid= ?,
+	    			upuser = ?, displaylimit = ?, upday = ?
+					WHERE no = ?";
+
+		$stmt = $conn->prepare($sql);
+
+		$stmt->bind_param('ssssssiiiiisi', $cd, $name, $tel, $zip, $address, $charge, $sales, $supervisor, $invalid, $insert_user, $displaylimit, $upday, $id);
+
+		$stmt->execute();
+		// print_r($stmt); die();
+
+	    if (!($stmt->error)) {
 		  $msg->success('取引先編集に成功しました。');
 	    } else {
-			if(mysqli_error($conn)){
+			if($stmt->error){
 				$msg->error('取引先の更新時にエラーが発生しました。もう一度お試しください。');
 				$msg->display();
 			}
@@ -119,9 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
 $conn->close();
 
-function test_input($data) {
+function removeWhitespaceAtBeginAndEndOfString($data) {
   $data = trim($data);
   $data = stripslashes($data);
-  $data = htmlspecialchars($data);
   return $data;
 }

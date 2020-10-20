@@ -148,7 +148,7 @@ if (isset($_SESSION["loginAccount"])) {
                     if ($resultSet->num_rows > 0) {
                       while ($row = $resultSet->fetch_assoc()) {
                     ?>
-                        <tr id="<?php echo $i; ?>">
+                        <tr id="<?php echo $i; ?>" style="<?php echo $row["mark"]==5?"background-color: yellow;":""?>">
                           <td style="display: none;"><?php echo $row["id"]; ?></td>
                           <td><?php echo $row["mName"] ?></td>
                           <td><?php echo $row["cName"] == null ? $markNew : $row["cName"] ?></td>
@@ -354,4 +354,14 @@ if (isset($_SESSION["loginAccount"])) {
   function generatecsv() {
     document.getElementById('csvForm').submit();
   }
+
+  $("#searchInvalid").change(function(){
+    if ($(this).checked) {
+      $("#searchInventory").attr('disabled',true);
+    }
+    else
+    {
+      $("#searchInventory").attr('disabled',false);
+    }
+  });
 </script>

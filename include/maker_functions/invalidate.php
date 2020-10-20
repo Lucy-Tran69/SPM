@@ -27,7 +27,7 @@ if($status=="OK")
     $result = execute($stmt, $conn);
     if ($result) 
     {
-        $msg = "Set as invalid";
+        $msg = "無効にしました。";
         //header("Location: ../../app/maker/");  
     } else 
     {

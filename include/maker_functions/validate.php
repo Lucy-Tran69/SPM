@@ -4,7 +4,6 @@ if (session_status() == PHP_SESSION_NONE)
     session_start();
 }
 include_once "database/db.inc";
-include_once "template/FlashMessages.php";
 $msg = "";
 $status = "OK";
 if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
@@ -28,8 +27,7 @@ if($status=="OK")
     $result = execute($stmt,$conn);
     if($result)
     {
-        $msg="Success";
-        //header("Location: ../../app/maker/");  
+        $msg="有効にしました。";
     }
     else
     {

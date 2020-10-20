@@ -21,6 +21,10 @@ header("content-type: text/html; charset=UTF-8");
     text-align: -webkit-center;
   }
 
+  .showPointer{
+    cursor:pointer;
+  }
+
 /* .tableFixHead {
   overflow-y: auto;
   height: 500px;
@@ -55,7 +59,7 @@ if (isset($_SESSION["loginAccount"])) {
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1 class="m-0 text-dark" id="d-page-name">マスター管理　メーカ管理</h1>
+							<h1 class="m-0 text-dark" id="d-page-name">メーカ管理</h1>
 						</div><!-- /.col -->
 					</div><!-- /.row -->
 				</div><!-- /.container-fluid -->
@@ -70,16 +74,13 @@ if (isset($_SESSION["loginAccount"])) {
               <!-- /.card-header -->
               <div class="card-body">
                 <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm">
-                  <div class="form-group">
-                    <div class="row">
-                      <div class="col-xs-5">
                         <div class="form-group">
                           <div class="row">
                             <div class="col-xs-5">
                               <div class="form-check">
                                 <div style="margin-left: 25px;">
                                   <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" onchange="searchTableByInvalid();" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?> />
-                                  <label id="checkLabel" class="form-check-label"><b>無効を含む</b></label>
+                                  <label id="checkLabel" class="form-check-label showPointer" onclick="$('#searchInvalid').click();"><b>無効を含む</b></label>
                                 </div>
                               </div>
                             </div>
@@ -90,7 +91,7 @@ if (isset($_SESSION["loginAccount"])) {
               <table id="details_table" class="table table-bordered">
                 <thead>
                   <tr>
-                    <th>no</th>
+                    <th style="display: none;">no</th>
                     <th>メーカ名</th>
                     <th>状態</th>
                     <th></th>
@@ -102,7 +103,7 @@ if (isset($_SESSION["loginAccount"])) {
                     while ($row = $resultSet->fetch_assoc()) {
                   ?>
                       <tr>
-                        <td><?php echo $row["no"] ?></td>
+                        <td style="display: none;"><?php echo $row["no"] ?></td>
                         <td><input type="text" id="<?php echo $row["no"] . "Name" ?>" value="<?php echo $row["name"] ?>" class="form-control"></td>
                         <td><?php
                             if ($row["invalid"] == 0) {
@@ -126,12 +127,10 @@ if (isset($_SESSION["loginAccount"])) {
                   // freeConnection($conn);
                   ?>
                   <tr>
-                    <td></td>
                     <td><input type="text" name="newMakerName" id="newMakerName" value="" class="form-control"></td>
                     <td></td>
                     <td class="align_button"><button class="btn btn-info" type="button" id="addNewMaker" value="" onclick="addNew();"><i class="fas fa-plus"></i>&nbsp;追加</button></td>
                   </tr>
-
                 </tbody>
               </table>
               <!-- /.card-footer-->
@@ -147,7 +146,6 @@ if (isset($_SESSION["loginAccount"])) {
 
   </body>
   <?php include "html/footer.inc" ?>
-
   </html>
 <?php
 } else {

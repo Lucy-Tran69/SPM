@@ -21,6 +21,10 @@ header("content-type: text/html; charset=UTF-8");
     text-align: -webkit-center;
   }
 
+  .showPointer{
+    cursor: pointer;
+  }
+
 /* .table-wrapper {
   max-height: 500px;
   overflow: auto;
@@ -71,7 +75,7 @@ if (isset($_SESSION["loginAccount"])) {
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1 class="m-0 text-dark" id="d-page-name">マスター管理　ユーザ管理</h1>
+							<h1 class="m-0 text-dark" id="d-page-name">ユーザ管理</h1>
 						</div><!-- /.col -->
 					</div><!-- /.row -->
 				</div><!-- /.container-fluid -->
@@ -126,7 +130,7 @@ if (isset($_SESSION["loginAccount"])) {
                       <div class="offset-sm-2 col-sm-10">
                       <div class="form-check">
                           <input type="checkbox" name="searchInvalid" id="searchInvalid" class="form-check-input" value="<?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?> />
-                          <label id="checkLabel" class="form-check-label"><b>ログインできないユーザ</b></label>                                
+                          <label id="checkLabel" class="form-check-label showPointer" onclick="$('#searchInvalid').click();"><b>ログインできないユーザを含む</b></label>                                
                       </div>
                         </div>
                       </div>
@@ -148,7 +152,7 @@ if (isset($_SESSION["loginAccount"])) {
               <table id="details_table" class="table table-bordered">
                 <thead>
                   <tr>
-                    <th>no</th>
+                    <th style="display: none;">no</th>
                     <th>氏名</th>
                     <th>アカウント</th>
                     <th>権限</th>
@@ -163,12 +167,12 @@ if (isset($_SESSION["loginAccount"])) {
                     while ($row = $resultSet->fetch_assoc()) {
                   ?>
                       <tr>
-                        <td><?php echo $row["no"] ?></td>
+                        <td style="display: none;"><?php echo $row["no"] ?></td>
                         <td><?php echo $row["name"] ?></td>
                         <td><?php echo $row["account"] ?></td>
                         <td><?php echo $row["role"] ?></td>
                         <td><?php echo $row["cname"] ?></td>
-                        <td><?php echo $row["effective_en_day"] ?></td>
+                        <td style="text-align: center;"><?php echo $row["effective_st_day"]?>~<?php echo $row["effective_en_day"]?></td>
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
                         <td class="align_button"><button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"><i class="fas fa-pencil-alt"></i>&nbsp;変更</button></td>
                       </tr>
@@ -217,7 +221,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="text" id="inputAccount" name="inputAccount" required autocomplete="off" /></td>
               </tr>
               <tr>
-                <td><label id="passwordLabel" class="label_align_table">パスウード</label></td>
+                <td><label id="passwordLabel" class="label_align_table">パスワード</label></td>
                 <td><input type="password" id="inputPass" name="inputPass" /></td>
               </tr>
               <tr>
@@ -243,7 +247,7 @@ if (isset($_SESSION["loginAccount"])) {
               <tr>
                 <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
                 <td><input type="date" id="inputStart" name="inputStart" required />~
-                <input type="date" id="inputExpire" name="inputExpire" min="<?php echo date('Y-m-d'); ?>" />
+                <input type="date" id="inputExpire" name="inputExpire" />
                 </td>
               </tr>
               <tr>
@@ -285,8 +289,8 @@ if (isset($_SESSION["loginAccount"])) {
             </table>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="Submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          <button type="Submit" class="btn btn-primary">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -312,7 +316,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="text" id="insertAccount" name="insertAccount" required autocomplete="off" /></td>
               </tr>
               <tr>
-                <td><label id="passwordLabel" class="label_align_table">パスウード</label></td>
+                <td><label id="passwordLabel" class="label_align_table">パスワード</label></td>
                 <td><input type="password" id="insertPass" name="insertPass" required autocomplete="off" /></td>
               </tr>
               <tr>
@@ -383,7 +387,7 @@ if (isset($_SESSION["loginAccount"])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="submit" class="btn btn-primary">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -407,7 +411,7 @@ if (isset($_SESSION["loginAccount"])) {
   var pHiragana = "[\\u3041-\\u3096\\u309D-\\u309F]|\\uD82C\\uDC01|\\uD83C\\uDE00";
   var pKatakana = "[\\u30A1-\\u30FA\\u30FD-\\u30FF\\u31F0-\\u31FF\\u32D0-\\u32FE\\u3300-\\u3357\\uFF66-\\uFF6F\\uFF71-\\uFF9D]|\\uD82C\\uDC00";
   var pHan = "[\\u2E80-\\u2E99\\u2E9B-\\u2EF3\\u2F00-\\u2FD5\\u3005\\u3007\\u3021-\\u3029\\u3038-\\u303B\\u3400-\\u4DB5\\u4E00-\\u9FD5\\uF900-\\uFA6D\\uFA70-\\uFAD9]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1]|\\uD87E[\\uDC00-\\uDE1D]";
-  var regexJapaneseAlnum = new RegExp("^([\\w-]|" + pHiragana + "|" + pKatakana + "|" + pHan + ")+$");
+  var regexJapaneseAlnum = new RegExp("/[\x3400-\x4DB5\x4E00-\x9FCB\xF900-\xFA6A]+|[一-龠]+|[ぁ-ゔ]+|[ァ-ヴー]+|[a-zA-Z0-9]+|[ａ-ｚＡ-Ｚ０-９]+|[々〆〤]+/u");
 
   function setExpire(type) {
     if (type == "INSERT") {
@@ -451,7 +455,7 @@ if (isset($_SESSION["loginAccount"])) {
         var month = ('0' + (expiryDate.getMonth() + 1)).slice(-2);
         var year = expiryDate.getFullYear();
 
-        $("#inputExpire").val(year + "-" + month + "-" + day);
+        // $("#inputExpire").val(year + "-" + month + "-" + day);
 
       } else {
         // display error message
@@ -481,7 +485,7 @@ if (isset($_SESSION["loginAccount"])) {
           $('#inputRole').val(response.role).change();
           $("#inputStart").val(response.start);
           if (response.expire == "" || response.expire == null) {
-            setExpire('UPDATE');
+            // setExpire('UPDATE');
           } else {
             $("#inputExpire").val(response.expire);
           }
@@ -506,102 +510,6 @@ if (isset($_SESSION["loginAccount"])) {
     modal.style.display = "none";
   }
 
-  function searchTableByName() {
-    // Declare variables
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("searchName");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("details_table");
-    tr = table.getElementsByTagName("tr");
-
-    // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[1];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
-      }
-    }
-  }
-
-  function searchTableByCustomer() {
-    // Declare variables
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("searchCustomer");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("details_table");
-    tr = table.getElementsByTagName("tr");
-
-    // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[4];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
-      }
-    }
-  }
-
-  function searchTableByRole() {
-    // Declare variables
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("selectedRole");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("details_table");
-    tr = table.getElementsByTagName("tr");
-
-    // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[3];
-      if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
-      }
-    }
-  }
-
-  function searchTableByInvalid() {
-    // Declare variables
-    // var input, filter, table, tr, td, i, txtValue;
-    // input = document.getElementById("searchInvalid").checked;
-    // filter = input;
-    // table = document.getElementById("details_table");
-    // tr = table.getElementsByTagName("tr");
-
-    // // Loop through all table rows, and hide those who don't match the search query
-    //   for (i = 0; i < tr.length; i++) {
-    //   td = tr[i].getElementsByTagName("td")[6];
-    //   if (td) {
-    //     txtValue = td.textContent || td.innerText;
-    //     if (txtValue==1) 
-    //     {
-    //       if(filter==true)
-    //       {
-    //         tr[i].style.display = "";
-    //       }
-    //       else
-    //       {
-    //         tr[i].style.display = "none";
-    //       }
-    //     }
-    //   }
-    // }
-
-    document.getElementById('searchForm').submit();
-  }
-
   function validateInsert() {
     var flag=true;
     var c = $("#insertCustomer").val();
@@ -610,17 +518,17 @@ if (isset($_SESSION["loginAccount"])) {
     var name = document.getElementById("insertName");
     if (regexJapaneseAlnum.test(name.value) == false) 
     {
-      alert("Name is invalid");
+      alert("氏名が無効です");
       flag=false;
     } 
-    if((r>=1 && r<=4) && (c=="" || c==null))
+    if((r>=1 && r<=4) && (o=="" || o==null))
     {
-      alert("Customer is invalid");
+      alert("所属が無効です");
       flag=false;
     }
-    if(r>=5 && r<=6 && (o=="" || o==null))
+    if(r>=5 && r<=6 && (c=="" || c==null))
     {
-      alert("Office is invalid");
+      alert("取引先が無効です");
       flag=false;
     }
 
@@ -635,17 +543,17 @@ if (isset($_SESSION["loginAccount"])) {
     var name = document.getElementById("inputName");
     if (regexJapaneseAlnum.test(name.value) == false) 
     {
-      alert("Name is invalid");
+      alert("氏名が無効です");
       flag=false;
     } 
-    if((r>=1 && r<=4) && (c=="" || c==null))
+    if((r>=1 && r<=4) && (o=="" || o==null))
     {
-      alert("Customer is invalid");
+      alert("所属が無効です");
       flag=false;
     }
-    if(r>=5 && r<=6 && (o=="" || o==null))
+    if(r>=5 && r<=6 && (c=="" || c==null))
     {
-      alert("Office is invalid");
+      alert("取引先が無効です");
       flag=false;
     }
 

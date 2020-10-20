@@ -22,10 +22,10 @@
     $status = 0;
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $cd = isset($_POST["cd"]) ? $_POST["cd"] : '';
-        $cd = test_input($cd);
+        $cd = removeWhitespaceAtBeginAndEndOfString($cd);
 
         $name = isset($_POST["name"]) ? $_POST["name"] : '';
-        $name =  test_input($_POST["name"]);
+        $name =  removeWhitespaceAtBeginAndEndOfString($_POST["name"]);
 
         $status = isset($_POST["status"]) ? $_POST["status"] : 0;
         
@@ -38,7 +38,6 @@
             $searchName = " customer.name like '%$name%' ";
         }
         if($status == 0) {
-            $status = mysqli_real_escape_string($conn, $status);
             $searchStatus = " customer.invalid = 0 ";
         }
        
@@ -70,6 +69,7 @@
             $searchQuery = "where ".$searchQuery;
         }
     }
+    // print_r($searchQuery);die();
 
     $sel = mysqli_query($conn, "select count(*) as allcount from customer ".$searchQuery);
 
@@ -78,14 +78,16 @@
 
 
     ## Fetch records
-    $empQuery = "select customer.no, customer.cd, customer.name, customer.invalid, A.NumberCustomerRole5, B.NumberCustomerRole6 from customer
+    $empQuery = "select customer.no, customer.cd, customer.name, customer.invalid, A.NumberCustomerRole5, B.NumberCustomerRole6, C.name AS DisplayLimit from customer
                                 LEFT JOIN 
                                 (SELECT customer, COUNT(users.no) AS NumberCustomerRole5 FROM users WHERE role=5 GROUP BY users.customer) A
                                 on customer.no = A.customer
                                 LEFT JOIN 
                                 (SELECT customer, COUNT(users.no) AS NumberCustomerRole6 FROM users WHERE role=6 GROUP BY users.customer) B
                                 on  customer.no = B.customer
+                                LEFT JOIN displaylimit C on C.no = customer.displaylimit
                                 ".$searchQuery." ORDER BY customer.name ASC LIMIT ".$row.",".$rowperpage;
+    // print_r($empQuery);die();
     
     $empRecords = mysqli_query($conn, $empQuery);
     $data = array();
@@ -97,6 +99,7 @@
                 "name" => $row['name'],
                 "NumberCustomerRole5" => ($row['NumberCustomerRole5'] == '') ? 0 : $row['NumberCustomerRole5'],
                 "NumberCustomerRole6" => ($row['NumberCustomerRole6'] == '') ? 0 : $row['NumberCustomerRole6'],
+                "DisplayLimit" => $row['DisplayLimit'],
                 "invalid" => ($row['invalid'] == 0) ? '有効' : '無効',
             );
     }
@@ -110,7 +113,11 @@
     echo json_encode($response);
     $conn->close();
 
-    function test_input($data) {
+    function removeWhitespaceAtBeginAndEndOfString($data) {
+        mb_internal_encoding('UTF-8');
+        mb_regex_encoding('UTF-8');
+        $data = mb_ereg_replace("^[\n\r\s\t　]+", '', $data);
+        $data = mb_ereg_replace("[\n\r\s\t　]+$", '', $data);
         $data = trim($data);
         $data = str_replace('_', '\\_', $data);
         $data = str_replace('%', '\\%', $data);

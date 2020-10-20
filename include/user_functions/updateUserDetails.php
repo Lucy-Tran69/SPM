@@ -14,7 +14,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     $role = $_POST["inputRole"];
     $email = $_POST["inputEmail"];
     $start = $_POST["inputStart"];
-    $expire = $_POST["inputExpire"];
+    $expire = $_POST["inputExpire"]==""?null:$_POST["inputExpire"];
     $customer = $_POST["inputCustomer"]==""?null:$_POST["inputCustomer"];
     $office = $_POST["inputOffice"]==""?null:$_POST["inputOffice"];
     $invalid = $_POST["inputInvalid"]==null? 0:1;

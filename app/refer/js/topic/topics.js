@@ -25,41 +25,11 @@ $(function () {
     };
 
     table.ajax = {
-        url: 'topics.php',
-        type: 'POST',
-        data: function (d) {
-            delete d.columns;
-        },
-        datatype: "json",
-
-    };
-
-    $(topicTable).DataTable(table);
-
-    $('#searchTopic').on('submit', function (e) {
-        e.preventDefault();
-        $('#flash-message').remove();
-        RequestData();
-    });
-
-    function RequestData() {
-        var title = $('#title').val();
-        var status = '';
-
-        if ($('#status').is(":checked")) {
-            status = $('#status').val();
-        }
-
-        if ($.fn.DataTable.isDataTable(topicTable)) {
-            $(topicTable).DataTable().destroy();
-        }
-
-        table.ajax = {
             url: 'topics.php',
             type: 'POST',
             data: function (d) {
-                d.title = title
-                d.status = status;
+                d.title = $('#title').val();
+                d.status = $('#status').is(":checked") ? $('#status').val() : '';
 
                 delete d.columns;
             },
@@ -67,8 +37,13 @@ $(function () {
 
         };
 
-        $(topicTable).DataTable(table);
-    }
+    topicTable.DataTable(table);
+
+    $('#searchTopic').on('submit', function (e) {
+        e.preventDefault();
+        $('#flash-message').remove();
+        topicTable.DataTable().ajax.reload();
+    });
 
     $('#topicsTable tbody').on('click', '.js-deleteTopic', function (e) {
         e.preventDefault();
@@ -121,19 +96,6 @@ $(function () {
     $("#closeDay").on("change.datetimepicker", function (e) {
         $('#openDay').datetimepicker('maxDate', e.date);
     });
-
-    // /*add method validate date format*/
-    // $.validator.addMethod('dateFormat', function (value, element) {
-    //         let regEx = /^\d{4}-\d{2}-\d{2}$/;
-    //         if (!value.match(regEx)) return false;
-
-    //         let inputDate = new Date(value);
-    //         let currentDate = new Date();
-
-    //         if (!inputDate.getTime() && inputDate.getTime() !== 0) return false;
-
-    //         return inputDate.toISOString().slice(0, 10) === value;
-    //     }, 'Please enter a date in the format yyyy-mm-dd.');
 
     $.validator.addMethod("accept", function (value, element, param) {
 
@@ -233,6 +195,7 @@ $(function () {
                 //check response is blank if success 
                 if (!$.trim(response)) {
                     window.location.href = "index.html";
+                    $(window).scrollTop(0);
                 }
                 // if error
                 else {
@@ -348,10 +311,6 @@ function fileValidation() {
             reader.readAsDataURL(fileInput.files[0]);
         }
     }
-}
-
-function redirectListTopic() {
-    window.location.href = "index.html";
 }
 
 function noscript(strCode) {

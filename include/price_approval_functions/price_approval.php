@@ -17,7 +17,7 @@ if($conn->connect_error)
         $customer = isset($_POST["selectedCustomer"])?$_POST["selectedCustomer"]:null;
        // echo json_encode ($status);die();
         if(!empty($customer)){
-            $searchCustomer = " and customer.no = ".$customer;
+            $searchCustomer = " and customer = ".$customer;
         }
         if (!empty($searchCustomer)) {
             $display=TRUE;
@@ -47,10 +47,10 @@ if($conn->connect_error)
         INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
         INNER JOIN print_type on print_type.no=commodity.print_type
 		INNER JOIN customer on a.customer=customer.no		
-		WHERE a.seq = (select max(seq) from selling_price WHERE approvalday IS NULL".$searchCustomer.")
+		WHERE a.seq = (select max(seq) from selling_price b WHERE (b.approvalday IS NULL AND b.status<>1)".$searchCustomer.")
         AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 ".$searchQuery."
 		GROUP BY a.customer,a.commodity,a.num
-        ORDER BY code ASC");
+        ORDER BY maker.name,print_type.no,code ASC");
 
     $result = execute($stmt,$conn);
     if($result==TRUE)
@@ -79,10 +79,10 @@ if($conn->connect_error)
         INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
         INNER JOIN print_type on print_type.no=commodity.print_type
 		INNER JOIN customer on a.customer=customer.no		
-		WHERE a.seq = (select max(seq)-1 from selling_price WHERE a.approvalday IS NOT NULL".$searchCustomer.")
+		WHERE a.seq = (select max(seq) from selling_price b WHERE b.approvalday IS NOT NULL".$searchCustomer.")
         AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 ".$searchQuery."
 		GROUP BY a.customer,a.commodity,a.num
-        ORDER BY code ASC");
+        ORDER BY maker.name,print_type.no,code ASC");
 
     $oldresult = execute($oldstmt,$conn);
     if($oldresult==TRUE)

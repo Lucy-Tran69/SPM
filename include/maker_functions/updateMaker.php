@@ -34,7 +34,7 @@ if($status=="OK")
     $result = execute($stmt,$conn);
     if($result)
     {
-        $msg = "Name updated";
+        $msg = "変更しました。";
         // header("Location: ../../app/maker/");  
     }
     else

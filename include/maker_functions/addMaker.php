@@ -32,7 +32,7 @@ if($status=="OK")
     $result = execute($stmt,$conn);
     if($result)
     {
-        $msg = "Maker added";
+        $msg = "追加しました。";
         // header("Location: ../../app/maker/");  
     }
     else

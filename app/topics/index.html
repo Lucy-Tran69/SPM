@@ -4,6 +4,15 @@
     $url = "topics";
     check_view_permission($url);
     include_once "html/menu.inc";
+
+    $title = '';
+    $status = '';
+    if (!empty($_SESSION['title'])) {
+        $title = $_SESSION['title'];
+    }
+     if (!empty($_SESSION['status'])) {
+        $status = $_SESSION['status'];
+    }
 ?>
 
 <style type="text/css" media="all">
@@ -26,6 +35,14 @@
     .w-200px {
         width: 200px;
     }
+
+    .w-500px {
+        width: 500px;
+    }
+
+    .w-100px {
+        width: 100px;
+    }
 </style>
 
 <input type="hidden" name="" id="page-name" value="トピックス一覧">
@@ -41,7 +58,7 @@
                                 <label>タイトル</label>
                             </div>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="title" name="title" placeholder="タイトル" />
+                                <input type="text" class="form-control" id="title" name="title" placeholder="タイトル" value="<?php echo $title;?>" />
                             </div>
                     </div>
                     </div>
@@ -51,8 +68,16 @@
                            </div>
                            <div class="col-sm-9">
                             <div class="custom-control custom-checkbox">
+                                <?php
+                                    if (!empty($status)) { ?>
+                                    <input type="checkbox" name="status" class="custom-control-input" id="status"
+                                    value="<?php echo date('Y-m-d h:i:s', time()); ?>" checked/>
+                                 <?php   } 
+                                 else {
+                                ?>
                                 <input type="checkbox" name="status" class="custom-control-input" id="status"
                                 value="<?php echo date('Y-m-d h:i:s', time()); ?>" />
+                                <?php } ?>
                                 <label class="custom-control-label" for="status">公開中のみ</label>
                             </div>
                         </div>
@@ -75,10 +100,10 @@
            <table id="topicsTable" class="table table-bordered table-striped">
             <thead>
                 <tr class="text-center">
-                    <th>作成日</th>
-                    <th>公開日</th>
-                    <th>終了日</th>
-                    <th>タイトル</th>
+                    <th class="w-100px">作成日</th>
+                    <th class="w-100px">公開日</th>
+                    <th class="w-100px">終了日</th>
+                    <th class="w-400px">タイトル</th>
                     <th class="w-200px"></th>
                 </tr>
             </thead>

@@ -95,6 +95,7 @@ $(function () {
                 //check response is blank if success 
                 if (!$.trim(response)) {
                     window.location.href = "index.html";
+                    $(window).scrollTop(0);
                 }
                 // if error
                 else {
@@ -109,10 +110,3 @@ $(function () {
     });
 });
 
-function redirectListRole() {
-	window.location.href = "index.html";
-}
-
-function redirectListRole() {
-	window.location.href = "index.html";
-}

@@ -1,5 +1,13 @@
 <?php include "html/header.inc" ?>
 
+<link rel="stylesheet" href="../refer/template/plugins/bootstrap-switch/css/bootstrap3/bootstrap-switch.min.css">
+
+<?php
+include "common/check_view_permission.php";
+$url = "customer";
+check_view_permission($url);
+?>
+
 <?php include "html/menu.inc" ?>
 
 <?php include "getItem.php" ?>
@@ -10,7 +18,7 @@
     }
 
     .center {
-        margin-left: 333px;
+        margin: auto;
         width: 70%;
         padding: 30px;
     }
@@ -23,6 +31,102 @@
     .error {
         color: red;
     }
+
+    /* The switch - the box around the slider */
+    .switch {
+    position: relative;
+    display: inline-block;
+    width: 90px;
+    height: 34px;
+    }
+
+    /* Hide default HTML checkbox */
+    .switch input {
+        display: none;
+    }
+
+    /* The slider */
+    .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    /* border-radius: 50%; */
+    }
+
+    .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+
+    input:checked + .slider {
+    background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(55px);
+    }
+
+    .on {
+        display: none;
+    }
+
+    .on,
+    .off {
+    color: white;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 25%;
+    left: 25%;
+    font-size: 10px;
+    font-family: Verdana, sans-serif;
+    }
+
+    .on {
+    top: 15px;
+    }
+
+    .off {
+    left: auto;
+    right: 0px;
+    top: 15px;
+    }
+
+    input:checked+ .slider .on {
+    display: block;
+    }
+
+    input:checked + .slider .off {
+    display: none;
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+    border-radius: 34px;
+    }
+
+    .slider.round:before {
+    border-radius: 50%;
+    }
+</style>
 </style>
 <?php
 if (isset($_SESSION["loginAccount"])) {
@@ -50,14 +154,12 @@ if (isset($_SESSION["loginAccount"])) {
                         <div class="col-md-6 col-sm-8">
                             <input type="text" name="name" class="form-control " id="name" placeholder="取引先名">
                         </div>
-
                     </div>
                     <div class="form-group row">
                         <label for="tel" class="col-md-2 col-sm-3 col-form-label-sm text-right required">TEL</label>
                         <div class="col-md-6 col-sm-8">
                             <input type="text" name="tel" class="form-control" id="tel" placeholder="TEL">
                         </div>
-
                     </div>
                     <div class="form-group row">
                         <label for="zip" class="col-md-2 col-sm-3 col-form-label-sm text-right required">郵便番号</label>
@@ -86,7 +188,6 @@ if (isset($_SESSION["loginAccount"])) {
                                     <option value="">選択</option>
                                     <?php
                                         if ($saleUserResultSet->num_rows > 0) {
-                                          mysqli_data_seek($saleUserResultSet,0);
                                           while ($row = $saleUserResultSet->fetch_assoc()) {
                                         ?>
                                     <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?>
@@ -107,7 +208,6 @@ if (isset($_SESSION["loginAccount"])) {
                                     <option value="">選択</option>
                                     <?php
                                         if ($approveUserResultSet->num_rows > 0) {
-                                          mysqli_data_seek($approveUserResultSet,0);
                                           while ($row = $approveUserResultSet->fetch_assoc()) {
                                         ?>
                                     <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?>
@@ -121,8 +221,27 @@ if (isset($_SESSION["loginAccount"])) {
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label for="displaylimit"
+                            class="col-md-2 col-sm-3 col-form-label-sm text-right">在庫表示※</label>
+                        <div class="col-md-6 col-sm-8">
+                            <!-- <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="displaylimit">
+                                <label class="custom-control-label" for="displaylimit"></label>
+                            </div> -->
+                            <!-- <input type="checkbox" data-toggle="switchbutton" checked data-style="ios" id="displaylimit"> -->
+                            <!-- Rounded switch -->
+                            <label class="switch">
+                                <input type="checkbox" id="displaylimit" checked>
+                                <div class="slider round">
+                                    <span class="on">ON</span>
+                                    <span class="off">OFF</span>
+                                  </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <div class="col-md-2 col-sm-3 text-right">
-                            <label id="invalidLabel" class="label_align_table ">停止</label>
+                            <label id="invalidLabel" class="label_align_table " for="invalid">無効</label>
                         </div>
                         <div class="col-md-2 col-sm-8 text-left">
                             <input type="checkbox" id="invalid" name="invalid" />
@@ -163,10 +282,10 @@ if (isset($_SESSION["loginAccount"])) {
 ?>
 <?php include "../../include/html/foot.inc" ?>
 
-<!-- bs-custom-file-input -->
-<script src="../../include/template/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<!-- bootstrap-switch -->
+<script src="../../app/refer/template/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<!-- bootstrap-switch -->
 
-<!-- bs-custom-file-input -->
 <script type="text/javascript">
     $(document).ready(function () {
         // bsCustomFileInput.init();
@@ -237,8 +356,8 @@ if (isset($_SESSION["loginAccount"])) {
                 },
                 sale: "営業担当を選択してください。",
                 supervisor: "承認者を選択してください。",
-            }
-
+            },
+            errorElement: 'span'
         });
 
 
@@ -248,11 +367,17 @@ if (isset($_SESSION["loginAccount"])) {
             if (!form.valid()) {
                 return false;
             }
+            var displaylimit = 1;
+            if (document.getElementById("displaylimit").checked) {
+                displaylimit = 1;
+            }
+            else{
+                displaylimit = 2;
+            }
             var invalid = 0;
             if (document.getElementById("invalid").checked) {
                 invalid = 1;
             }
-            console.log(invalid);
             $.ajax({
                 url: "CreateCustomer.php",
                 dataType: "html",
@@ -266,6 +391,7 @@ if (isset($_SESSION["loginAccount"])) {
                     charge: $("#charge").val(),
                     sale: $("#sale").val(),
                     supervisor: $("#supervisor").val(),
+                    displaylimit: displaylimit,
                     invalid: invalid
                 },
                 success: function (response) {
@@ -300,6 +426,17 @@ if (isset($_SESSION["loginAccount"])) {
             return regex.test(str);
         }
     });
+
+    jQuery.validator.methods.oldRequired = jQuery.validator.methods.required;
+
+    $.validator.addMethod("required",
+        function (value, element, params) {
+            if (value && value.trim() == "") {
+                return false;
+            }
+
+            return jQuery.validator.methods.oldRequired.call(this, value, element, params);
+        });
 
     function redirectCustomerList() {
         window.location.href = "../../app/customer/index.html";

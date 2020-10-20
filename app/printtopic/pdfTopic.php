@@ -1,105 +1,123 @@
 <?php 
+include_once('pdf/japanese.php');
+require_once('getTopicDetail.php');
 
-require_once('libs/japanese.php');
+$imgPath = "";
+if (!empty($data["image"])) {
+    $imgPath = "../../app/refer/images/topics/".$data["image"];
+}
 
-//↓↓↓ dummy data
-// $headers = array("No", "品名", "数", "担当者");
-// $content = array();
-// for ($i=1; $i <= 100; $i++) { 
-//     $item = array($i, '品名'.$i, rand(0, 99), '担当者'.$i);
-//     array_push($content, $item);
-// }
-//↑↑↑ dummy data
+$mm = 0.2645833333;
 
 class PDF extends PDF_Japanese
 {
-    // $pdf = new PDF();
+    private $data;
+
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
     function Header()
     {
         $this->SetFont('SJIS','',14);
        
-        //set 
         $this->SetTextColor(0,0,0);
 
-        // 表のタイトル
-        $title = $_POST['title'];
-        $this->Cell(0, 10,mb_convert_encoding($title, 'SJIS'),0,0,'L', false);
-        
-        //line break
-        $this->Ln();
+        $this->SetFont('SJIS','',7);
+        $this->Cell(0, 0, mb_convert_encoding("公開日：". $this->data["open_day"], 'SJIS'), 0, 0, 'R', false);
+        $this->Ln(3);
 
-        //テーブルのヘッダー
-        // $headers = array("No", "品名", "数", "担当者");
-
-        //テーブルのヘッダー
-        $this->Cell(0, 10, mb_convert_encoding($_POST['openDay'], 'SJIS'),0,0,'R', false);
-        $this->Ln(50);
-        // var_dump($_POST['image']);die();
-        $image = $_POST['image'];
-         // $this->Image('../../app/refer/images/topics/$image', 30, 0, 0, 0);
-        $this->Ln(50);
-        $this->Cell(0, 10, mb_convert_encoding($_POST['body'], 'SJIS'),0,0,'L', false);
-        $this->Ln();
-
-        $this->Cell(0, 10, mb_convert_encoding($_POST['linkTitle'], 'SJIS'),0,0,'L', false);
-        
-        //line break
+        $this->SetFont('SJIS','',14);
         $this->Ln();
     }
-
 
     // Page footer
     function Footer()
     {
         // Position at 1.5 cm from bottom
-        $this->SetY(-15);
+        $this->SetY(-10);
       
         //$this->SetTextColor(0,0,0);
  
-        $this->Write(5,'Visit ');
         // Then put a blue underlined link
-        $this->SetTextColor(0,0,255);
-        $this->SetFont('','U');
-        $this->Write(5,'www.fpdf.org','http://www.fpdf.org');
+        // $this->SetTextColor(0,0,255);
+        // $this->SetFont('','U');
 
         // Page number
-        $this->Cell(0,0,mb_convert_encoding('ページ ', 'SJIS').$this->PageNo().'',0,0,'C');
+        $this->SetFont('SJIS','',7);
+        $this->Cell(0,0,mb_convert_encoding('ページ ', 'SJIS').$this->PageNo()."/{nb}".'',0,0,'C');
     }
 }
 
 $pdf = new PDF();
+$pdf->AliasNbPages();
+$pdf->setData($data);
+
 $pdf->AddSJISFont();
-$pdf->AddPage();
+$pdf->AddPage("P","A4");
 
 $pdf->SetFont('SJIS','',14);
 
+//title
+$pdf->MultiCell(0, 7, mb_convert_encoding( $data['title'], 'SJIS'),0,'C', false);
+$pdf->Ln();
+
+//image
+$imgPath = "";
+if (!empty($data["image"])) {
+    $imgPath = "../refer/images/topics/".$data["image"];
+}
+
 //insert image
-// $pdf->Image('printer.jpg', 30, 0, 0, 0);
+if (file_exists($imgPath)) {
+    list($width, $height) =  getimagesize($imgPath);
+
+    $r = $height/$width;
+
+    //convert size to milimet
+    $width  = $width  * $mm;
+    $height = $height * $mm;
+
+    //set max height is 100 mili
+    if ($height > 100) {
+        $height = 100;
+    }
+    
+    $pageWidth = $pdf->GetPageWidth() - 20;
+
+    //set max width is page width
+    if ($width > $pageWidth) {
+        $width = $pageWidth;
+    }
+
+    if ($height/$width > $r) {
+        $height = $width * $r;
+    } elseif ($height/$width < $r) {
+        $width = $height / $r;
+    }
+
+    $pdf->Image($imgPath, null, null, $width, $height);
+}
 
 //line break
 $pdf->Ln();
 
-//Fill data
-// foreach ($content as $key1 => $item) {
-    
+//topic content
+$pdf->SetFont('SJIS','',11);
+$pdf->MultiCell(0, 7, mb_convert_encoding( $data['body'], 'SJIS'),0,'L', false);
+$pdf->Ln();
 
-//     $pdf->Cell(15, 8, mb_convert_encoding($item[0], 'SJIS'), 1, 0, 'C');
-    
-//     //set text color to red
-//     $pdf->SetTextColor(255, 0, 0);
-//     $pdf->Cell(80, 8, mb_convert_encoding($item[1], 'SJIS'), 1, 0, 'C');
-    
-//     //set the other to black
-//     $pdf->SetTextColor(0,0,0);
+//link
+if (!empty($data["link_title"])) {
+    $pdf->MultiCell(0, 7, mb_convert_encoding( $data['link_title'], 'SJIS'),0,'L', false);
+}
+if (!empty($data["link_url"])) {
+    $pdf->MultiCell(0, 7, mb_convert_encoding( $data['link_url'], 'SJIS'),0,'L', false);
+    $pdf->Ln();        
+}
 
-//     $pdf->Cell(15, 8, mb_convert_encoding($item[2], 'SJIS'), 1, 0, 'C');
-//     $pdf->Cell(75, 8, mb_convert_encoding($item[3], 'SJIS'), 1, 0, 'C');
-//     $pdf->Ln();
-// }
 
-$pdf->Output('I','ファイル名.pdf',true);
+$pdf->Output('I','Topic.pdf',true);
 $pdf->Close();
-
-
-
 ?>

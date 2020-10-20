@@ -1,4 +1,8 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) 
+{
+    session_start();
+}
 include_once "database/db.inc";
 $err_msg = "";
 $conn  = getConnection();
@@ -106,7 +110,7 @@ if($custResult==TRUE)
     $custResultSet = $custResult;
 }
 
-$officeStmt = $conn->prepare("select no,name from office ORDER BY name ASC");
+$officeStmt = $conn->prepare("select no,name from office ORDER BY no ASC");
 $officeResult = execute($officeStmt,$conn);
 if($officeResult==TRUE)
 {

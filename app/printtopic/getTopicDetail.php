@@ -8,7 +8,7 @@
         die("Failed to connect to database. ".$conn->connect_error);
     }
 
-    $id = isset($_GET['no']) ? (int)$_GET['no'] : '';
+    $id = isset($_POST['id']) ? (int)$_POST['id'] : '';
 
     if (empty($id)) {
         exit();

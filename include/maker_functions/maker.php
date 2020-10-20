@@ -15,11 +15,11 @@ if($conn->connect_error)
 $stmt;
 if($invalid==null)
 {
-    $stmt = $conn->prepare("select no,name,invalid from maker where invalid=0");
+    $stmt = $conn->prepare("select no,name,invalid from maker where invalid=0 ORDER BY name ASC");
 }
 else
 {
-    $stmt = $conn->prepare("select no,name,invalid from maker");
+    $stmt = $conn->prepare("select no,name,invalid from maker ORDER BY name ASC");
 }
 $result = execute($stmt,$conn);
 if($result==TRUE)

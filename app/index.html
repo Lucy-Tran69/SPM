@@ -1,5 +1,7 @@
 <?php
+include_once "const/system.inc";
 include_once "common/session.php";
+
 
 if (!isset($_SESSION[AUTH])) {
   header("Location: ../app/login/");

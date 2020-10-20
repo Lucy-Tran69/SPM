@@ -1,0 +1,312 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+include "common/check_view_permission.php";
+$url = "office";
+check_view_permission($url);
+header("content-type: text/html; charset=UTF-8");
+//Get array of roles from session variable 
+?>
+<style>
+  .update_button {
+    width: 50%;
+  }
+
+  .align_button {
+    text-align: center;
+  }
+
+  .align_form {
+    text-align: -webkit-center;
+  }
+
+  .showPointer{
+    cursor: pointer;
+  }
+
+/* .table-wrapper {
+  max-height: 500px;
+  overflow: auto;
+  display:inline-block;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+} */
+.tableFixHead {
+  overflow-y: auto;
+  height: 500px;
+  width: 100%;
+}
+
+.tableFixHead table {
+  border-collapse: collapse;
+}
+
+.tableFixHead th,
+.tableFixHead td {
+  padding: 8px 16px;
+}
+
+thead{
+  text-align: center;
+}
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+</style>
+<?php include "html/sidebar.inc" ?>
+<?php include "office_functions/office.php" ?>
+<!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
+<?php
+if (isset($_SESSION["loginAccount"])) {
+?>
+  <div class="content-wrapper">
+  <div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 class="m-0 text-dark" id="d-page-name">オフィス管理</h1>
+						</div><!-- /.col -->
+					</div><!-- /.row -->
+				</div><!-- /.container-fluid -->
+		</div>
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <!-- Default box -->
+            <div class="card card-primary">
+              <div class="card-body d-flex justify-content-center">
+                <form action=<?php echo htmlentities($_SERVER["PHP_SELF"]); ?> method="POST" role="form" id="searchForm" class="form-horizontal search-form col-lg-8 col-sm-12">
+                        <div style="float:right;">
+                            <button type="button" value="" class="btn btn-info" style="width: 100px;" data-target="#insert" data-toggle="modal"><i class="fas fa-plus"></i>&nbsp;追加</button>
+                        </div>
+                    </div>
+                  </div>
+                </form>
+            </div>
+            <div class="card card-primary" style="width:100%;">
+            <div class="card-body d-flex justify-content-center">
+              <div class="tableFixHead">
+              <table id="details_table" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>no</th>
+                    <th>name</th>
+                    <th>tel</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php
+                  if ($resultSet->num_rows > 0) {
+                    while ($row = $resultSet->fetch_assoc()) {
+                  ?>
+                      <tr>
+                        <td style="text-align: center;"><?php echo $row["no"] ?></td>
+                        <td><?php echo $row["name"] ?></td>
+                        <td style="text-align: center;"><?php echo $row["tel"] ?></td>
+                        <td class="align_button"><button class="btn btn-success" type="button" id="<?php echo $row["no"]; ?>" value="" onclick="openModal(this.id);" data-toggle="modal" data-target="#details"><i class="fas fa-pencil-alt"></i>&nbsp;変更</button></td>
+                      </tr>
+                  <?php
+                    }
+                  }
+                  // $resultStmt->free_result();
+                  // freeConnection($conn);
+                  ?>
+                </tbody>
+              </table>
+              </div>
+              <!-- <ul class="pagination" style="margin-left: 38%;">
+                <li class="paginate_button page-item previous disabled" id="customerTable_previous"><a href="#" aria-controls="customerTable" data-dt-idx="0" tabindex="0" class="page-link">Previous</a></li>
+                <li class="paginate_button page-item active"><a href="#" aria-controls="customerTable" data-dt-idx="1" tabindex="0" class="page-link">1</a></li>
+                <li class="paginate_button page-item "><a href="#" aria-controls="customerTable" data-dt-idx="2" tabindex="0" class="page-link">2</a></li>
+                <li class="paginate_button page-item next" id="customerTable_next"><a href="#" aria-controls="customerTable" data-dt-idx="3" tabindex="0" class="page-link">Next</a></li>
+              </ul> -->
+              <!-- /.card-footer-->
+            </div>
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <div class="modal fade" tabindex="-1" role="dialog" id="insert">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content" style="width: max-content;margin-left: 30%;">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body align_form">
+          <form action="../../include/office_functions/insertNewOffice.php" method="POST" class="form_style" onsubmit="return validateInsert();">
+            <input type="hidden" id="inputId" name="inputId" />
+            <table class="popup_table">
+              <tr>
+                <td><label id="nameLabel" class="label_align_table">名称<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="inputName" name="inputName" required autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td><label id="TelLabel" class="label_align_table">TEL<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="inputTel" name="inputTel" required autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td><label id="FaxLabel" class="label_align_table">FAX<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="inputFax" name="inputFax" required autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td><label id="zipLabel" class="label_align_table">郵便番号<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="inputZip" name="inputZip" required autocomplete="off"/></td>
+              </tr>
+              <tr>
+                <td><label id="addressLabel" class="label_align_table">住所<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><textarea id="inputAddress" name="inputAddress" required autocomplete="off" style="width:-webkit-fill-available;"></textarea></td>
+              </tr>
+              <tr>
+                <td><label id="titleLabel" class="label_align_table">肩書<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><textarea id="inputTitle" name="inputTitle" required autocomplete="off" style="width: -webkit-fill-available;"></textarea></td>
+              </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          <button type="Submit" class="btn btn-primary">保存する</button>
+        </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+  <!-- Add user modal -->
+  <div class="modal fade" tabindex="-1" role="dialog" id="details">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content" style="width: max-content;margin-left: 30%;">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body align_form">
+          <form action="../../include/office_functions/updateOfficeDetails.php" method="POST" class="form_style" onsubmit="return validateUpdate();">
+            <input type="hidden" id="updateId" name="updateId" />
+            <table class="popup_table">
+              <tr>
+                <td><label id="nameLabel" class="label_align_table">Name</label></td>
+                <td><input type="text" id="updateName" name="updateName" required autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td><label id="TelLabel" class="label_align_table">Tel</label></td>
+                <td><input type="text" id="updateTel" name="updateTel" required autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td><label id="FaxLabel" class="label_align_table">Fax</label></td>
+                <td><input type="text" id="updateFax" name="updateFax" required autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td><label id="zipLabel" class="label_align_table">Zip</label></td>
+                <td><input type="text" id="updateZip" name="updateZip" required autocomplete="off"/></td>
+              </tr>
+              <tr>
+                <td><label id="addressLabel" class="label_align_table">Address</label></td>
+                <td><textarea id="updateAddress" name="updateAddress" required autocomplete="off" style="width: -webkit-fill-available;"></textarea></td>
+              </tr>
+              <tr>
+                <td><label id="titleLabel" class="label_align_table">Title</label></td>
+                <td><textarea id="updateTitle" name="updateTitle" required autocomplete="off" style="width: -webkit-fill-available;"></textarea></td>
+              </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          <button type="Submit" class="btn btn-primary">保存する</button>
+        </div>
+        </form>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  </body>
+  <?php include "html/footer.inc" ?>
+
+  </html>
+<?php
+} else {
+  header("Location: ../../include/common/logout.php");
+}
+?>
+
+<script>
+  var modal = document.getElementById("details");
+  var span = document.getElementsByClassName("close")[0];
+  var regexAlnum = new RegExp("^[a-zA-Z0-9]+$");
+  var regexJapanese = /[\u3040-\u309F]|[\u30A0-\u30FF]|[\uFF00-\uFFEF]|[\u4E00-\u9FAF]/g;
+  var pHiragana = "[\\u3041-\\u3096\\u309D-\\u309F]|\\uD82C\\uDC01|\\uD83C\\uDE00";
+  var pKatakana = "[\\u30A1-\\u30FA\\u30FD-\\u30FF\\u31F0-\\u31FF\\u32D0-\\u32FE\\u3300-\\u3357\\uFF66-\\uFF6F\\uFF71-\\uFF9D]|\\uD82C\\uDC00";
+  var pHan = "[\\u2E80-\\u2E99\\u2E9B-\\u2EF3\\u2F00-\\u2FD5\\u3005\\u3007\\u3021-\\u3029\\u3038-\\u303B\\u3400-\\u4DB5\\u4E00-\\u9FD5\\uF900-\\uFA6D\\uFA70-\\uFAD9]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1]|\\uD87E[\\uDC00-\\uDE1D]";
+  var regexJapaneseAlnum = new RegExp("/[\x3400-\x4DB5\x4E00-\x9FCB\xF900-\xFA6A]+|[一-龠]+|[ぁ-ゔ]+|[ァ-ヴー]+|[a-zA-Z0-9]+|[ａ-ｚＡ-Ｚ０-９]+|[々〆〤]+/u");
+
+
+  function openModal(userid) {
+    $.ajax({
+      url: "../../include/office_functions/getSelectedOffice.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        id: userid
+      },
+      success: function(response) {
+        if (response.status == "success") {
+          $("#updateId").val(userid);
+          $("#updateName").val(response.name);
+          $("#updateTel").val(response.tel);
+          $('#updateZip').val(response.zip);
+          $("#updateAddress").val(response.address);
+          $("#updateTitle").val(response.title);
+          $("#updateFax").val(response.fax);
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+      }
+    });
+    modal.style.display = "block";
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+  }
+
+  function validateInsert() {
+    var flag=true;
+    var name = document.getElementById("inputName");
+    if (regexJapaneseAlnum.test(name.value) == false) 
+    {
+      alert("Name");
+      flag=false;
+    } 
+
+    return flag;
+  }
+
+  function validateUpdate() {
+    var flag=true;
+    var name = document.getElementById("updateName");
+    if (regexJapaneseAlnum.test(name.value) == false) 
+    {
+      alert("Name");
+      flag=false;
+    } 
+
+    return flag;
+  }
+</script>

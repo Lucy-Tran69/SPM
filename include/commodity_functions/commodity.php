@@ -134,6 +134,7 @@ $stmt = $conn->prepare("select  commodity.no,
                         commodity.invalid as invalid,
                         commodity.cd as code,
                         commodity.name as name,
+                        commodity.note as note,
                         maker.name as maker,
                         commodity.memo as memo,
                         commodity.print_type as type

@@ -51,7 +51,7 @@ if($inventory==null)
                         commodity.no as id 
                         from maker 
                         LEFT JOIN commodity on maker.no=commodity.maker
-                        LEFT JOIN inventory on inventory.commodity=commodity.no
+                        inner JOIN inventory on inventory.commodity=commodity.no
                         LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
                         where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." order by commodity.cd ASC");
     }
@@ -65,7 +65,7 @@ if($inventory==null)
                         commodity.no as id 
                         from maker 
                         LEFT JOIN commodity on maker.no=commodity.maker
-                        LEFT JOIN inventory on inventory.commodity=commodity.no
+                        inner JOIN inventory on inventory.commodity=commodity.no
                         LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
                         where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery. " AND inventory.inventory_mark<>4 order by commodity.cd ASC");
     }
@@ -84,7 +84,7 @@ else
                         LEFT JOIN commodity on maker.no=commodity.maker
                         inner JOIN inventory on inventory.commodity=commodity.no
                         LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
-                        where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." order by commodity.cd ASC");
+                        where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." AND inventory_mark.no=5 order by commodity.cd ASC");
     }
     else
     {
@@ -98,7 +98,7 @@ else
                         LEFT JOIN commodity on maker.no=commodity.maker
                         inner JOIN inventory on inventory.commodity=commodity.no
                         LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
-                        where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." AND inventory.inventory_mark<>4 order by commodity.cd ASC");
+                        where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." AND inventory_mark.no=5 order by commodity.cd ASC");
     }
 }
 $result = execute($stmt,$conn);
@@ -136,5 +136,19 @@ if($makerResult==TRUE)
     $makerResult=$makerStmt->get_result();
     $makerResultSet = $makerResult;
 }
+
+$dateStmt = $conn->prepare("SELECT date(GREATEST(MAX(inday),MAX(upday))) as LAST_UPDATE FROM inventory");
+$dateResult = execute($dateStmt,$conn);
+if($dateResult==true)
+{
+    $dateResult = $dateStmt->get_result();
+    $dateResultSet = $dateResult;
+}
+$last_updated="";
+while($row = $dateResult->fetch_assoc())
+{
+    $last_updated = $row["LAST_UPDATE"];
+}
+
 
 ?>?

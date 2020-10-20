@@ -107,6 +107,3 @@ $(function () {
     });
 });
 
-function redirectListRole() {
-	window.location.href = "index.html";
-}

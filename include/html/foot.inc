@@ -6,14 +6,13 @@
 
 
 
-
+<!-- 
 <footer class="main-footer">
 <strong>Copyright &copy; <a href="#">NCI</a>.</strong>
 All rights reserved.
 <div class="float-right d-none d-sm-inline-block">
-  <!-- <b>Version</b> 3.0.5 -->
 </div>
-</footer>
+</footer> -->
 
 <!-- Control Sidebar -->
 <aside class="control-sidebar control-sidebar-dark">
@@ -70,5 +69,16 @@ $.widget.bridge('uibutton', $.ui.button)
 
   $(function () {
     $.fn.dataTable.ext.errMode = 'throw';
+  });
+</script>
+
+<?php if (isset($url)) {?>
+<input type="hidden" name="" id="url" value="<?php echo $url ?>">
+<?php } ?>
+
+<script>
+  $(function(){
+    var url = "#" + $("#url").val();
+    var menu = $(url).addClass("active");
   });
 </script>

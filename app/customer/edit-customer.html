@@ -1,5 +1,10 @@
 <?php
     include "html/header.inc";
+
+    include "common/check_view_permission.php";
+    $url = "customer";
+    check_view_permission($url);
+
     include "html/menu.inc";
     include "getItem.php";
 ?>
@@ -9,7 +14,7 @@
     }
 
     .center {
-        margin-left: 250px;
+        margin: auto;
         width: 70%;
         padding: 30px;
     }
@@ -21,6 +26,101 @@
 
     .error {
         color: red;
+    }
+
+    /* The switch - the box around the slider */
+    .switch {
+    position: relative;
+    display: inline-block;
+    width: 90px;
+    height: 34px;
+    }
+
+    /* Hide default HTML checkbox */
+    .switch input {
+        display: none;
+    }
+
+    /* The slider */
+    .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    /* border-radius: 50%; */
+    }
+
+    .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    }
+
+    input:checked + .slider {
+    background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(55px);
+    }
+
+    .on {
+        display: none;
+    }
+
+    .on,
+    .off {
+    color: white;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 25%;
+    left: 25%;
+    font-size: 10px;
+    font-family: Verdana, sans-serif;
+    }
+
+    .on {
+    top: 15px;
+    }
+
+    .off {
+    left: auto;
+    right: 0px;
+    top: 15px;
+    }
+
+    input:checked+ .slider .on {
+    display: block;
+    }
+
+    input:checked + .slider .off {
+    display: none;
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+    border-radius: 34px;
+    }
+
+    .slider.round:before {
+    border-radius: 50%;
     }
 </style>
 
@@ -36,12 +136,12 @@ if (isset($_SESSION["loginAccount"])) {
         }        
 
         $id = $_GET['id'];
-        $sql = "SELECT no, cd, name, tel, zip, address, charge, sales, supervisor, invalid FROM customer WHERE no='$id'";
+        $sql = "SELECT no, cd, name, tel, zip, address, charge, sales, supervisor, invalid, displaylimit FROM customer WHERE no='$id'";
         $getCustomer = mysqli_query($conn, $sql);
         //print_r($getCustomer); die();
         if(mysqli_num_rows($getCustomer) > 0){
             $row = mysqli_fetch_assoc($getCustomer); 
-            // print_r($row);die();
+            //print_r($row);die();
 ?>
 <input type="hidden" name="" id="page-name" value="取引先編集">
 <div id="d-message"></div>
@@ -50,9 +150,6 @@ if (isset($_SESSION["loginAccount"])) {
     <div class="col-md-12">
         <!-- jquery validation -->
         <div class="card card-primary">
-            <!-- <div class="card-header">
-                <h3 class="card-title">取引先編集</h3>
-            </div> -->
             <!-- /.card-header -->
             <!-- form start -->
             <form action="#" role="form" id="editCustomer" method="POST" novalidate="novalidate"
@@ -63,14 +160,14 @@ if (isset($_SESSION["loginAccount"])) {
                         <label for="cd" class="col-md-2 col-sm-3 col-form-label-sm text-right required">取引先コード</label>
                         <div class="col-md-6 col-sm-8">
                             <input type="text" name="cd" class="form-control" id="cd" placeholder="取引先コード"
-                                value="<?php echo $row['cd']; ?>">
+                                value="<?php echo htmlspecialchars($row['cd']); ?>">
                         </div>
                     </div>
                     <div class="form-group row">
                         <label for="name" class="col-md-2 col-sm-3 col-form-label-sm text-right required">取引先名</label>
                         <div class="col-md-6 col-sm-8">
                             <input type="text" name="name" class="form-control " id="name" placeholder="取引先名"
-                                value="<?php echo $row['name']; ?>">
+                                value="<?php echo htmlspecialchars($row['name']); ?>">
                         </div>
 
                     </div>
@@ -110,7 +207,6 @@ if (isset($_SESSION["loginAccount"])) {
                                 <option value="">選択</option>
                                     <?php
                                         if ($saleUserResultSet->num_rows > 0) {
-                                          mysqli_data_seek($saleUserResultSet,0);
                                           while ($row1 = $saleUserResultSet->fetch_assoc()) {
                                         ?>
                                     <option value="<?php echo $row1['no']; ?>"
@@ -132,7 +228,6 @@ if (isset($_SESSION["loginAccount"])) {
                                 <option value="">選択</option>
                                     <?php
                                         if ($approveUserResultSet->num_rows > 0) {
-                                          mysqli_data_seek($approveUserResultSet,0);
                                           while ($row1 = $approveUserResultSet->fetch_assoc()) {
                                         ?>
                                     <option value="<?php echo $row1['no']; ?>"
@@ -148,8 +243,21 @@ if (isset($_SESSION["loginAccount"])) {
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label for="displaylimit"
+                            class="col-md-2 col-sm-3 col-form-label-sm text-right">在庫表示※</label>
+                        <div class="col-md-6 col-sm-8">
+                            <label class="switch">
+                                <input type="checkbox" id="displaylimit" <?php if ($row['displaylimit'] == 1) {echo 'checked';} ?>>
+                                <div class="slider round">
+                                    <span class="on">ON</span>
+                                    <span class="off">OFF</span>
+                                  </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <div class="col-md-2 col-sm-3 text-right">
-                            <label id="invalidLabel" class="label_align_table ">停止</label>
+                            <label id="invalidLabel" class="label_align_table" for="invalid">無効</label>
                         </div>
                         <div class="col-md-2 col-sm-8 text-left">
                             <input type="checkbox" id="invalid" name="invalid"
@@ -176,10 +284,6 @@ if (isset($_SESSION["loginAccount"])) {
         <!-- /.card -->
     </div>
     <!--/.col (left) -->
-    <!-- right column -->
-    <div class="col-md-6">
-    </div>
-    <!--/.col (right) -->
 </div>
 <!-- /.row -->
 
@@ -202,12 +306,8 @@ if (isset($_SESSION["loginAccount"])) {
 include "../../include/html/foot.inc"
 ?>
 
-<!-- bs-custom-file-input -->
-<script src="../../include/template/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
-<!-- bs-custom-file-input -->
 <script type="text/javascript">
     $(document).ready(function () {
-        bsCustomFileInput.init();
         // validate From
         $("#editCustomer").validate({
             rules: {
@@ -275,7 +375,8 @@ include "../../include/html/foot.inc"
                 },
                 sale: "営業担当を選択してください。",
                 supervisor: "承認者を選択してください。",
-            }
+            },
+            errorElement: 'span'
         });
 
         $("#editCustomer").submit(function (event) {
@@ -283,6 +384,13 @@ include "../../include/html/foot.inc"
             // check if the input is valid
             if (!form.valid()) {
                 return false;
+            }
+            var displaylimit = 1;
+            if (document.getElementById("displaylimit").checked) {
+                displaylimit = 1;
+            }
+            else{
+                displaylimit = 2;
             }
             var invalid = 0;
             if (document.getElementById("invalid").checked) {
@@ -301,6 +409,7 @@ include "../../include/html/foot.inc"
                     charge: $("#charge").val(),
                     sale: $("#sale").val(),
                     supervisor: $("#supervisor").val(),
+                    displaylimit: displaylimit,
                     invalid: invalid
                 },
                 success: function (response) {
@@ -335,6 +444,17 @@ include "../../include/html/foot.inc"
             return regex.test(str);
         }
     });
+
+    jQuery.validator.methods.oldRequired = jQuery.validator.methods.required;
+
+    $.validator.addMethod("required",
+        function (value, element, params) {
+            if (value && value.trim() == "") {
+                return false;
+            }
+
+            return jQuery.validator.methods.oldRequired.call(this, value, element, params);
+        });
 
     function redirectCustomerList() {
         window.location.href = "../../app/customer/index.html";

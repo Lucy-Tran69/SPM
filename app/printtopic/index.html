@@ -1,11 +1,3 @@
-<?php
-
-include "getTopicDetail.php";
-
-
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
     <?php  include_once "common/session.php"; ?>
@@ -47,7 +39,7 @@ include "getTopicDetail.php";
         <!-- Common css -->
         <link rel="stylesheet" type="text/css" href="../refer/css/nci_style.css" />
         <style>
-            .image{
+            .image img{
                 max-width: 100%;
                 max-height: 500px;
             }
@@ -55,8 +47,16 @@ include "getTopicDetail.php";
         </style>
     </head>
 <body>
-    <div class="container">
 
+<?php
+
+require_once "getTopicDetail.php";
+
+
+
+?>
+
+    <div class="container">
         <h3> <?php echo ($data["title"]);   ?></h3>
 
         <div class="image d-flex justify-content-left">
@@ -64,19 +64,20 @@ include "getTopicDetail.php";
             $image = trim($data["image"]);
             if ($image != "") {
                 $url = "../../app/refer/images/topics/". $image;
-                echo '<img src='.$url.' >';
+                echo '<img class="mt-5" src='.$url.' >';
             }
 
         ?>
         </div>
 
         <?php $body = str_replace("\n", "<br>", $data["body"]); ?>
+        <div class="mt-5 mb-5">
         <p>
             <?php
             echo $body;
             ?>
         </p>
-
+        </div>
         <div>
             <?php
             if (trim($data["link_title"])!="")
@@ -84,8 +85,6 @@ include "getTopicDetail.php";
             ?>
 
         </div>
-
-        
     </div>
 </body>
 </html>
@@ -124,7 +123,7 @@ $.widget.bridge('uibutton', $.ui.button)
     $.fn.dataTable.ext.errMode = 'throw';
 
     window.print();
-    window.close();
+    window.onafterprint = function(){ window.close()};
   });
 </script>
 

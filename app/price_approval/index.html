@@ -57,7 +57,7 @@ if (isset($_SESSION["loginAccount"])) {
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1 class="m-0 text-dark" id="d-page-name">マスター管理　ユーザ管理</h1>
+							<h1 class="m-0 text-dark" id="d-page-name">価格承認</h1>
 						</div><!-- /.col -->
 					</div><!-- /.row -->
 				</div><!-- /.container-fluid -->
@@ -127,12 +127,12 @@ if (isset($_SESSION["loginAccount"])) {
                           <td style="display: none;"><?php echo $row["customer"];?></td>
                           <td style="display: none;"><?php echo $row["commodity"];?></td>
                           <td style="display: none;"><?php echo $row["seq"];?></td>
-                          <td><?php echo $row["type"];?></td>
                           <td><?php echo $row["maker"];?></td>
+                          <td><?php echo $row["type"];?></td>
                           <td><?php echo $row["code"];?></td>
                           <td><?php echo numfmt_format_currency($fmt,$row["original"], "JPY")?></td>
                           <td><?php echo numfmt_format_currency($fmt,$rowOld["sp"], "JPY")?></td>
-                          <td style="background-color: <?php echo ($rowOld["sp"]!=$row["sp"])?"#ffa861":"#81c9fc"?>;"><?php echo numfmt_format_currency($fmt,$row["sp"], "JPY")?></td>
+                          <td style="background-color: <?php echo ($rowOld["sp"]!=$row["sp"])?"#ffa861":"#81c9fc"?>;"><?php echo $row["sp"]==0?"-":numfmt_format_currency($fmt,$row["sp"], "JPY")?></td>
                           <td><?php echo $row["qty"];?></td>
                           <td><?php echo $row["support"];?></td>
                           <td><?php echo $row["display"];?></td>
@@ -149,7 +149,8 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
             </div>
             <div class="card-footer" style="text-align: center;">
-                <input type="button" value="Confirm" class="btn btn-outline-success" style="width: 200px;" onclick="confirmValues();"/>
+                <input type="button" value="確認" id="confirmBtn" class="btn btn-outline-success" style="width: 200px;" onclick="confirmValues();"/>
+                <input type="button" value="否認" id="rejectBtn" class="btn btn-outline-danger" style="width: 200px;" onclick="rejectValues();"/>
             </div>
             <!-- /.card -->
           </div>
@@ -165,14 +166,33 @@ if (isset($_SESSION["loginAccount"])) {
     <div class="modal-dialog">
         <div class="modal-content bg-warning">
             <div class="modal-header">
-                <h4 class="modal-title">Success</h4>
+                <h4 class="col-12 modal-title text-center">確認</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="text-align: center;">
                 <p id="confirmMessageText">&hellip;</p>
             </div>
             <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-outline-light" data-dismiss="modal" onclick="updateValues();">Submit</button>
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">いいえ</button>
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal" onclick="updateValues();">はい</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  <!-- Warning modal -->
+</div>
+<div class="modal fade" id="rejectMessage">
+    <div class="modal-dialog">
+        <div class="modal-content bg-warning">
+            <div class="modal-header">
+                <h4 class="col-12 modal-title text-center">確認</h4>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <p id="rejectMessageText">&hellip;</p>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">いいえ</button>
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal" onclick="reject();">はい</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -188,19 +208,69 @@ if (isset($_SESSION["loginAccount"])) {
 ?>
 
 <script>
+
+$( document ).ready(function() {
+    var searchCust = $("#selectedCustomer");
+    var x=0;
+    $('#details_table tbody tr').each(function() {
+      x++;
+    });
+    if(searchCust.val()=="" || x==0)
+    {
+      $("#confirmBtn").prop("disabled", true );
+      $("#rejectBtn").prop("disabled", true );
+    }
+  });
+
+
   function confirmValues() {
-    $("#confirmMessageText").text("送信してもよろしいですか？");
+    $("#confirmMessageText").text("価格を設定します。よろしいですか？");
     $("#confirmMessage").modal('toggle');
   }
-  function confirmSubmit()
+
+  function rejectValues()
   {
-    var arr = [];
+    $("#rejectMessageText").text("価格を否認します。よろしいですか？");
+    $("#rejectMessage").modal('toggle');
+  } 
+
+  function reject()
+  {
+    var customers = [];
+    var items = [];
+    var nums = [];
+    var seqs = [];
+    var id = $("#loginUserId").val();
     $('#details_table tbody tr').each(function() {
-      var value = $(this).find('td:eq(5)').html().replace(/[￥,]/g,'');
-      alert(value);
-      arr.push(value);
+      var cust = $(this).find('td:eq(0)').html();
+      var item = $(this).find('td:eq(1)').html();
+      var seq = $(this).find('td:eq(2)').html();
+      customers.push(cust);
+      items.push(item);
+      seqs.push(seq);
     });
 
+    for(var i=0;i<customers.length;i++)
+    {
+      $.ajax({
+        url: "../../include/price_approval_functions/rejectPrice.php",
+        type: "POST",
+        dataType: "text",
+        data: {
+          cust: customers[i],
+          commodity: items[i],
+          seq : seqs[i],
+          loginUserId: id
+        },
+        success: function(response) {
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus, errorThrown);
+        }
+      });
+    }
+    $("#alertSuccessText").text("否認しました。");
+    $("#alertSuccess").modal('toggle');
   }
   function updateValues(cst,com,val,id) {
     
@@ -237,7 +307,7 @@ if (isset($_SESSION["loginAccount"])) {
         }
       });
     }
-    $("#alertSuccessText").text("Success");
+    $("#alertSuccessText").text("承認しました。");
     $("#alertSuccess").modal('toggle');
   }
 </script>

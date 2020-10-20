@@ -31,7 +31,7 @@ if ($conn->connect_error)
 
 $stmt = $conn->prepare("insert into commodity(name,cd,print_type,num,price,maker,green,printer_support,note,memo,invalid,inday,inuser) 
                         values(?,?,?,?,?,?,?,?,?,?,?,?,?)");
-$stmt->bind_param('ssiiisisssisi',$name,$code,$print_type,$num,$price,$maker,$green,$printer_support,$note,$memo,$invalid,$insert_date,$insert_user);
+$stmt->bind_param('ssiississsisi',$name,$code,$print_type,$num,$price,$maker,$green,$printer_support,$note,$memo,$invalid,$insert_date,$insert_user);
 
 $result = execute($stmt,$conn);
 if($result)

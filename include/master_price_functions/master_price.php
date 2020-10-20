@@ -8,16 +8,18 @@ $invalid = isset($_POST["searchInvalid"])?$_POST["searchInvalid"]:null;
 $err_msg = "";
 $conn  = getConnection();
 $display=FALSE;
+$searchQuery = "";
 if($conn->connect_error)
 {
     die("Failed to connect to database. ".$conn->connect_error);
 }
-    $searchQuery = "";
+    
     $searchCd = "";
     $searchMaker = "";
     $searchCustomer = "";
     $searchSupport = "";
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $display=TRUE;
         $maker = isset($_POST["selectedMaker"])?$_POST["selectedMaker"]:null;
         $customer = isset($_POST["selectedCustomer"])?$_POST["selectedCustomer"]:null;
         $cart = isset($_POST["searchCartridge"])?$_POST["searchCartridge"]:null;
@@ -30,7 +32,7 @@ if($conn->connect_error)
             $searchMaker = " and maker.no = ".$maker;
         }
         if(!empty($customer)){
-            $searchCustomer = " and customer.no = ".$customer;
+            $searchCustomer = " and customer = ".$customer;
         }
         if(!empty($support)){
             $searchSupport = " and commodity.printer_support like '%$support%'";
@@ -58,69 +60,135 @@ if($conn->connect_error)
     }
 $stmt;
 $result;
-  if($invalid==null && !empty($searchCustomer))
-    {
-        $stmt = $conn->prepare("SELECT  distinct print_type.name as type,
-		customer.no as customer,
-        commodity.no as commodity,
-		a.seq as seq,
-		maker.name as maker,
-		commodity.cd as code,
-		commodity.price as original,
-		a.price as sp,
-		a.approver as approver,
-		commodity.num as qty,
-		commodity.printer_support as support,
-		inventory_mark.display as display,
-        a.approvalday
-		from selling_price a
-        INNER JOIN commodity on a.commodity=commodity.no
-        INNER JOIN inventory on inventory.commodity=commodity.no
-        INNER JOIN maker on commodity.maker=maker.no
-        INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
-        INNER JOIN print_type on print_type.no=commodity.print_type
-		INNER JOIN customer on a.customer=customer.no		
-		WHERE a.seq = (select max(seq) from selling_price WHERE approvalday IS NOT NULL".$searchCustomer.")
-        AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 AND inventory_mark.hidden=0 ".$searchQuery."
-		GROUP BY a.customer,a.commodity,a.num
-        ORDER BY code ASC");
-        $result = execute($stmt,$conn);
-    }
-    else if(!empty($invalid) && !empty($searchCustomer))
-    {
-        $stmt = $conn->prepare("SELECT  distinct print_type.name as type,
-		customer.no as customer,
-        commodity.no as commodity,
-		a.seq as seq,
-		maker.name as maker,
-		commodity.cd as code,
-		commodity.price as original,
-		a.price as sp,
-		a.approver as approver,
-		commodity.num as qty,
-		commodity.printer_support as support,
-		inventory_mark.display as display,
-        a.approvalday
-		from selling_price a
-        INNER JOIN commodity on a.commodity=commodity.no
-        INNER JOIN inventory on inventory.commodity=commodity.no
-        INNER JOIN maker on commodity.maker=maker.no
-        INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
-        INNER JOIN print_type on print_type.no=commodity.print_type
-		INNER JOIN customer on a.customer=customer.no		
-		WHERE a.seq = (select max(seq) from selling_price WHERE ".$searchCustomer." AND approvalday IS NOT NULL)
-        AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 AND inventory_mark.hidden=0 ".$searchQuery."
-		GROUP BY a.customer,a.commodity,a.num
-        ORDER BY code ASC");
-        $result = execute($stmt,$conn);
-    }
 
+            if(!empty($searchCustomer))
+            {
+                $stmt = $conn->prepare("SELECT  distinct print_type.name as type,
+                customer.no as customer,
+                commodity.no as commodity,
+                a.seq as seq,
+                maker.name as maker,
+                commodity.cd as code,
+                commodity.price as original,
+                a.price as sp,
+                a.approver as approver,
+                commodity.num as qty,
+                commodity.printer_support as support,
+                inventory_mark.display as display,
+                a.approvalday,
+                inventory_mark.hidden as hidden,
+                date(a.upday) as LAST_UPDATE
+                from selling_price a
+                INNER JOIN commodity on a.commodity=commodity.no
+                INNER JOIN inventory on inventory.commodity=commodity.no
+                INNER JOIN maker on commodity.maker=maker.no
+                INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
+                INNER JOIN print_type on print_type.no=commodity.print_type
+                INNER JOIN customer on a.customer=customer.no		
+                WHERE a.seq = (select max(seq) from selling_price b WHERE b.inday IS NOT NULL ".$searchCustomer." )
+                AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 ".$searchQuery."
+                GROUP BY a.customer,a.commodity,a.num
+                ORDER BY maker.name,print_type.no,code ASC");
+                $result = execute($stmt,$conn);
+            }
 
 if($result==TRUE)
 {
     $result = $stmt->get_result();
     $resultSet = $result;
 }
+
+$oldstmt = $conn->prepare("SELECT  distinct print_type.name as type,
+		customer.no as customer,
+        commodity.no as commodity,
+		a.seq as seq,
+		maker.name as maker,
+		commodity.cd as code,
+		commodity.price as original,
+		a.price as sp,
+		a.approver as approver,
+		commodity.num as qty,
+		commodity.printer_support as support,
+		inventory_mark.display as display,
+        a.approvalday
+		from selling_price a
+        INNER JOIN commodity on a.commodity=commodity.no
+        INNER JOIN inventory on inventory.commodity=commodity.no
+        INNER JOIN maker on commodity.maker=maker.no
+        INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
+        INNER JOIN print_type on print_type.no=commodity.print_type
+		INNER JOIN customer on a.customer=customer.no		
+		WHERE a.seq = (select max(seq) from selling_price b WHERE b.inday IS NOT NULL ".$searchCustomer.")
+        AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 ".$searchQuery."
+		GROUP BY a.customer,a.commodity,a.num
+        ORDER BY maker.name,print_type.no,code ASC");
+
+    $oldresult = execute($oldstmt,$conn);
+    if($oldresult==TRUE)
+    {
+        $oldresult = $oldstmt->get_result();
+        $oldresultSet = $oldresult;
+    }
+
+    $pricestmt = $conn->prepare("SELECT  distinct print_type.name as type,
+		customer.no as customer,
+        commodity.no as commodity,
+		a.seq as seq,
+		maker.name as maker,
+		commodity.cd as code,
+		commodity.price as original,
+		a.price as sp,
+		a.approver as approver,
+		commodity.num as qty,
+		commodity.printer_support as support,
+		inventory_mark.display as display,
+        a.approvalday
+		from selling_price a
+        INNER JOIN commodity on a.commodity=commodity.no
+        INNER JOIN inventory on inventory.commodity=commodity.no
+        INNER JOIN maker on commodity.maker=maker.no
+        INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
+        INNER JOIN print_type on print_type.no=commodity.print_type
+		INNER JOIN customer on a.customer=customer.no		
+		WHERE a.seq = (select max(seq) from selling_price b WHERE b.approvalday IS NOT NULL ".$searchCustomer.")
+        AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 ".$searchQuery."
+		GROUP BY a.customer,a.commodity,a.num
+        ORDER BY maker.name,print_type.no,code ASC");
+
+    $priceresult = execute($pricestmt,$conn);
+    if($priceresult==TRUE)
+    {
+        $priceresult = $pricestmt->get_result();
+        $priceresultSet = $priceresult;
+    }
+
+    if($invalid==null && !empty($searchCustomer))
+    {
+        $addstmt = $conn->prepare("SELECT  distinct print_type.name as type,
+                    commodity.no as commodity,
+                    maker.name as maker,
+                    commodity.cd as code,
+                    commodity.price as original,
+                    commodity.num as qty,
+                    commodity.printer_support as support,
+                    inventory_mark.display as display,
+                    inventory_mark.hidden as hidden
+                    from inventory 
+                    INNER JOIN commodity on inventory.commodity=commodity.no AND commodity.invalid=0
+                    LEFT OUTER JOIN selling_price on inventory.commodity=selling_price.commodity
+                    INNER JOIN maker on commodity.maker=maker.no AND maker.invalid=0
+                    INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no AND inventory_mark.hidden=0
+                    INNER JOIN print_type on print_type.no=commodity.print_type		
+                    WHERE selling_price.commodity IS NULL ".$searchMaker.$searchSupport.$searchCd."
+                    ORDER BY maker.name,print_type.no,code ASC");
+
+            $addresult = execute($addstmt,$conn);
+            if($addresult==TRUE)
+            {
+                $addresult = $addstmt->get_result();
+                $addresultSet = $addresult;
+            }
+    }
 
 $makerStmt = $conn->prepare("select no,name from maker where invalid=0");
 $makerResult = execute($makerStmt,$conn);
@@ -137,4 +205,31 @@ if($customerResult==TRUE)
     $customerResult=$customerStmt->get_result();
     $customerResultSet = $customerResult;
 }
-?>?
+
+$last_updated="";
+$dateStmt = $conn->prepare("SELECT  distinct 
+        date(a.upday) as LAST_UPDATE
+		from selling_price a
+        INNER JOIN commodity on a.commodity=commodity.no
+        INNER JOIN inventory on inventory.commodity=commodity.no
+        INNER JOIN maker on commodity.maker=maker.no
+        INNER JOIN inventory_mark on inventory.inventory_mark=inventory_mark.no
+        INNER JOIN print_type on print_type.no=commodity.print_type
+		INNER JOIN customer on a.customer=customer.no		
+		WHERE a.seq = (select max(seq) from selling_price b WHERE (b.approvalday IS NOT NULL OR b.seq=0) ".$searchCustomer." )
+        AND commodity.invalid=0 AND maker.invalid=0 AND customer.invalid=0 ".$searchQuery."");
+$dateResult = execute($dateStmt,$conn);
+if($dateResult==true)
+{
+    $dateResult = $dateStmt->get_result();
+    $dateResultSet = $dateResult;
+}
+$last_updated="";
+while($row = $dateResult->fetch_assoc())
+{
+    $last_updated = !empty($row["LAST_UPDATE"])?$row["LAST_UPDATE"]:"まだ更新されていません";
+}
+
+if(empty($searchCustomer))
+    $last_updated="-";
+?>

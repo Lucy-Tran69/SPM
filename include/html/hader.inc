@@ -2,15 +2,15 @@
 include_once "common/session.php";
 include_once "common/authentication.php"; 
 ?>
+<!DOCTYPE html>
 <html>
 <head>
-<title>WEB在庫・価格管理システム</title>
-<link rel="stylesheet" type="text/css" href="../refer/template/dist/css/adminlte.css">
-<link rel="stylesheet" type="text/css" href="../refer/template/dist/css/adminlte.css.map">
+<title>NCI WEB在庫・価格システム</title>
+<!-- <link rel="stylesheet" type="text/css" href="../refer/template/dist/css/adminlte.css"> -->
+<!-- <link rel="stylesheet" type="text/css" href="../refer/template/dist/css/adminlte.css.map"> -->
 <link rel="stylesheet" type="text/css" href="../refer/template/dist/css/adminlte.min.css">
-<link rel="stylesheet" type="text/css" href="../refer/template/dist/css/adminlte.min.css.map">
+<!-- <link rel="stylesheet" type="text/css" href="../refer/template/dist/css/adminlte.min.css.map"> -->
 <link rel="stylesheet" type="text/css" href="../refer/css/nci_style.css" />
-<title>NCI - 在庫・価格管理システム</title>
 
 <!-- Font Awesome -->
 <link rel="stylesheet" href="../refer/template/plugins/fontawesome-free/css/all.min.css">

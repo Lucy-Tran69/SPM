@@ -13,7 +13,8 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     $insert_user = $_SESSION["loginUserId"];
    	$cd = $_POST["cd"];
    	$checkOK = 1;
-
+	$cd = removeWhitespaceAtBeginAndEndOfString($_POST["cd"]);
+	$cd = mysqli_real_escape_string($conn, $cd);
    	if (empty($cd)) {
 		$msg->error('取引先コードを入力してください。');
     	$checkOK = 0;
@@ -22,14 +23,14 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
        $msg->error('取引先コードは8文字以内で入力してください。');
     	$checkOK = 0;
   	} else {
-	    $cd = test_input($_POST["cd"]);
 	    if (!preg_match("/^[a-z A-Z 0-9]*$/",$cd)) {
 			$msg->error('数字・文字のみ（特殊文字を含めない）を入力してください。');
 	      $checkOK = 0;
     	}
   	}
 
-  	$name = $_POST["name"];
+	$name = removeWhitespaceAtBeginAndEndOfString($_POST["name"]);
+	$name = mysqli_real_escape_string($conn, $name);
   	if (empty($name)) {
 		  $msg->error('取引先名を入力してください。');
     	$checkOK = 0;
@@ -38,7 +39,8 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
   		$checkOK = 0;
   	}
 
-  	$tel = $_POST["tel"];
+	$tel = removeWhitespaceAtBeginAndEndOfString($_POST["tel"]);
+	$tel = mysqli_real_escape_string($conn, $tel);
   	if (empty($tel)) {
 		  $msg->error('電話番号を入力してください。');
     	$checkOK = 0;
@@ -47,7 +49,8 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
   		$checkOK = 0;
   	}
 
-  	$zip = $_POST["zip"];
+	$zip = removeWhitespaceAtBeginAndEndOfString($_POST["zip"]);
+	$zip = mysqli_real_escape_string($conn, $zip);
   	if (empty($zip)) {
 		  $msg->error('郵便番号を入力してください。');
     	$checkOK = 0;
@@ -56,7 +59,8 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
   		$checkOK = 0;
   	}
 
-  	$address = $_POST["address"];
+	$address = removeWhitespaceAtBeginAndEndOfString($_POST["address"]);
+	$address = mysqli_real_escape_string($conn, $address);
   	if (empty($address)) {
 		  $msg->error('住所を入力してください。');
     	$checkOK = 0;
@@ -65,7 +69,8 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
   		$checkOK = 0;
   	}
 
-  	$charge = $_POST["charge"];
+	$charge = removeWhitespaceAtBeginAndEndOfString($_POST["charge"]);
+	$charge = mysqli_real_escape_string($conn, $charge);
   	if (empty($charge)) {
 		  $msg->error('担当者名を入力してください。');
     	$checkOK = 0;
@@ -74,8 +79,8 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
   		$checkOK = 0;
   	}
 
-  	$sale = $_POST["sale"];
-  	if (empty($sale)) {
+  	$sales = $_POST["sale"];
+  	if (empty($sales)) {
 		  $msg->error('営業担当を選択してください。');
     	$checkOK = 0;
   	}
@@ -84,7 +89,10 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
   	if (empty($supervisor)) {
 		  $msg->error('承認者を選択してください。');
     	$checkOK = 0;
-  	}
+	  }
+	  
+	$displaylimit = isset($_POST["displaylimit"]) ? $_POST["displaylimit"] : 1;
+	// print_r($displaylimit);die();
 
     $invalid = isset($_POST["invalid"]) ? $_POST["invalid"] : 0;
 
@@ -100,28 +108,33 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 
   	if ($checkOK == 1) {
   		//save db
-  		$sql = "insert into customer (cd, name, tel, zip, address, charge, sales, supervisor, invalid, inuser)
-                values ('$cd','$name','$tel','$zip','$address','$charge',$sale,$supervisor,$invalid, $insert_user)";
-  		if (mysqli_query($conn, $sql)) {
+  		$sql = "insert into customer (cd, name, tel, zip, address, charge, sales, supervisor, invalid, inuser, displaylimit)
+				values (?,?,?,?,?,?,?,?,?,?,?)";
+				
+		$stmt = $conn->prepare($sql);
+
+		$stmt->bind_param('ssssssiiiii', $cd, $name, $tel, $zip, $address, $charge, $sales, $supervisor, $invalid, $insert_user, $displaylimit);
+
+		$stmt->execute();
+
+  		if (!($stmt->error)) {
 		  $msg->success('新規取引先の追加に成功しました。');
   		} else {
-			if(mysqli_error($conn)){
+			if($stmt->error){
 				$msg->error('新規取引先の追加時にエラーが発生しました。もう一度お試しください。');
 				$msg->display();
 			}
   		}
   	}else{
-	//   echo json_encode(array("statusCode"=>201, "msg" =>  $errmsg));
 	  $msg->display();
     }
 }
 
 $conn->close();
 
-function test_input($data) {
+function removeWhitespaceAtBeginAndEndOfString($data) {
   $data = trim($data);
   $data = stripslashes($data);
-  $data = htmlspecialchars($data);
   return $data;
 }
 ?>

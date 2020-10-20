@@ -1,23 +1,36 @@
+<?php include "html/header.inc";?>
+<?php
+include "common/check_view_permission.php";
+$url = "customer";
+check_view_permission($url);
+?>
 
 <style>
   .align_button {
     text-align: center;
   }
-
   .title_nowrap_align_middle {
     white-space: nowrap;
     vertical-align: middle;
+    text-align: center;
+  }
+  .dataTables_scrollHeadInner {
+    width: 100% !important;
+  }
+
+  table > thead > tr > th:last-child,
+  table > tbody > tr > td:last-child {
+    min-width: 100px;
   }
 </style>
 
-<?php include "html/header.inc";?>
 <?php include "html/menu.inc";?>
 <input type="hidden" name="" id="page-name" value="取引先管理">
 <div class="card card-default">
   <div class="card-body">
     <div class="row justify-content-md-center">
       <div class="col-md-6">
-        <form action="#" id="searchCustomer" method="POST" role="form">
+        <form action="#" id="searchCustomer" method="GET" role="form">
           <div class="form-group row">
             <label class="col-sm-4 col-form-label text-right">取引先コード</label>
             <div class="col-sm-8">
@@ -51,7 +64,7 @@
   <div class="col-12">
     <div class="card">
       <!-- /.card-header -->
-      <div class="card-body table-responsive-sm">
+      <div class="card-body">
         <div class="row justify-content-end" style="margin-right: 10px; margin-bottom: 20px">
           <button type="button" class="btn btn-primary" onclick="redirectAddOrEditCustomer()"><i class="fas fa-plus mr-2"></i>追加</button>
         </div>
@@ -61,8 +74,9 @@
               <tr>
                 <th class="title_nowrap_align_middle">取引先コード</th>
                 <th class="title_nowrap_align_middle">取引先名</th>
-                <th class="title_nowrap_align_middle">在庫閲覧ユーザ数</th>
-                <th class="title_nowrap_align_middle">在庫・価格表閲覧ユーザ数</th>
+                <th class="title_nowrap_align_middle text-center">在庫閲覧ユーザ数</th>
+                <th class="title_nowrap_align_middle text-center">在庫・価格表閲覧ユーザ数</th>
+                <th class="title_nowrap_align_middle text-center">在庫表示</th>
                 <th class="title_nowrap_align_middle">ステータス</th>
                 <th class="title_nowrap_align_middle"></th>
               </tr>
@@ -82,6 +96,8 @@
 <script type="text/javascript">
   $(function () {
     const customerTable = $('#customerTable');
+    
+
     var table = {
       'start': 0,
       'processing': true,
@@ -90,14 +106,17 @@
       'serverSide': true,
       'deferRender': true,
       'info': false,
-      'autoWidth': false,
       'lengthChange': false,
-      'scrollX': true,
       'columns': [
-        { data: 'cd', "defaultContent": "", "title": '取引先コード' },
-        { data: 'name', "defaultContent": "", "title": '取引先名' },
-        { data: 'NumberCustomerRole5', "defaultContent": "", "title": '在庫閲覧ユーザ数' },
-        { data: 'NumberCustomerRole6', "defaultContent": "", "title": '在庫・価格表閲覧ユーザ数' },
+        { data: 'cd', "defaultContent": "", "title": '取引先コード'},
+        { data: 'name', "defaultContent": "", "title": '取引先名',
+          render: function (data, type, row) {
+              return htmlEncode(data);
+            }
+        },
+        { data: 'NumberCustomerRole5', "defaultContent": "", "title": '在庫閲覧ユーザ数', className: "text-right" },
+        { data: 'NumberCustomerRole6', "defaultContent": "", "title": '在庫・価格表閲覧ユーザ数', className: "text-right" },
+        { data: 'DisplayLimit', "defaultContent": "", "title": '在庫表示' },
         { data: 'invalid', "defaultContent": "", "title": 'ステータス' },
         {
           data: 'no',
@@ -106,54 +125,45 @@
           }
         },
       ],
+      'drawCallback': function(settings) {
+      }
     };
 
     table.ajax ={
       url: 'customer.php',
         type: 'POST',
         data: function (d) {
-            delete d.columns;
+          d.cd = $('#cd').val();
+          d.name = $('#name').val();
+          d.status = $('#status').is(":checked") ? 1 : 0;
+          delete d.columns;
         },
         datatype: "json",
     };
 
-    $(customerTable).DataTable(table);
+    customerTable.DataTable(table);
+
+    // var cd = document.getElementById("cd").value();
+    // var name = document.getElementById("name").value();
+    // var status = document.getElementById("status").value();
+
+      // var info = customerTable.page.info();
+      // console.log(info);  
 
     $('#searchCustomer').on('submit', function (e) {
       e.preventDefault();
-      RequestData();
+      $('#flash-message').remove();
+      customerTable.DataTable().ajax.reload();
     });
-
-    function RequestData() {
-      let cd = $('#cd').val();
-      let name = $('#name').val();
-      let status = 0;
-      if (document.getElementById("status").checked) {
-        status = 1;
-      }
-
-      $('#customerTable').DataTable().destroy();
-      
-      table.ajax = {
-        url: 'customer.php',
-        type: 'POST',
-        data: function (d) {
-            d.cd = $('#cd').val();
-            d.name = $('#name').val();
-			      d.status = status;
-			
-            delete d.columns;
-        },
-        datatype: "json",
-      };
-
-      $(customerTable).DataTable(table);
-    }
   });
 
   function redirectAddOrEditCustomer() {
     window.location.href = "../../app/customer/add-customer.html";
   }
+
+  function htmlEncode(value) {
+    return $('<textarea/>').text(value).html();
+}
 </script>
 
 </body>

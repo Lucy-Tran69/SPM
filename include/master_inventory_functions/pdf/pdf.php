@@ -45,7 +45,7 @@ if($invalid==null)
                     inventory_mark.display as display 
                     from maker 
                     LEFT JOIN commodity on maker.no=commodity.maker
-                    LEFT JOIN inventory on inventory.commodity=commodity.no
+                    inner JOIN inventory on inventory.commodity=commodity.no
                     LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
                     where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." order by commodity.cd ASC");
 }
@@ -56,7 +56,7 @@ else
                     inventory_mark.display as display 
                     from maker 
                     LEFT JOIN commodity on maker.no=commodity.maker
-                    LEFT JOIN inventory on inventory.commodity=commodity.no
+                    inner JOIN inventory on inventory.commodity=commodity.no
                     LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
                     where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery. " AND inventory.inventory_mark<>4 order by commodity.cd ASC");
 }
@@ -121,6 +121,8 @@ if ($officeResult == TRUE) {
 $office;
 $customer;
 $tel;
+$name="";
+$fax="";
 if ($officeResultSet->num_rows > 0) 
 {
     mysqli_data_seek($officeResultSet, 0);
@@ -132,7 +134,7 @@ if ($officeResultSet->num_rows > 0)
 
     if (!empty($office)) 
     {
-        $Stmt = $conn->prepare("select tel from office where no=".$office);
+        $Stmt = $conn->prepare("select tel,title as NAME,fax from office where no=".$office);
         $Result = execute($Stmt, $conn);
         if ($Result == TRUE) 
         {
@@ -142,7 +144,7 @@ if ($officeResultSet->num_rows > 0)
     }
     else if(!empty($customer))
     {
-        $Stmt = $conn->prepare("select tel from customer where no=".$customer);
+        $Stmt = $conn->prepare("select tel,name as NAME,fax from customer where no=".$customer);
         $Result = execute($Stmt, $conn);
         if ($Result == TRUE) 
         {
@@ -154,38 +156,52 @@ if ($officeResultSet->num_rows > 0)
     while($row = $ResultSet->fetch_assoc())
     {
         $tel = $row["tel"];
+        $name = $row["NAME"];
+        $fax = empty($row["fax"])?" -":$row["fax"];
     }
 }
 class PDF extends PDF_Japanese
 {
     public $tel;
-    public function __construct($custom) {
+    public $name;
+    var $count;
+    public $fax;
+    public function __construct($custom,$name,$fax) {
         parent::__construct();
         $this->tel = $custom;
+        $this->name = $name;
+        $this->fax=$fax;
+        $this->count=0;
     }
     function Header()
     {
 
-        $this->SetFont('SJIS','',14);
+        $this->SetFont('SJIS','B',14);
        
         //set 
         $this->SetTextColor(0,0,0);
 
         // 表のタイトル
-        $top = "在庫表";
-        $this->Cell(0, 10,mb_convert_encoding($top, 'SJIS'),0,0,'C', false);
-        $this->Ln();
-        $this->Cell(0, 10,mb_convert_encoding("エヌシーアイ販売(株)　CS業務担当", 'SJIS'),0,0,'R', false);
-        $this->Ln();
-        $this->Cell(0, 10,mb_convert_encoding("TEL :".$this->tel." FAX :".$this->tel, 'SJIS'),0,0,'R', false);
-        
-        //line break
-        $this->Ln();
-        $title = "在庫状況表示：　○/在庫あり　△/在庫少量　リターン/リターン再生対応";
-        $this->Cell(0, 10,mb_convert_encoding($title, 'SJIS'),0,0,'C', false);
-        
-        //line break
-        $this->Ln();
+        if($this->count==0)
+        {
+            $this->count=1;
+            $top = "在庫表";
+            $this->SetFont('SJIS','B',20);
+            $this->Cell(0, 10,mb_convert_encoding($top, 'SJIS'),0,0,'C', false);
+            $this->Ln();
+            $this->SetFont('SJIS','',12);
+            $this->Cell(0, 10,mb_convert_encoding(trim($this->name), 'SJIS'),0,0,'R', false);
+            $this->Ln();
+            $this->Cell(0, 10,mb_convert_encoding("TEL :".$this->tel." FAX :".$this->fax, 'SJIS'),0,0,'R', false);
+            $this->SetFont('SJIS','',12);
+            //line break
+            $this->Ln();
+            $title = "在庫状況表示：　○/在庫あり　△/在庫少量　リターン/リターン再生対応";
+            $this->Cell(0, 10,mb_convert_encoding($title, 'SJIS'),0,0,'C', false);
+            
+            //line break
+            $this->Ln();
+        }
         $this->SetFont('SJIS','B',14);
         //テーブルのヘッダー
         // $headers = array("No", "品名", "数", "担当者");
@@ -195,10 +211,9 @@ class PDF extends PDF_Japanese
         // $this->Cell(80, 8, mb_convert_encoding("品名", 'SJIS'), 1, 0, 'C');
         // $this->Cell(15, 8, mb_convert_encoding("数", 'SJIS'), 1, 0, 'C');
         // $this->Cell(75, 8, mb_convert_encoding("担当者", 'SJIS'), 1, 0, 'C');
-        foreach($headers as $h)
-        {
-            $this->Cell(65, 8, mb_convert_encoding($h, 'SJIS'), 1, 0, 'C');
-        }
+        $this->Cell(33, 8, mb_convert_encoding($headers[0], 'SJIS'), 1, 0, 'C');
+        $this->Cell(130, 8, mb_convert_encoding($headers[1], 'SJIS'), 1, 0, 'C');
+        $this->Cell(32, 8, mb_convert_encoding($headers[2], 'SJIS'), 1, 0, 'C');
         
         //line break
         $this->Ln();
@@ -224,7 +239,7 @@ class PDF extends PDF_Japanese
     }
 }
 
-$pdf = new PDF($tel);
+$pdf = new PDF($tel,$name,$fax);
 $pdf->AddSJISFont();
 $pdf->AddPage();
 
@@ -238,9 +253,23 @@ $pdf->SetFont('SJIS','',14);
 
 //Fill data
 foreach ($result as $row) {
+    $i=0;
     foreach($row as $column)
     {
-        $pdf->Cell(65, 8, mb_convert_encoding($column, 'SJIS'), 1, 0, 'C');
+        $w;
+        if($i==0)
+        {
+            $pdf->Cell(33, 8, mb_convert_encoding($column, 'SJIS'), 1, 0, 'L');
+        }
+        else if($i==1)
+        {
+            $pdf->Cell(130, 8, mb_convert_encoding($column, 'SJIS'), 1, 0, 'L');
+        }
+        else
+        {
+            $pdf->Cell(32, 8,mb_convert_encoding($column, 'SJIS'), 1, 0, 'C');
+        }
+        $i++;
     }
     $pdf->Ln();
 }

@@ -14,9 +14,10 @@
     $searchOutSide = "";
     $status = 0;
     $join = "";
-
-    if($_SERVER['REQUEST_METHOD'] == 'POST') {
+print_r($_SESSION['status']);
+    if($_SERVER['REQUEST_METHOD'] == 'POST' || !empty($_SESSION['menu']) || !empty($_SESSION['outSide']) || !empty($_SESSION['status'])) {
         $menu = isset($_POST["menu"]) ? $_POST["menu"] : '';
+        print_r($_SESSION['menu']);
         $outSide = isset($_POST["outSide"]) ? $_POST["outSide"] : '';
         $status = isset($_POST["status"]) ? $_POST["status"] : 0;
         $sortOrder = isset($_POST["sortOrder"]) ? $_POST["sortOrder"] : '';
@@ -73,6 +74,11 @@
                 $msg->success('表示順の更新に成功しました。');
             }
         }
+
+        // $_SESSION['menu'] = $menu;
+        $_SESSION['menu'] = $menu;
+        $_SESSION['outSide'] = $outSide;
+        $_SESSION['status'] = $status;
     }
 
     if ($status != 1) {

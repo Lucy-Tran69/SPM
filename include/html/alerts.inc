@@ -3,13 +3,13 @@
     <div class="modal-dialog">
         <div class="modal-content bg-danger">
             <div class="modal-header">
-                <h4 class="modal-title">Error</h4>
+                <h4 class="col-12 modal-title text-center">Error</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="text-align: center;">
                 <p id="alertFailText">&hellip;</p>
             </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-outline-light" data-dismiss="modal" onclick="window.location.reload();">Close</button>
+            <div class="modal-footer justify-content">
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal" onclick="$('#searchForm').submit();">はい</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -21,13 +21,13 @@
     <div class="modal-dialog">
         <div class="modal-content bg-success">
             <div class="modal-header">
-                <h4 class="modal-title">Success</h4>
+                <h4 class="col-12 modal-title text-center">Success</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="text-align: center;">
                 <p id="alertSuccessText">&hellip;</p>
             </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-outline-light" data-dismiss="modal" onclick="window.location.reload();">Close</button>
+            <div class="modal-footer justify-content">
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal" onclick="$('#searchForm').submit();">はい</button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -39,13 +39,13 @@
     <div class="modal-dialog">
         <div class="modal-content bg-warning">
             <div class="modal-header">
-                <h4 class="modal-title">Success</h4>
+                <h4 class="col-12 modal-title text-center">Warning</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="text-align: center;">
                 <p id="alertWarningText">&hellip;</p>
             </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-outline-light" data-dismiss="modal" onclick="warningOk();">Close</button>
+            <div class="modal-footer justify-content">
+                <button type="button" class="btn btn-outline-light" data-dismiss="modal" onclick="warningOk();">はい</button>
             </div>
         </div>
         <!-- /.modal-content -->

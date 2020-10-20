@@ -31,7 +31,7 @@ if ($conn->connect_error)
 }
 
 $stmt = $conn->prepare("update commodity set name=?,cd=?,print_type=?,num=?,price=?,maker=?,green=?,printer_support=?,note=?,memo=?,invalid=?,upday=?,upuser=? where no=?");
-$stmt->bind_param('ssiiisisssisii',$name,$code,$print_type,$num,$price,$maker,$green,$printer_support,$note,$memo,$invalid,$insert_date,$insert_user,$no);
+$stmt->bind_param('ssiississsisii',$name,$code,$print_type,$num,$price,$maker,$green,$printer_support,$note,$memo,$invalid,$insert_date,$insert_user,$no);
 
 $result = execute($stmt,$conn);
 if($result)

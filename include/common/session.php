@@ -1,9 +1,21 @@
 <?php
-//if(session_id() == '' || !isset($_SESSION)) {
+include_once "const/system.inc";
+
 if (session_status() != PHP_SESSION_ACTIVE) {    
     // session isn't started
     session_start();
 }
+
+// $time = $_SERVER['REQUEST_TIME'];
+// $timeout_duration = SESSION_LIFE_TIME;
+
+// if (isset($_SESSION['LAST_ACTIVITY']) && ($time - $_SESSION['LAST_ACTIVITY']) > $timeout_duration) {
+//     session_unset();
+//     session_destroy();
+//     session_start();
+// }
+// $_SESSION['LAST_ACTIVITY'] = $time;
+
 
 if (!isset($msg)) {
     $msg = new FlashMessages();
