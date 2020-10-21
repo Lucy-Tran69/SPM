@@ -5,18 +5,18 @@ $(function () {
     }
 
     if ($('#outCompany').is(":checked")) {
-         $('#inSideCompany').hide();
+        $('#inSideCompany').hide();
         $('#outSideCompany').show();
     }
 
-    $(document).on('change', '.outSideCompany', function(e) {
+    $(document).on('change', '.outSideCompany', function (e) {
         e.preventDefault();
-        if($('#inCompany').is(":checked")) {
+        if ($('#inCompany').is(":checked")) {
             $('#inSideCompany').show();
             $('#outSideCompany').hide();
         }
 
-        if($('#outCompany').is(":checked")) {
+        if ($('#outCompany').is(":checked")) {
             $('#inSideCompany').hide();
             $('#outSideCompany').show();
         }
@@ -44,6 +44,14 @@ $(function () {
             roleName: {
                 required: true,
             },
+            'menuIn[]': {
+                required: true,
+                minlength: 1
+            },
+            'menuOut[]': {
+                required: true,
+                minlength: 1
+            },
             // menuCheck: {
             //   required: true,
             // },
@@ -55,6 +63,8 @@ $(function () {
             roleName: "権限名を入力して下さい。",
             // menuCheck: "Please select menu.",
             // menuOut: "Please select menu."
+            'menuIn[]': "Please select at least one checkbox",
+            'menuOut[]': "Please select at least one checkbox",
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -63,9 +73,29 @@ $(function () {
         },
         highlight: function (element, errorClass, validClass) {
             $(element).addClass('is-invalid');
+            if ($(element).attr("name") == "menuIn[]") {
+                $('.menuIn').each(function () {
+                    $(this).addClass('is-invalid');
+                });
+            }
+            if ($(element).attr("name") == "menuOut[]") {
+                $('.menuOut').each(function () {
+                    $(this).addClass('is-invalid');
+                });
+            }
         },
         unhighlight: function (element, errorClass, validClass) {
             $(element).removeClass('is-invalid');
+            if ($(element).attr("name") == "menuIn[]") {
+                $('.menuIn').each(function () {
+                    $(this).removeClass('is-invalid');
+                });
+            }
+            if ($(element).attr("name") == "menuOut[]") {
+                $('.menuOut').each(function () {
+                    $(this).removeClass('is-invalid');
+                });
+            }
         }
     });
 
@@ -79,20 +109,21 @@ $(function () {
         var menu = [];
         if ($('#inCompany').is(":checked")) {
             outSide = $('#inCompany').val();
-            $("input[name=menuIn]:checked").each ( function() {
+            $(".menuIn:checked").each(function () {
                 menu.push($(this).val());
             });
         }
 
         if ($('#outCompany').is(":checked")) {
             outSide = $('#outCompany').val();
-          
-             $("input[name=menuOut]:checked").each ( function() {
+
+            $(".menuOut:checked").each(function () {
                 menu.push($(this).val());
             });
         }
+        console.log(menu);
 
-         if ($('#status').is(":checked")) {
+        if ($('#status').is(":checked")) {
             var status = $('#status').val();
         }
 
@@ -100,11 +131,11 @@ $(function () {
             url: "addRole.php",
             type: "POST",
             data: {
-                roleName : $('#roleName').val(),
-                outSide : outSide,
-                sortOrder : $('#sortOrder').val(),
-                status : status,
-                menu : menu
+                roleName: $('#roleName').val(),
+                outSide: outSide,
+                sortOrder: $('#sortOrder').val(),
+                status: status,
+                menu: menu
             },
             dataType: "html",
             success: function (response) {

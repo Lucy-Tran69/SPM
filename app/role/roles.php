@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 $param = $_SERVER['QUERY_STRING'];
 if (isset($param) && !empty($param)) {
     $menu = isset($_GET["menu"]) ? $_GET["menu"] : '';
-    $outSide = isset($_GET["outSide"]) ? $_GET["outSide"] : '';
+    $outSide = isset($_GET["outside"]) ? $_GET["outside"] : '';
     $status = isset($_GET["status"]) ? $_GET["status"] : 0;
 
     if (!empty($menu)) {

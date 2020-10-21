@@ -14,7 +14,7 @@
        $sortOrder = isset($_POST["sortOrder"]) ? $_POST["sortOrder"] : '';
        $status = isset($_POST["status"]) ? $_POST["status"] : 0;
        $menu = isset($_POST["menu"]) ? $_POST["menu"] : '';
-
+       
        $insert_user = $_SESSION["loginUserId"];
 
        $checkOK = 1;
