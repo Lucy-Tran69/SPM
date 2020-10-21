@@ -1,5 +1,6 @@
 $(function () {
     const topicTable = $('#topicsTable');
+    // var currentURL = $(location).attr('href');
     var table = {
         'processing': true,
         'serverSide': true,
@@ -39,10 +40,11 @@ $(function () {
 
     topicTable.DataTable(table);
 
-    $('#searchTopic').on('submit', function (e) {
-        e.preventDefault();
+    $('#searchTopic').on('submit', function () {
         $('#flash-message').remove();
         topicTable.DataTable().ajax.reload();
+        new_url = window.location.search + '?title=' + title+ '&status=' + status;
+        window.location.href = new_url;
     });
 
     $('#topicsTable tbody').on('click', '.js-deleteTopic', function (e) {

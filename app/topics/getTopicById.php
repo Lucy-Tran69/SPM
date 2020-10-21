@@ -18,5 +18,7 @@ if (isset($_SESSION["loginAccount"])) {
             $row = mysqli_fetch_assoc($getTopic); 
         }
     }
+
+    $conn->close();
 }
 ?>

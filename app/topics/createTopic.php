@@ -116,7 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 					if (!move_uploaded_file($fileName['tmp_name'], UPLOAD_DIR.$image)) {
 						$msg->error('アップロードでエラーが発生しました。もう一度お試しください。');
 					}
-				}	
+				}
+
+				$stm->close();	
 		}
 
 		if ($stmt->error) {
@@ -131,6 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	else {
 		$msg->display();
 	}
+
+	$conn->close();
 }
 
 function remove_special_character($string) {

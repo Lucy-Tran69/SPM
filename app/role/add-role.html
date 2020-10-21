@@ -14,6 +14,11 @@
             text-align: left!important;
         }
     }
+
+    .required:after {
+        content: "*";
+        color: red;
+    }
 </style>
 
 <input type="hidden" name="" id="page-name" value="権限新規追加">
@@ -24,7 +29,7 @@
             <form action="" role="form" id="addRole" method="POST" novalidate="novalidate">
                 <div class="card-body">
                     <div class="form-group">
-                        <label for="roleName required">権限名</label>
+                        <label class="required" for="roleName">権限名</label>
                         <input type="text" name="roleName" class="form-control" id="roleName" placeholder="権限名">
                     </div>
                     <div class="form-group">

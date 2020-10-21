@@ -16,6 +16,11 @@
     .custom-file-label::after {
         content: none;
     }
+
+     .required:after {
+        content: "*";
+        color: red;
+    }
 </style>
 
 <input type="hidden" name="" id="page-name" value="トピックス変更">
@@ -28,7 +33,7 @@
                 <div class="card-body">
                     <input type="hidden" id="no" name="no" value="<?php echo $row['no']; ?>">
                     <div class="form-group">
-                        <label for="title">タイトル</label>
+                        <label class="required" for="title">タイトル</label>
                         <input type="text" name="title" class="form-control" id="title" placeholder="タイトル"
                             value="<?php echo $row['title']; ?>">
                     </div>
@@ -62,7 +67,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="body">本文</label>
+                        <label class="required" for="body">本文</label>
                         <textarea type="text" name="body" class="form-control" rows="6" id="body"
                             placeholder="本文"><?php echo $row['body']; ?></textarea>
                     </div>

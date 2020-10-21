@@ -92,7 +92,6 @@ $(function () {
     });
 
     formEditTopic.submit(function (event) {
-
         event.preventDefault();
         if (!formEditTopic.valid()) {
             return false;
@@ -126,10 +125,12 @@ $(function () {
             data: form_data,
             dataType: "html",
             success: function (response) {
+                debugger
                 //check response is blank if success 
                 if (!$.trim(response)) {
-                    window.location.href = "index.html";
+                    //window.location.href = "index.html?";
                     $(window).scrollTop(0);
+                    window.history.back();
                 }
                 // if error
                 else {

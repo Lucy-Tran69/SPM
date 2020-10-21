@@ -14,6 +14,11 @@
             text-align: left!important;
         }
     }
+
+     .required:after {
+        content: "*";
+        color: red;
+    }
 </style>
 
 <input type="hidden" name="" id="page-name" value="権限変更">
@@ -25,7 +30,7 @@
                 <input type="hidden" name="no" id="no" value="<?php echo $role['no']?>">
                 <div class="card-body">
                     <div class="form-group">
-                        <label for="roleName">権限名</label>
+                        <label class="required" for="roleName">権限名</label>
                         <input type="text" name="roleName" class="form-control" id="roleName" placeholder="権限名" value="<?php echo $role['name']?>">
                     </div>
                     <div class="form-group">

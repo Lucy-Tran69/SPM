@@ -4,15 +4,8 @@
     $url = "topics";
     check_view_permission($url);
     include_once "html/menu.inc";
-
-    $title = '';
-    $status = '';
-    if (!empty($_SESSION['title'])) {
-        $title = $_SESSION['title'];
-    }
-     if (!empty($_SESSION['status'])) {
-        $status = $_SESSION['status'];
-    }
+$_SERVER['REQUEST_URI'];
+  
 ?>
 
 <style type="text/css" media="all">
@@ -51,14 +44,14 @@
     <div class="card-body">
         <div class="row justify-content-md-center">
             <div class="col-md-6">
-                <form action="#" id="searchTopic" method="POST" role="form">
+                <form action="#" id="searchTopic" method="post" role="form">
                     <div class="form-group">
                         <div class="row">
                            <div class="col-sm-3 text-center text-left" style="margin-top: 5px">
                                 <label>タイトル</label>
                             </div>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="title" name="title" placeholder="タイトル" value="<?php echo $title;?>" />
+                                <input type="text" class="form-control" id="title" name="title" value="" placeholder="タイトル"/>
                             </div>
                     </div>
                     </div>
@@ -68,16 +61,22 @@
                            </div>
                            <div class="col-sm-9">
                             <div class="custom-control custom-checkbox">
-                                <?php
+                              <!--   <?php
                                     if (!empty($status)) { ?>
                                     <input type="checkbox" name="status" class="custom-control-input" id="status"
                                     value="<?php echo date('Y-m-d h:i:s', time()); ?>" checked/>
                                  <?php   } 
                                  else {
-                                ?>
+                                ?> -->
+                              <!--   <?php
+                                  $checked= "";
+                                  if(isset($_GET['status'])) {
+                                        $checked= "checked";
+                                  }
+                                ?> -->
                                 <input type="checkbox" name="status" class="custom-control-input" id="status"
                                 value="<?php echo date('Y-m-d h:i:s', time()); ?>" />
-                                <?php } ?>
+                                <!-- <?php } ?> -->
                                 <label class="custom-control-label" for="status">公開中のみ</label>
                             </div>
                         </div>

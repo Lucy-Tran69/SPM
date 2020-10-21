@@ -40,8 +40,8 @@
             mysqli_query($conn, $empQuery);
         }
 
-        $_SESSION['title'] = $title;
-        $_SESSION['status'] = $status;
+        // $_SESSION['title'] = $title;
+        // $_SESSION['status'] = $status;
     }
 
     ## Total number of records without filtering

@@ -14,9 +14,97 @@
     $searchOutSide = "";
     $status = 0;
     $join = "";
+
+    if($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $menu = isset($_POST["menu"]) ? $_POST["menu"] : '';
+        $outSide = isset($_POST["outSide"]) ? $_POST["outSide"] : '';
+        $status = isset($_POST["status"]) ? $_POST["status"] : 0;
+        $sortOrder = isset($_POST["sortOrder"]) ? $_POST["sortOrder"] : '';
+        unset ($_SESSION['search']);
+
+        if(!empty($menu)){
+            $searchMenu = "role_menu.menu = $menu ";
+            $join = "inner join role_menu on role.no = role_menu.role ";
+        }
+
+        if(!empty($outSide)){
+            if ($outSide == 0){
+                $searchOutSide = "";
+            }
+            else {
+                $searchOutSide = "outside.no = $outSide ";
+            }
+        }
+
+        if (!empty($searchMenu) || !empty($searchOutSide)) {
+            if (!empty($searchMenu))
+            {
+                if(!empty($searchQuery))
+                {
+                    $searchQuery = $searchQuery." and ";
+                }
+                $searchQuery = $searchQuery.$searchMenu ;
+            }
+
+            if (!empty($searchOutSide))
+            {
+                if(!empty($searchQuery))
+                {
+                    $searchQuery = $searchQuery." and ";
+                }
+                $searchQuery = $searchQuery.$searchOutSide ;
+            }
+        }
+
+        if (!empty($sortOrder)) {
+            $checkOK = 1;
+             //check duplicate sort order
+            $checkDupSortOrder = "select count(*) as count_row from role where sort_order = ?";
+            $stmtCheckDup = $conn->prepare($checkDupSortOrder);
+
+            $stmtCheckDup->bind_param('i', $sortOrder);
+
+            $stmtCheckDup->execute();
+
+            if(!$stmtCheckDup->error) {
+                $rs = $stmtCheckDup->get_result();
+                $row = $rs->fetch_array(MYSQLI_ASSOC);
+            }
+
+            $stmtCheckDup->close();
+           
+            $num = $row['count_row'];
+            if($num > 0){
+                $msg->error('表示順は既に存在しています。');
+                $checkOK = 0;
+            }
+
+            if ($checkOK == 1) {
+                 $empQuery = "update role set sort_order = ? where no = ?";
+                $stmSort = $conn->prepare($empQuery);
+                foreach ($sortOrder as $value) {
+                    $sort = $value['sortOrder'];
+                    $no = $value['no'];
+
+                    $stmSort->bind_param('ii', $sort, $no);
+                    $stmSort->execute();
+                }
+
+                if($stmSort->error) {
+                    $msg->error('表示順の更新に失敗しました。');
+                }
+                else {
+                    $msg->success('表示順の更新に成功しました。');
+                }
+
+                $stmSort->close();
+            }
+        }
+
+        $_SESSION['search'] = array('menu' => $menu, 'outSide' => $outSide, 'status' => $status);
+    }
     
     if(isset($_SESSION['search']) && count($_SESSION['search'])>0) {
-        // print_r($_SESSION['search']);
         $menu = isset($_SESSION['search']["menu"]) ? $_SESSION['search']["menu"] : '';
         $outSide = isset($_SESSION['search']["outSide"]) ? $_SESSION['search']["outSide"] : '';
         $status = isset($_SESSION['search']["status"]) ? $_SESSION['search']["status"] : 0;
@@ -54,70 +142,6 @@
                 $searchQuery = $searchQuery.$searchOutSide ;
             }
         }
-    }
-
-    if($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $menu = isset($_POST["menu"]) ? $_POST["menu"] : '';
-        // print_r($_SESSION['menu']);
-        $outSide = isset($_POST["outSide"]) ? $_POST["outSide"] : '';
-        $status = isset($_POST["status"]) ? $_POST["status"] : 0;
-        $sortOrder = isset($_POST["sortOrder"]) ? $_POST["sortOrder"] : '';
-
-        if(!empty($menu)){
-            $searchMenu = "role_menu.menu = $menu ";
-            $join = "inner join role_menu on role.no = role_menu.role ";
-        }
-
-        if(!empty($outSide)){
-            if ($outSide == 0){
-                $searchOutSide = "";
-            }
-            else {
-                $searchOutSide = "outside.no = $outSide ";
-            }
-        }
-
-        if (!empty($searchMenu) || !empty($searchOutSide)) {
-            if (!empty($searchMenu))
-            {
-                if(!empty($searchQuery))
-                {
-                    $searchQuery = $searchQuery." and ";
-                }
-                $searchQuery = $searchQuery.$searchMenu ;
-            }
-
-            if (!empty($searchOutSide))
-            {
-                if(!empty($searchQuery))
-                {
-                    $searchQuery = $searchQuery." and ";
-                }
-                $searchQuery = $searchQuery.$searchOutSide ;
-            }
-        }
-
-        if (!empty($sortOrder)) {
-            $empQuery = "update role set sort_order = ? where no = ?";
-            $stmSort = $conn->prepare($empQuery);
-            foreach ($sortOrder as $value) {
-                $sort = $value['sortOrder'];
-                $no = $value['no'];
-
-                $stmSort->bind_param('ii', $sort, $no);
-                $stmSort->execute();
-            }
-
-            if($stmSort->error) {
-                $msg->error('表示順の更新に失敗しました。');
-            }
-            else {
-                $msg->success('表示順の更新に成功しました。');
-            }
-        }
-
-        // $_SESSION['menu'] = $menu;
-        $_SESSION['search'] = array('menu' => $menu, 'outSide' => $outSide, 'status' => $status);
     }
 
     if ($status != 1) {

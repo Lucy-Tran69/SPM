@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$openDay = isset($_POST["openDay"]) ? $_POST["openDay"] : date('Y-m-d h:i:s');;
 	$closeDay = isset($_POST["closeDay"]) ? $_POST["closeDay"] : NULL;
 	$statusImage = isset($_POST["statusImage"]) ? $_POST["statusImage"] : '';
+	$returnURL = isset($_POST["returnURL"]) ? $_POST["returnURL"] : '';
 
 	$insert_user = $_SESSION["loginUserId"];
 	$checkOK = 1;
@@ -139,6 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	else {
 		$msg->display();
 	}
+
+	$conn->close();
 }
 
 function remove_special_character($string) {
