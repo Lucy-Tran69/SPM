@@ -4,7 +4,16 @@
     $url = "topics";
     check_view_permission($url);
     include_once "html/menu.inc";
-$_SERVER['REQUEST_URI'];
+
+    
+    $title = '';
+    $status = '';
+    
+    $param = $_SERVER['QUERY_STRING'];
+    if(isset($param) && !empty($param)) {
+        $title = $_GET['title'];
+        $status = $_GET['status'];
+    }
   
 ?>
 
@@ -51,7 +60,7 @@ $_SERVER['REQUEST_URI'];
                                 <label>タイトル</label>
                             </div>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="title" name="title" value="" placeholder="タイトル"/>
+                                <input type="text" class="form-control" id="title" name="title" value="<?php echo $title ?>" placeholder="タイトル"/>
                             </div>
                     </div>
                     </div>
@@ -61,22 +70,8 @@ $_SERVER['REQUEST_URI'];
                            </div>
                            <div class="col-sm-9">
                             <div class="custom-control custom-checkbox">
-                              <!--   <?php
-                                    if (!empty($status)) { ?>
-                                    <input type="checkbox" name="status" class="custom-control-input" id="status"
-                                    value="<?php echo date('Y-m-d h:i:s', time()); ?>" checked/>
-                                 <?php   } 
-                                 else {
-                                ?> -->
-                              <!--   <?php
-                                  $checked= "";
-                                  if(isset($_GET['status'])) {
-                                        $checked= "checked";
-                                  }
-                                ?> -->
                                 <input type="checkbox" name="status" class="custom-control-input" id="status"
-                                value="<?php echo date('Y-m-d h:i:s', time()); ?>" />
-                                <!-- <?php } ?> -->
+                                value="<?php echo !empty($status) ? $status : date('Y-m-d h:i:s', time()); ?>" <?php echo !empty($status) ? 'checked' : ''; ?> />
                                 <label class="custom-control-label" for="status">公開中のみ</label>
                             </div>
                         </div>

@@ -56,6 +56,11 @@ td{
   tr:nth-child(even) {
     background-color: #f2f2f2;
   }
+
+  .dropdown-menu > li:hover{
+    background-color: #e0a800;
+    background-image: none;
+}
 </style>
 <?php include "html/sidebar.inc" ?>
 <?php include "master_price_functions/master_price.php" ?>
@@ -104,8 +109,17 @@ if (isset($_SESSION["loginAccount"])) {
                           }
                           ?>
                         </select>
-                        <input type="submit" value="表示" class="btn btn-primary" style="width: 100px;margin-right: 5px;">
-                        <button class="btn btn-warning" id="createPDF" style="width: 100px;margin-right: 5px;" onclick="generatepdf();"><i class="fas fa-file-pdf"></i>&nbsp;PDF</button>
+                        <input type="submit" value="表示" class="btn btn-primary" style="width: 100px;margin-right: 5px;margin-left: 2px;">
+                        <div class="btn-group" style="width: 100px;margin-right: 5px;">
+                        <button type="button" id="createPDF" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                          <span class="caret"><i class="fas fa-file-pdf"></i>&nbsp;PDF</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                          <li class="dropdown-item"><a href="#" onclick="generatepdf('true');">担当者あり</a></li>
+                          <li class="dropdown-item"><a href="#" onclick="generatepdf('false');">担当者なし</a></li>
+                        </ul>
+                      </div>
+                        <!-- <button class="btn btn-warning" id="createPDF" style="width: 100px;margin-right: 5px;" onclick="generatepdf();"><i class="fas fa-file-pdf"></i>&nbsp;PDF</button> -->
                         <button class="btn btn-success" id="createCSV" style="width: 100px;"onclick="generatecsv();"><i class="fas fa-table"></i>&nbsp;CSV</button> 
                         </div>
                       </div>
@@ -189,11 +203,13 @@ if (isset($_SESSION["loginAccount"])) {
                   </thead>
                   <tbody>
                     <?php
+                    $disabled = "";
                     if(isset($resultSet))
                     {
                     if ($resultSet->num_rows > 0 && $display==TRUE) {
                       mysqli_data_seek($resultSet,0);
                       while ($row = $resultSet->fetch_assoc()) {
+                        $disabled = $row["sales"]!=$_SESSION["loginUserId"]?"disabled":"";
                         $rowOld = $oldresultSet->fetch_assoc();
                         $rowPrice = $priceresultSet->fetch_assoc();
                         if($row["sp"]!=$rowPrice["sp"]){
@@ -207,8 +223,8 @@ if (isset($_SESSION["loginAccount"])) {
                           <td><?php echo $row["type"];?></td>
                           <td><?php echo $row["code"];?></td>
                           <td><?php echo numfmt_format_currency($fmt,$row["original"], "JPY")?></td>
-                          <td><?php echo !empty($row["sp"])?numfmt_format_currency($fmt,$row["sp"], "JPY"):"-"; ?></td>
-                          <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value="<?php echo trim($rowOld["sp"]); ?>"></td>
+                          <td><?php echo !empty($row["sp"])?numfmt_format_currency($fmt,$row["sp"], "JPY"):"-"; ?></td>                          
+                          <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value="<?php echo trim($rowOld["sp"]); ?>" <?php echo $row["sales"]!=$_SESSION["loginUserId"]?"disabled":"" ?>></td>
                           <td style="text-align: center;"><?php echo trim($row["qty"]);?></td>
                           <td><?php echo $row["support"];?></td>
                           <td><?php echo $row["display"];?></td>
@@ -235,7 +251,7 @@ if (isset($_SESSION["loginAccount"])) {
                           <td><?php echo $row["code"];?></td>
                           <td><?php echo is_numeric($row["original"])?numfmt_format_currency($fmt,$row["original"], "JPY"):$row["original"];?></td>
                           <td><?php echo !empty($row["sp"])?numfmt_format_currency($fmt,$row["sp"], "JPY"):"-"; ?></td>
-                          <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value=""></td>
+                          <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value="" <?php echo $disabled ?>></td>
                           <td style="text-align: center;"><?php echo $row["qty"];?></td>
                           <td><?php echo trim($row["support"]);?></td>
                           <td><?php echo $row["display"];?></td>
@@ -265,6 +281,7 @@ if (isset($_SESSION["loginAccount"])) {
   <?php include "html/footer.inc" ?>
   <form id="pdfForm" style="display: none;" action="pdf/generatePDF.php" method="POST" role="form" target='_blank'>
     <input type="checkbox" id="pdfInvalid" name="searchInvalid" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>>
+    <input type="hidden" name="username" id="username" value="">
     <input type="hidden" name="UserId" id="UserId" value="<?php echo $_SESSION["loginUserId"];?>">
     <select name="selectedCustomer" id="selectedCustomer" class="form-control">
       <option value="">-</option>
@@ -393,6 +410,7 @@ function confirmSubmit()
     var id = $("#loginUserId").val();
     var flag = [];
     var searchCust = $('select[customName="' + 0 + '"]');
+    var finalArray = [];
     $('#details_table tbody tr').each(function() {
       var cust = $(this).find('td:eq(0)').html();
       var item = $(this).find('td:eq(1)').html();
@@ -418,17 +436,21 @@ function confirmSubmit()
 
     for(var i=0;i<customers.length;i++)
     {
-      $.ajax({
+      var temp={
+          "cust": customers[i],
+          "commodity": items[i],
+          "value" : values[i],
+          "loginUserId": id,
+          "flag":flag[i]
+      }
+      finalArray.push(temp);
+    }
+    $.ajax({
         url: "../../include/master_price_functions/updatePrice.php",
         type: "POST",
         dataType: "text",
-        async:false,
-        data: {
-          cust: customers[i],
-          commodity: items[i],
-          value : values[i],
-          loginUserId: id,
-          flag:flag[i]
+        data: { 
+          arr : JSON.stringify(finalArray)
         },
         success: function(response) {
         },
@@ -436,7 +458,6 @@ function confirmSubmit()
           console.log(textStatus, errorThrown);
         }
       });
-    }
     $("#alertSuccessText").text("価格を設定しました。承認依頼を送信しました。");
     $("#alertSuccess").modal('toggle');
   }
@@ -494,7 +515,7 @@ function confirmSubmit()
       $("#confimBtn").prop("disabled", true );
     }
   });
-  function generatepdf() {
+  function generatepdf(name) {
     // $.ajax({
     //     url: "../../include/inventory_functions/pdf/pdf.php",
     //     type: "POST",
@@ -505,7 +526,8 @@ function confirmSubmit()
     //       console.log(textStatus, errorThrown);
     //     }
     //   });
-
+    
+    document.getElementById('pdfForm').username.value = name;
     document.getElementById('pdfForm').submit();
   }
 

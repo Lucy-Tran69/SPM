@@ -63,11 +63,19 @@ $(function () {
         var menu = [];
 
         if ($('#inCompany').is(":checked")) {
-        	outSide = $('#inCompany').val();
+            outSide = $('#inCompany').val();
+            $("input[name=menuOut]:checked").remove();
+            $("input[name=menuIn]:checked").each ( function() {
+                menu.push($(this).val());
+            });
         }
 
         if ($('#outCompany').is(":checked")) {
-        	outSide = $('#outCompany').val();
+            outSide = $('#outCompany').val();
+          $("input[name=menuIn]:checked").remove();
+             $("input[name=menuOut]:checked").each ( function() {
+                menu.push($(this).val());
+            });
         }
 
          if ($('#status').is(":checked")) {
@@ -94,7 +102,7 @@ $(function () {
             success: function (response) {
                 //check response is blank if success 
                 if (!$.trim(response)) {
-                    window.location.href = "index.html";
+                     window.history.back();
                     $(window).scrollTop(0);
                 }
                 // if error

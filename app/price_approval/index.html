@@ -47,6 +47,7 @@ header("content-type: text/html; charset=UTF-8");
 </style>
 <?php include "html/sidebar.inc" ?>
 <?php include "price_approval_functions/price_approval.php" ?>
+<?php include "price_approval_functions/isPending.php" ?>
 <?php include "html/alerts.inc" ?>
 <!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
 <?php
@@ -82,11 +83,14 @@ if (isset($_SESSION["loginAccount"])) {
                           if ($customerResultSet->num_rows > 0) {
                             mysqli_data_seek($customerResultSet, 0);
                             while ($row = $customerResultSet->fetch_assoc()) {
+                              if(isPending($row["no"],$conn)==true)
+                              {
                           ?>
                               <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedCustomer"]) && $_POST["selectedCustomer"] == $row["no"]) {
                                                                           echo "selected='selected'";
                                                                         } ?>><?php echo $row["name"]; ?></option>
                           <?php
+                              }
                             }
                           }
                           ?>
@@ -240,6 +244,7 @@ $( document ).ready(function() {
     var items = [];
     var nums = [];
     var seqs = [];
+    var finalArray = [];
     var id = $("#loginUserId").val();
     $('#details_table tbody tr').each(function() {
       var cust = $(this).find('td:eq(0)').html();
@@ -249,18 +254,22 @@ $( document ).ready(function() {
       items.push(item);
       seqs.push(seq);
     });
-
     for(var i=0;i<customers.length;i++)
     {
-      $.ajax({
+      var temp={
+          "cust": customers[i],
+          "commodity": items[i],
+          "seq" : seqs[i],
+          "loginUserId": id
+      }
+      finalArray.push(temp);
+    }
+    $.ajax({
         url: "../../include/price_approval_functions/rejectPrice.php",
         type: "POST",
         dataType: "text",
         data: {
-          cust: customers[i],
-          commodity: items[i],
-          seq : seqs[i],
-          loginUserId: id
+          arr : JSON.stringify(finalArray)
         },
         success: function(response) {
         },
@@ -268,16 +277,17 @@ $( document ).ready(function() {
           console.log(textStatus, errorThrown);
         }
       });
-    }
     $("#alertSuccessText").text("否認しました。");
     $("#alertSuccess").modal('toggle');
   }
+
   function updateValues(cst,com,val,id) {
     
     var customers = [];
     var items = [];
     var nums = [];
     var seqs = [];
+    var finalArray = [];
     var id = $("#loginUserId").val();
     $('#details_table tbody tr').each(function() {
       var cust = $(this).find('td:eq(0)').html();
@@ -290,15 +300,20 @@ $( document ).ready(function() {
 
     for(var i=0;i<customers.length;i++)
     {
-      $.ajax({
+      var temp={
+          "cust": customers[i],
+          "commodity": items[i],
+          "seq" : seqs[i],
+          "loginUserId": id
+      }
+      finalArray.push(temp);
+    }
+    $.ajax({
         url: "../../include/price_approval_functions/approvePrice.php",
         type: "POST",
         dataType: "text",
         data: {
-          cust: customers[i],
-          commodity: items[i],
-          seq : seqs[i],
-          loginUserId: id
+          arr : JSON.stringify(finalArray)
         },
         success: function(response) {
         },
@@ -306,7 +321,6 @@ $( document ).ready(function() {
           console.log(textStatus, errorThrown);
         }
       });
-    }
     $("#alertSuccessText").text("承認しました。");
     $("#alertSuccess").modal('toggle');
   }

@@ -1,44 +1,60 @@
 $(function () {
-	if ($('#inCompany').is(":checked")) {
-		$('#inSideCompany').show();
-		$('#outSideCompany').hide();
-	}
+    if ($('#inCompany').is(":checked")) {
+        $('#inSideCompany').show();
+        $('#outSideCompany').hide();
+    }
 
-	if ($('#outCompany').is(":checked")) {
-		 $('#inSideCompany').hide();
+    if ($('#outCompany').is(":checked")) {
+         $('#inSideCompany').hide();
         $('#outSideCompany').show();
-	}
+    }
 
-	$(document).on('change', '.outSideCompany', function(e) {
-		e.preventDefault();
-		if($('#inCompany').is(":checked")) {
-			$('#inSideCompany').show();
-			$('#outSideCompany').hide();
-		}
+    $(document).on('change', '.outSideCompany', function(e) {
+        e.preventDefault();
+        if($('#inCompany').is(":checked")) {
+            $('#inSideCompany').show();
+            $('#outSideCompany').hide();
+        }
 
-		if($('#outCompany').is(":checked")) {
-			$('#inSideCompany').hide();
-			$('#outSideCompany').show();
-		}
-	});
+        if($('#outCompany').is(":checked")) {
+            $('#inSideCompany').hide();
+            $('#outSideCompany').show();
+        }
+    });
 
-	// $.validator.addMethod('minSort', function (value, el, param) {
-	// 	return value > param;
-	// });
+    // $.validator.addMethod('menuIn', function (value, el, param) {
+    //     var menuIn = [];
+    //   $("input[name=menuIn]:checked").each ( function() {
+    //             menuIn.push($(this).val());
+    //         });
+    //   return menuIn.length < 0 && $('#inCompany').is(":checked");
+    // });
 
-	 var formAddRole = $('#addRole');
+    // $.validator.addMethod('menuOut', function (value, el, param) {
+    //     var menuIn = [];
+    //   $("input[name=menuOut]:checked").each ( function() {
+    //             menuIn.push($(this).val());
+    //         });
+    //   return menuIn.length < 0 && $('#outCompany').is(":checked");
+    // });
+
+    var formAddRole = $('#addRole');
     formAddRole.validate({
         rules: {
             roleName: {
                 required: true,
             },
-            // sortOrder: {
-            // 	minSort: 0
+            // menuCheck: {
+            //   required: true,
+            // },
+            // menuOut: {
+            //   required: true,
             // }
         },
         messages: {
             roleName: "権限名を入力して下さい。",
-            // sortOrder: "Please select number greater than 0"
+            // menuCheck: "Please select menu.",
+            // menuOut: "Please select menu."
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -60,39 +76,42 @@ $(function () {
         }
 
         var outSide = '';
+        var menu = [];
         if ($('#inCompany').is(":checked")) {
-        	outSide = $('#inCompany').val();
+            outSide = $('#inCompany').val();
+            $("input[name=menuIn]:checked").each ( function() {
+                menu.push($(this).val());
+            });
         }
 
         if ($('#outCompany').is(":checked")) {
-        	outSide = $('#outCompany').val();
+            outSide = $('#outCompany').val();
+          
+             $("input[name=menuOut]:checked").each ( function() {
+                menu.push($(this).val());
+            });
         }
 
          if ($('#status').is(":checked")) {
-        	var status = $('#status').val();
+            var status = $('#status').val();
         }
-
-        var menu = [];
-		$("input[name=menu]:checked").each ( function() {
-		    menu.push($(this).val());
-		});
 
         $.ajax({
             url: "addRole.php",
             type: "POST",
             data: {
-            	roleName : $('#roleName').val(),
-            	outSide : outSide,
-            	sortOrder : $('#sortOrder').val(),
-            	status : status,
-            	menu : menu
+                roleName : $('#roleName').val(),
+                outSide : outSide,
+                sortOrder : $('#sortOrder').val(),
+                status : status,
+                menu : menu
             },
             dataType: "html",
             success: function (response) {
-            	// debugger
                 //check response is blank if success 
                 if (!$.trim(response)) {
-                    window.location.href = "index.html";
+                    window.history.back();
+                    $(window).scrollTop(0);
                 }
                 // if error
                 else {

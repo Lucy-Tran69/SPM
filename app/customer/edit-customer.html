@@ -52,7 +52,6 @@
     background-color: #ccc;
     -webkit-transition: .4s;
     transition: .4s;
-    /* border-radius: 50%; */
     }
 
     .slider:before {
@@ -125,7 +124,6 @@
 </style>
 
 <?php
-if (isset($_SESSION["loginAccount"])) {
     if(isset($_GET["id"]) && !empty(trim($_GET["id"])) && is_numeric($_GET['id'])){
         include_once "database/db.inc";
 
@@ -138,10 +136,8 @@ if (isset($_SESSION["loginAccount"])) {
         $id = $_GET['id'];
         $sql = "SELECT no, cd, name, tel, zip, address, charge, sales, supervisor, invalid, displaylimit FROM customer WHERE no='$id'";
         $getCustomer = mysqli_query($conn, $sql);
-        //print_r($getCustomer); die();
         if(mysqli_num_rows($getCustomer) > 0){
             $row = mysqli_fetch_assoc($getCustomer); 
-            //print_r($row);die();
 ?>
 <input type="hidden" name="" id="page-name" value="取引先編集">
 <div id="d-message"></div>
@@ -169,7 +165,6 @@ if (isset($_SESSION["loginAccount"])) {
                             <input type="text" name="name" class="form-control " id="name" placeholder="取引先名"
                                 value="<?php echo htmlspecialchars($row['name']); ?>">
                         </div>
-
                     </div>
                     <div class="form-group row">
                         <label for="tel" class="col-md-2 col-sm-3 col-form-label-sm text-right required">TEL</label>
@@ -177,7 +172,6 @@ if (isset($_SESSION["loginAccount"])) {
                             <input type="text" name="tel" class="form-control" id="tel" placeholder="TEL"
                                 value="<?php echo $row['tel']; ?>">
                         </div>
-
                     </div>
                     <div class="form-group row">
                         <label for="zip" class="col-md-2 col-sm-3 col-form-label-sm text-right required">郵便番号</label>
@@ -242,7 +236,7 @@ if (isset($_SESSION["loginAccount"])) {
                             </td>
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row mb-0">
                         <label for="displaylimit"
                             class="col-md-2 col-sm-3 col-form-label-sm text-right">在庫表示※</label>
                         <div class="col-md-6 col-sm-8">
@@ -268,15 +262,13 @@ if (isset($_SESSION["loginAccount"])) {
                         <label class="col-md-2 col-sm-3 col-form-label-sm"></label>
                         <div class="col-md-6 col-sm-8 mx-auto">
                             <button type="submit" class="btn btn-primary mr-2">更新</button>
-                            <button type="button" class="btn btn-default btn-primary mr-2"
-                                onclick="redirectCustomerList()">戻る</button>
+                            <input type="button" value="戻る" class="btn btn-default btn-primary mr-2" onclick="javascript:window.history.back();" />
                         </div>
                     </div>
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
                     <div class="row justify-content-md-center">
-
                     </div>
                 </div>
             </form>
@@ -299,9 +291,6 @@ if (isset($_SESSION["loginAccount"])) {
     http_response_code(404);
     echo "<h1>404 Page Not Found!</h1>";
     }
-} else {
-    //header("Location: ../../include/logout.php");
-}
 
 include "../../include/html/foot.inc"
 ?>

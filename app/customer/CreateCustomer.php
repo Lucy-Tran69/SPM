@@ -92,7 +92,6 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 	  }
 	  
 	$displaylimit = isset($_POST["displaylimit"]) ? $_POST["displaylimit"] : 1;
-	// print_r($displaylimit);die();
 
     $invalid = isset($_POST["invalid"]) ? $_POST["invalid"] : 0;
 
@@ -118,6 +117,9 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 		$stmt->execute();
 
   		if (!($stmt->error)) {
+		  //get parameter of url 
+		  // gans value into input search
+		  // reload table
 		  $msg->success('新規取引先の追加に成功しました。');
   		} else {
 			if($stmt->error){
@@ -130,7 +132,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     }
 }
 
-$conn->close();
+$stmt->close();
 
 function removeWhitespaceAtBeginAndEndOfString($data) {
   $data = trim($data);

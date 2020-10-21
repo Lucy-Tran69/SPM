@@ -54,7 +54,6 @@ check_view_permission($url);
             </div>
             <div class="row justify-content-center">
                 <button type="submit" class="btn btn-primary mr-2">検索</button>
-                <!-- <input type="reset" class="btn btn-default" value="リセット"> -->
             </div>
         </form>
     </div>
@@ -68,8 +67,8 @@ check_view_permission($url);
           <table id="inventoryTable" class="table table-bordered table-striped w-100">
             <thead style="text-align: center;">
               <tr>
-                <th class="title_nowrap_align_middle">区分</th>
                 <th class="title_nowrap_align_middle">メーカー名</th>
+                <th class="title_nowrap_align_middle">区分</th>
                 <th class="title_nowrap_align_middle">商品名(型番)</th>
                 <th id="inventoryTable-last-th" class="title_nowrap_align_middle">在庫</th>
               </tr>
@@ -101,8 +100,8 @@ check_view_permission($url);
           'serverSide': true,
           'processing': true,
           'columns':[
-          { data: 'print_type', "defaultContent": ""},
           { data: 'maker', "defaultContent": ""},
+          { data: 'print_type', "defaultContent": ""},
           { data: 'name', "defaultContent": ""},
           { data: 'display', "defaultContent": ""}
           ],

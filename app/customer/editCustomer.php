@@ -124,7 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 		$stmt->bind_param('ssssssiiiiisi', $cd, $name, $tel, $zip, $address, $charge, $sales, $supervisor, $invalid, $insert_user, $displaylimit, $upday, $id);
 
 		$stmt->execute();
-		// print_r($stmt); die();
 
 	    if (!($stmt->error)) {
 		  $msg->success('取引先編集に成功しました。');
@@ -139,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
     }
 }
 
-$conn->close();
+$stmt->close();
 
 function removeWhitespaceAtBeginAndEndOfString($data) {
   $data = trim($data);

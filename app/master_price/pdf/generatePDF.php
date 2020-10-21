@@ -10,6 +10,7 @@ $err_msg = "";
 $conn  = getConnection();
 $display=FALSE;
 $user = $_SESSION["loginUserId"];
+$userAccount = $_SESSION["loginAccount"];
 $cust="";
 if($conn->connect_error)
 {
@@ -20,11 +21,13 @@ if($conn->connect_error)
     $searchMaker = "";
     $searchCustomer = "";
     $searchSupport = "";
+    $printName = false;
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $maker = isset($_POST["selectedMaker"])?$_POST["selectedMaker"]:null;
         $customer = isset($_POST["selectedCustomer"])?$_POST["selectedCustomer"]:null;
         $cart = isset($_POST["searchCartridge"])?$_POST["searchCartridge"]:null;
         $support = isset($_POST["searchSupport"])?$_POST["searchSupport"]:null;
+        $printName = isset($_POST["username"])?$_POST["username"]:null;
        // echo json_encode ($status);die();
         if(!empty($cart)){
             $searchCd = " and commodity.cd like '%$cart%' ";
@@ -149,7 +152,7 @@ $appDay="";
 $appDay1="";
 $seq="";
 $fax="";
-$customerStmt = $conn->prepare("select name,no,tel,cd,address,zip,fax from customer where no=".$cust);
+$customerStmt = $conn->prepare("select name,no,tel,cd,address,zip from customer where no=".$cust);
 $customerResult = execute($customerStmt, $conn);
 if ($customerResult == TRUE) {
     $customerResult = $customerStmt->get_result();
@@ -165,7 +168,6 @@ while($row = $customerResultSet->fetch_assoc())
     $cd=$row["cd"];
     $address=$row["address"];
     $zip=$row["zip"];
-    $fax=$row["fax"];
 }
 
 while($row = $oldresultSet->fetch_assoc())
@@ -214,7 +216,9 @@ class PDF extends PDF_Japanese
     var $apday1;
     var $fax;
     var $oname;
-    public function __construct($o,$n,$num,$telp,$code,$address,$zip,$seq,$ap,$ap1,$fax,$oname) {
+    var $printName;
+    var $user;
+    public function __construct($o,$n,$num,$telp,$code,$address,$zip,$seq,$ap,$ap1,$fax,$oname,$pname,$user) {
         parent::__construct($o);
         $this->name=$n;
         $this->no=$num;
@@ -228,6 +232,8 @@ class PDF extends PDF_Japanese
         $this->apday1=$ap1;
         $this->fax=$fax;
         $this->oname=$oname;
+        $this->printName=$pname;
+        $this->user = $user;
     }
     function Header()
     {
@@ -267,6 +273,13 @@ class PDF extends PDF_Japanese
             $this->SetX(131);
             $this->Cell(0, 6,mb_convert_encoding("TEL : ".trim($this->tel)." FAX : ".trim($this->fax), 'SJIS'));
             $this->Ln();
+
+            if($this->printName=='true')
+            {
+                $this->SetX(131);
+                $this->Cell(0, 6,mb_convert_encoding("担当者： ".trim($this->user), 'SJIS'));
+                $this->Ln();
+            }
 
            
             // $this->SetX(123);
@@ -505,7 +518,7 @@ protected $extgstates = array();
 
 }
 $fmt = numfmt_create( 'ja_JP', NumberFormatter::CURRENCY );
-$pdf = new PDF('P',$name,$no,$tel,$cd,$address,$zip,$seq,$appDay,$appDay1,$fax,$oname);
+$pdf = new PDF('P',$name,$no,$tel,$cd,$address,$zip,$seq,$appDay,$appDay1,$fax,$oname,$printName,$userAccount);
 $pdf->AddSJISFont();
 $pdf->AddPage();
 

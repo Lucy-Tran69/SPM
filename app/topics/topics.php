@@ -39,9 +39,6 @@
             $empQuery = "UPDATE topics SET invalid = 1 WHERE no = $topicID";
             mysqli_query($conn, $empQuery);
         }
-
-        // $_SESSION['title'] = $title;
-        // $_SESSION['status'] = $status;
     }
 
     ## Total number of records without filtering

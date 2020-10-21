@@ -5,7 +5,6 @@ include_once "database/db.inc";
 $conn  = getConnection();
 
 $cusAcc = $_SESSION["loginUserId"];
-    // print_r($cusAcc);die();
 
 $cusStmt = "SELECT customer FROM users WHERE users.no = ".$cusAcc;
 $cusResult = mysqli_query($conn,$cusStmt);
@@ -20,13 +19,12 @@ $makerStmt = $conn-> prepare("SELECT m.name FROM maker m
                                         INNER JOIN (select I.commodity, im.display 
                                                         FROM inventory I
                                                         INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1)) inv ON inv.commodity = C.no 
-                                        WHERE C.invalid = 0) A GROUP BY m.name") ;
+                                        WHERE C.invalid = 0) A WHERE m.invalid != 1 GROUP BY m.name") ;
 $makerResult = execute($makerStmt,$conn);
 if($makerResult==TRUE)
 {
     $makerResult=$makerStmt->get_result();
     $makerResultSet = $makerResult;
-    // print_r($makerResultSet);
 }
 
 $conn->close();

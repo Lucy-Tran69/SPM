@@ -145,9 +145,9 @@ if (isset($_SESSION["loginAccount"])) {
               <table id="details_table" class="table table-bordered">
                 <thead>
                   <tr>
+                    <th>メーカ名</th>
                     <th>商品コード</th>
                     <th>商品名</th>
-                    <th>メーカ名</th>
                     <th>備考欄</th>
                     <th></th>
                   </tr>
@@ -158,9 +158,9 @@ if (isset($_SESSION["loginAccount"])) {
                     while ($row = $resultSet->fetch_assoc()) {
                   ?>
                       <tr>
+                        <td><?php echo $row["maker"] ?></td>  
                         <td><?php echo $row["code"] ?></td>
                         <td><?php echo $row["name"] ?></td>
-                        <td><?php echo $row["maker"] ?></td>
                         <td><?php echo $row["note"] ?></td>
                         <td style="display: none;"><?php echo $row["invalid"] ?></td>
                         <td style="display: none;"><?php echo $row["type"] ?></td>
@@ -199,7 +199,7 @@ if (isset($_SESSION["loginAccount"])) {
             <input type="hidden" id="inputId" name="inputId" />
             <table class="popup_table">
               <tr>
-                <td><label id="nameLabel" class="label_align_table">メーカ名</label></td>
+                <td><label id="nameLabel" class="label_align_table">メーカ名<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><select id="inputMaker" name="inputMaker">
                     <?php
                     if ($makerResultSet->num_rows > 0) {
@@ -215,7 +215,7 @@ if (isset($_SESSION["loginAccount"])) {
                 </td>
               </tr>
               <tr>
-                <td><label id="typeLabel" class="label_align_table">タイプ</label></td>
+                <td><label id="typeLabel" class="label_align_table">タイプ<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><div class="icheck-primary d-inline">
                         <input type="radio" id="inputType1" name="inputType" value="1" checked/>
                         <label style="font-weight: normal;" for="inputType1">
@@ -231,16 +231,16 @@ if (isset($_SESSION["loginAccount"])) {
                 </td>
               </tr>
               <tr>
-                <td><label id="codeLabel" class="label_align_table">商品コード</label></td>
-                <td><input type="text" id="inputCode" name="inputCode" required/></td>
+                <td><label id="codeLabel" class="label_align_table">商品コード<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="inputCode" name="inputCode" required autocomplete="off"/></td>
               </tr>
               <tr>
-                <td><label id="codeLabel" class="label_align_table">商品名</label></td>
-                <td><input type="text" id="inputName" name="inputName" required/></td>
+                <td><label id="codeLabel" class="label_align_table">商品名<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="inputName" name="inputName" required autocomplete="off"/></td>
               </tr>
               <tr>
-                <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
-                <td><input type="text" id="inputPrice" name="inputPrice" required/></td>
+                <td><label id="priceLabel" class="label_align_table">参考価格<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="inputPrice" name="inputPrice" required autocomplete="off"/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
@@ -292,7 +292,7 @@ if (isset($_SESSION["loginAccount"])) {
           <form action="../../include/commodity_functions/copyCommodity.php" method="POST" class="form_style" onsubmit="return validateCopy();">
             <table class="popup_table">
               <tr>
-                <td><label id="nameLabel" class="label_align_table">メーカ名</label></td>
+                <td><label id="nameLabel" class="label_align_table">メーカ名<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><select id="copyMaker" name="copyMaker">
                     <?php
                     if ($makerResultSet->num_rows > 0) {
@@ -308,7 +308,7 @@ if (isset($_SESSION["loginAccount"])) {
                 </td>
               </tr>
               <tr>
-                <td><label id="typeLabel" class="label_align_table">タイプ</label></td>
+                <td><label id="typeLabel" class="label_align_table">タイプ<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><div class="icheck-primary d-inline">
                         <input type="radio" id="copyType1" name="copyType" value="1" checked/>
                         <label style="font-weight: normal;" for="copyType1">
@@ -324,16 +324,16 @@ if (isset($_SESSION["loginAccount"])) {
                 </td>
               </tr>
               <tr>
-                <td><label id="codeLabel" class="label_align_table">商品コード</label></td>
-                <td><input type="text" id="copyCode" name="copyCode" required/></td>
+                <td><label id="codeLabel" class="label_align_table">商品コード<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="copyCode" name="copyCode" required autocomplete="off"/></td>
               </tr>
               <tr>
-                <td><label id="codeLabel" class="label_align_table">商品名</label></td>
-                <td><input type="text" id="copyName" name="copyName" required/></td>
+                <td><label id="codeLabel" class="label_align_table">商品名<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="copyName" name="copyName" required autocomplete="off"/></td>
               </tr>
               <tr>
-                <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
-                <td><input type="text" id="copyPrice" name="copyPrice" required/></td>
+                <td><label id="priceLabel" class="label_align_table">参考価格<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="copyPrice" name="copyPrice" required autocomplete="off"/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">再生回数</label></td>
@@ -385,7 +385,7 @@ if (isset($_SESSION["loginAccount"])) {
           <form action="../../include/commodity_functions/insertCommodity.php" method="POST" class="form_style" onsubmit="return validateInsert();">
           <table class="popup_table">
               <tr>
-                <td><label id="nameLabel" class="label_align_table">メーカ名</label></td>
+                <td><label id="nameLabel" class="label_align_table">メーカ名<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><select id="insertMaker" name="insertMaker">
                     <?php
                     if ($makerResultSet->num_rows > 0) {
@@ -401,7 +401,7 @@ if (isset($_SESSION["loginAccount"])) {
                 </td>
               </tr>
               <tr>
-                <td><label id="typeLabel" class="label_align_table">タイプ</label></td>
+                <td><label id="typeLabel" class="label_align_table">タイプ<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><div class="icheck-primary d-inline">
                         <input type="radio" id="insertType1" name="insertType" value="1" checked/>
                         <label style="font-weight: normal;" for="insertType1">
@@ -417,16 +417,16 @@ if (isset($_SESSION["loginAccount"])) {
                 </td>
               </tr>
               <tr>
-                <td><label id="codeLabel" class="label_align_table">商品コード</label></td>
-                <td><input type="text" id="insertCode" name="insertCode" required/></td>
+                <td><label id="codeLabel" class="label_align_table">商品コード<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="insertCode" name="insertCode" required autocomplete="off"/></td>
               </tr>
               <tr>
-                <td><label id="codeLabel" class="label_align_table">商品名</label></td>
-                <td><input type="text" id="insertName" name="insertName" required/></td>
+                <td><label id="codeLabel" class="label_align_table">商品名<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="insertName" name="insertName" required autocomplete="off"/></td>
               </tr>
               <tr>
-                <td><label id="priceLabel" class="label_align_table">参考価格</label></td>
-                <td><input type="text" id="insertPrice" name="insertPrice" required/></td>
+                <td><label id="priceLabel" class="label_align_table">参考価格<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><input type="text" id="insertPrice" name="insertPrice" required autocomplete="off"/></td>
               </tr>
               <tr>
                 <td><label id="loginLabel" class="label_align_table">再生回数</label></td>

@@ -14,9 +14,12 @@
   .dataTables_scrollHeadInner {
     width: 100% !important;
   }
-  table > thead > tr > th:first-child,
-  table > tbody > tr > td:first-child {
+  table > thead > tr > th:nth-child(2),
+  table > tbody > tr > th:nth-child(2) {
     min-width: 200px;
+  }
+  .max_width_column {
+    max-width: 500px;
   }
   table > thead > tr > th{
     text-align: center;
@@ -66,7 +69,6 @@ check_view_permission($url);
           </div>
           <div class="row justify-content-center">
               <button type="submit" class="btn btn-primary mr-2">検索</button>
-              <!-- <input type="reset" class="btn btn-default" value="リセット"> -->
           </div>
       </form>
   </div>
@@ -79,8 +81,8 @@ check_view_permission($url);
           <table id="priceInventoryTable" class="table table-bordered table-striped w-100">
             <thead style="text-align: center;">
               <tr>
-                <th class="title_nowrap_align_middle">区分</th>
                 <th class="title_nowrap_align_middle">メーカー名</th>
+                <th class="title_nowrap_align_middle">区分</th>
                 <th class="title_nowrap_align_middle">商品名(型番)</th>
                 <th class="title_nowrap_align_middle text-center">純正品価格</th>
                 <th class="title_nowrap_align_middle text-center">弊社価格</th>
@@ -116,8 +118,8 @@ check_view_permission($url);
       'serverSide': true,
       'processing': true,
       'columns':[
-        { data: 'print_type', "defaultContent": ""},
         { data: 'maker', "defaultContent": ""},
+        { data: 'print_type', "defaultContent": ""},
         { data: 'name', "defaultContent": ""},
         { data: 'price1', "defaultContent": "", className: "text-right"},
         {
@@ -132,7 +134,7 @@ check_view_permission($url);
           }
         },
         { data: 'num', "defaultContent": "", className: "text-right"},
-        { data: 'printer_support', "defaultContent": ""},
+        { data: 'printer_support', "defaultContent": "", className:" max_width_column"},
         { data: 'display', "defaultContent": ""}
       ],
       'ajax': {
@@ -157,8 +159,6 @@ check_view_permission($url);
         }    
       }
     });
-
-    // priceInventoryTable.DataTable(table);
 
     $('#searchCommodity').on('submit', function (e) {
       e.preventDefault();

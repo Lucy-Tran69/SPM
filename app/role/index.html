@@ -7,12 +7,14 @@
     include_once "getNameMenu.php";
 
     $menu = '';
-    $outSide = '';
+    $outside = '';
     $status = '';
-    if (!empty($_SESSION['search'])) {
-        $menu = $_SESSION['search']['menu'];
-        $outSide = $_SESSION['search']['outSide'];
-        $status = $_SESSION['search']['status'];
+    
+    $param = $_SERVER['QUERY_STRING'];
+    if(isset($param) && !empty($param)) {
+        $menu = $_GET['menu'];
+        $outside = $_GET['outside'];
+        $status = $_GET['status'];
     }
 ?>
 
@@ -73,11 +75,11 @@
                                 <label>所属</label>
                             </div>
                             <div class="col-sm-9">
-                                <input type="radio" id="all" name="outSide" value="0" <?php echo $outSide == 0 ? 'checked' : '' ?>>
+                                <input type="radio" id="all" name="outSide" value="0" <?php echo $outside == 0 ? 'checked' : '' ?>>
                                 <label class="font-weight-normal" for="all">すべて</label><br>
-                                <input type="radio" id="inCompany" name="outSide" value="1" <?php echo $outSide == 1 ? 'checked' : '' ?>>
+                                <input type="radio" id="inCompany" name="outSide" value="1" <?php echo $outside == 1 ? 'checked' : '' ?>>
                                 <label class="font-weight-normal" for="inCompany">社内</label><br>
-                                <input type="radio" id="outCompany" name="outSide" value="2" <?php echo $outSide == 2 ? 'checked' : '' ?>>
+                                <input type="radio" id="outCompany" name="outSide" value="2" <?php echo $outside == 2 ? 'checked' : '' ?>>
                                 <label class="font-weight-normal" for="outCompany">社外</label>
                             </div>
                         </div>
@@ -88,14 +90,8 @@
                             </div>
                             <div class="col-sm-9">
                                 <div class="custom-control custom-checkbox">
-                                    <?php if (!empty($status)) { ?>
-                                    <input type="checkbox" name="status" class="custom-control-input" id="status"
-                                        value="<?php echo $status; ?>" checked />
-                                    <?php }
-                                    else { ?>
-                                    <input type="checkbox" name="status" class="custom-control-input" id="status"
-                                        value="1" />
-                                    <?php } ?>
+                                     <input type="checkbox" name="status" class="custom-control-input" id="status"
+                                     value="<?php echo !empty($status) ? $status : 1; ?>" <?php echo !empty($status) ? 'checked' : ''; ?> />
                                     <label class="custom-control-label font-weight-normal" for="status">無効を含む</label>
                                 </div>
                             </div>

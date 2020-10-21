@@ -9,8 +9,6 @@
         die("Failed to connect to database. ".$conn->connect_error);
     }
 
-    // print_r($row);die();
-
     ## Read value
     $draw = isset($_POST['draw']) ? $_POST['draw'] : 1;
     $rowa = isset($_POST['start']) ? $_POST['start'] : 0;
@@ -35,7 +33,6 @@
             $freeword = mysqli_real_escape_string($conn, $freeword);
             $searchFreeWord = "AND C.name LIKE '%$freeword%' ";
         }
-        // print_r($searchMaker);
         if (!empty($searchMaker) || !empty($searchFreeWord)) {
             if (!empty($searchMaker)){
                 if (!empty($searchQuery)){
@@ -50,14 +47,12 @@
                 $searchQuery = $searchQuery.$searchFreeWord ;
             }       
         } 
-        // print_r($searchQuery);
     }
-    // die();
 
     $sel = mysqli_query($conn, "select count(*) as allcount from (select PT.name AS print_type, M.name AS maker, C.name, inv.commodity, inv.display 
                                                                     FROM commodity C 
                                                                     LEFT JOIN print_type PT ON C.print_type = PT.no 
-                                                                    LEFT JOIN maker M ON C.maker = M.no 
+                                                                    INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
                                                                     INNER JOIN (select I.commodity, im.display 
                                                                                 FROM inventory I
                                                                                 INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1)) inv ON inv.commodity = C.no 
@@ -79,25 +74,21 @@
     $newestDateResult = mysqli_query($conn,$newestDateQuery);
     $row = mysqli_fetch_assoc($newestDateResult);
     $newestDate = $row['newestDate'];
-    // print_r($newestDate);
 
     ## Fetch records
     $empQuery = "select PT.name AS print_type, M.name AS maker, C.name, inv.commodity, inv.display 
                     FROM commodity C 
                     LEFT JOIN print_type PT ON C.print_type = PT.no 
-                    LEFT JOIN maker M ON C.maker = M.no 
+                    INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
                     INNER JOIN (select I.commodity, im.display 
                                 FROM inventory I
                                 INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1)) inv ON inv.commodity = C.no 
-                    WHERE C.invalid = 0 ".$searchQuery." LIMIT ".$rowa.",".$rowperpage;
-    // print_r($empQuery);die();
+                    WHERE C.invalid = 0 ".$searchQuery." ORDER BY maker, print_type, C.cd ASC LIMIT ".$rowa.",".$rowperpage;
 
     $empRecords = mysqli_query($conn, $empQuery);
-    // print_r($empRecords); //die();
     
     $data = array();
     
-    // print_r($empQuery); die();
     while ($row = mysqli_fetch_assoc($empRecords)) {
         $data[] = array(
                 "print_type" => $row['print_type'],
@@ -106,7 +97,6 @@
                 "display" => $row['display']
             );
     }
-    // print_r($data); die();
     
     ## Response
     $response = array(

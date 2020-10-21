@@ -1,7 +1,5 @@
 <?php include "html/header.inc" ?>
 
-<link rel="stylesheet" href="../refer/template/plugins/bootstrap-switch/css/bootstrap3/bootstrap-switch.min.css">
-
 <?php
 include "common/check_view_permission.php";
 $url = "customer";
@@ -56,7 +54,6 @@ check_view_permission($url);
     background-color: #ccc;
     -webkit-transition: .4s;
     transition: .4s;
-    /* border-radius: 50%; */
     }
 
     .slider:before {
@@ -127,10 +124,7 @@ check_view_permission($url);
     border-radius: 50%;
     }
 </style>
-</style>
-<?php
-if (isset($_SESSION["loginAccount"])) {
-?>
+
 <input type="hidden" name="" id="page-name" value="取引先追加">
 <div id="d-message"></div>
 <div class="row">
@@ -220,16 +214,10 @@ if (isset($_SESSION["loginAccount"])) {
                             </td>
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row mb-0">
                         <label for="displaylimit"
                             class="col-md-2 col-sm-3 col-form-label-sm text-right">在庫表示※</label>
                         <div class="col-md-6 col-sm-8">
-                            <!-- <div class="custom-control custom-switch">
-                                <input type="checkbox" class="custom-control-input" id="displaylimit">
-                                <label class="custom-control-label" for="displaylimit"></label>
-                            </div> -->
-                            <!-- <input type="checkbox" data-toggle="switchbutton" checked data-style="ios" id="displaylimit"> -->
-                            <!-- Rounded switch -->
                             <label class="switch">
                                 <input type="checkbox" id="displaylimit" checked>
                                 <div class="slider round">
@@ -251,8 +239,8 @@ if (isset($_SESSION["loginAccount"])) {
                         <label class="col-md-2 col-sm-3 col-form-label-sm"></label>
                         <div class="col-md-6 col-sm-8 mx-auto">
                             <button type="submit" class="btn btn-primary mr-2">登録</button>
-                            <button type="button" class="btn btn-default btn-primary mr-2"
-                                onclick="redirectCustomerList()">戻る</button>
+                            <a class="btn btn-default btn-primary mr-2" href="javascript:goBack();" >戻る</a>
+                            <!-- <a href="' + document.referrer + '">Go Back</a> -->
                         </div>
                     </div>
                     <div class="form-group row">
@@ -270,25 +258,12 @@ if (isset($_SESSION["loginAccount"])) {
         </div>
         <!-- /.card -->
     </div>
-    <!--/.col (left) -->
-    <!-- right column -->
-    <!--/.col (right) -->
 </div>
 <!-- /.row -->
-<?php
-} else {
-    //header("Location: ../../include/logout.php");
-}
-?>
 <?php include "../../include/html/foot.inc" ?>
-
-<!-- bootstrap-switch -->
-<script src="../../app/refer/template/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
-<!-- bootstrap-switch -->
 
 <script type="text/javascript">
     $(document).ready(function () {
-        // bsCustomFileInput.init();
         // validate From
         $("#addCustomer").validate({
             rules: {
@@ -360,7 +335,6 @@ if (isset($_SESSION["loginAccount"])) {
             errorElement: 'span'
         });
 
-
         $("#addCustomer").submit(function (event) {
             var form = $("#addCustomer");
             // check if the input is valid
@@ -397,6 +371,7 @@ if (isset($_SESSION["loginAccount"])) {
                 success: function (response) {
                     //check response is blank if success 
                     if (!$.trim(response)) {
+                        
                         window.location.href = "index.html";
                     }
                     // if error
@@ -441,6 +416,9 @@ if (isset($_SESSION["loginAccount"])) {
     function redirectCustomerList() {
         window.location.href = "../../app/customer/index.html";
     }
+    function goBack() {
+		location.href = document.referrer;
+	}
 
 </script>
 

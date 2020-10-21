@@ -68,8 +68,10 @@
             }
             $searchQuery = "where ".$searchQuery;
         }
+        $_SESSION['cd'] = $cd;
+        $_SESSION['name'] = $name;
+        $_SESSION['status'] = $status;
     }
-    // print_r($searchQuery);die();
 
     $sel = mysqli_query($conn, "select count(*) as allcount from customer ".$searchQuery);
 
@@ -86,8 +88,7 @@
                                 (SELECT customer, COUNT(users.no) AS NumberCustomerRole6 FROM users WHERE role=6 GROUP BY users.customer) B
                                 on  customer.no = B.customer
                                 LEFT JOIN displaylimit C on C.no = customer.displaylimit
-                                ".$searchQuery." ORDER BY customer.name ASC LIMIT ".$row.",".$rowperpage;
-    // print_r($empQuery);die();
+                                ".$searchQuery." ORDER BY customer.name ASC, customer.cd LIMIT ".$row.",".$rowperpage;
     
     $empRecords = mysqli_query($conn, $empQuery);
     $data = array();

@@ -5,6 +5,22 @@ $url = "customer";
 check_view_permission($url);
 ?>
 
+<?php
+  // check search conditions
+  $cd = '';
+  $name = '';
+  $status = '';
+  //if(!empty($_SESSION['cd'])){
+    //$cd = $_SESSION['cd'];
+  //}
+  //if(!empty($_SESSION['name'])){
+    //$name = $_SESSION['name'];
+  //}
+  //if(!empty($_SESSION['status'])){
+    //$status = $_SESSION['status'];
+  //}
+?>
+
 <style>
   .align_button {
     text-align: center;
@@ -34,13 +50,13 @@ check_view_permission($url);
           <div class="form-group row">
             <label class="col-sm-4 col-form-label text-right">取引先コード</label>
             <div class="col-sm-8">
-              <input type="text" class="form-control" id="cd" name="cd" placeholder="取引先コード" />
+              <input type="text" class="form-control" id="cd" name="cd" placeholder="取引先コード" value=""/>
             </div>             
           </div>
           <div class="form-group row">
             <label class="col-sm-4 col-form-label text-right">取引先名</label>
             <div class="col-sm-8">
-              <input type="text" class="form-control" id="name" name="name" placeholder="取引先名" />
+              <input type="text" class="form-control" id="name" name="name" placeholder="取引先名" value=""/>
             </div>
           </div>
           <div class="form-group row">
@@ -97,7 +113,6 @@ check_view_permission($url);
   $(function () {
     const customerTable = $('#customerTable');
     
-
     var table = {
       'start': 0,
       'processing': true,
@@ -141,25 +156,30 @@ check_view_permission($url);
         datatype: "json",
     };
 
-    customerTable.DataTable(table);
-
-    // var cd = document.getElementById("cd").value();
-    // var name = document.getElementById("name").value();
-    // var status = document.getElementById("status").value();
-
-      // var info = customerTable.page.info();
-      // console.log(info);  
+    customerTable.DataTable(table); 
 
     $('#searchCustomer').on('submit', function (e) {
       e.preventDefault();
       $('#flash-message').remove();
+      //get parameter search
+      var cd = $('#cd').val();
+      var name = $('#name').val();
       customerTable.DataTable().ajax.reload();
     });
   });
 
   function redirectAddOrEditCustomer() {
-    window.location.href = "../../app/customer/add-customer.html";
+    // value search
+    // if (value search != null) {
+    //   href = ....?idSearch=value search
+    // }
+    // else {
+
+    // }
+    window.location.href = "../../app/customer/add-customer.html?idsaerch=abc";
   }
+
+
 
   function htmlEncode(value) {
     return $('<textarea/>').text(value).html();

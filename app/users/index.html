@@ -65,6 +65,7 @@ tr:nth-child(even) {
 }
 </style>
 <?php include "html/sidebar.inc" ?>
+<?php include "html/alerts.inc" ?>
 <?php include "user_functions/users.php" ?>
 <!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
 <?php
@@ -209,15 +210,15 @@ if (isset($_SESSION["loginAccount"])) {
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body align_form">
-          <form action="../../include/user_functions/updateUserDetails.php" method="POST" class="form_style" onsubmit="return validateUpdate();">
+          <form action="" id="updateForm" method="POST" class="form_style">
             <input type="hidden" id="inputId" name="inputId" />
             <table class="popup_table">
               <tr>
-                <td><label id="nameLabel" class="label_align_table">氏名</label></td>
+                <td><label id="nameLabel" class="label_align_table">氏名<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="text" id="inputName" name="inputName" required autocomplete="off" /></td>
               </tr>
               <tr>
-                <td><label id="accountLabel" class="label_align_table">アカウント</label></td>
+                <td><label id="accountLabel" class="label_align_table">アカウント<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="text" id="inputAccount" name="inputAccount" required autocomplete="off" /></td>
               </tr>
               <tr>
@@ -225,7 +226,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="password" id="inputPass" name="inputPass" /></td>
               </tr>
               <tr>
-                <td><label id="roleLabel" class="label_align_table">権限</label></td>
+                <td><label id="roleLabel" class="label_align_table">権限<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><select id="inputRole" name="inputRole">
                     <?php
                     if ($roleResultSet->num_rows > 0) {
@@ -241,11 +242,11 @@ if (isset($_SESSION["loginAccount"])) {
                 </td>
               </tr>
               <tr>
-                <td><label id="emailLabel" class="label_align_table">Email</label></td>
+                <td><label id="emailLabel" class="label_align_table">Email<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="email" id="inputEmail" name="inputEmail" required autocomplete="off" /></td>
               </tr>
               <tr>
-                <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
+                <td><label id="loginLabel" class="label_align_table">ログイン期限<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="date" id="inputStart" name="inputStart" required />~
                 <input type="date" id="inputExpire" name="inputExpire" />
                 </td>
@@ -290,7 +291,7 @@ if (isset($_SESSION["loginAccount"])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-          <button type="Submit" class="btn btn-primary">保存する</button>
+          <button type="button" class="btn btn-primary" onclick="validateUpdate();">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -305,22 +306,22 @@ if (isset($_SESSION["loginAccount"])) {
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body align_form">
-          <form action="../../include/user_functions/insertNewUser.php" method="POST" class="form_style" id="insert_form" onsubmit="return validateInsert();">
+          <form action="" method="POST" class="form_style" id="insert_form" >
             <table class="popup_table">
               <tr>
-                <td><label id="nameLabel" class="label_align_table">氏名</label></td>
+                <td><label id="nameLabel" class="label_align_table">氏名<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="text" id="insertName" name="insertName" required autocomplete="off" /></td>
               </tr>
               <tr>
-                <td><label id="accountLabel" class="label_align_table">アカウント</label></td>
+                <td><label id="accountLabel" class="label_align_table">アカウント<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="text" id="insertAccount" name="insertAccount" required autocomplete="off" /></td>
               </tr>
               <tr>
-                <td><label id="passwordLabel" class="label_align_table">パスワード</label></td>
+                <td><label id="passwordLabel" class="label_align_table">パスワード<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="password" id="insertPass" name="insertPass" required autocomplete="off" /></td>
               </tr>
               <tr>
-                <td><label id="roleLabel" class="label_align_table">権限</label></td>
+                <td><label id="roleLabel" class="label_align_table">権限<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><select id="insertRole" name="insertRole">
                     <?php
                     if ($roleResultSet->num_rows > 0) {
@@ -336,11 +337,11 @@ if (isset($_SESSION["loginAccount"])) {
                 </td>
               </tr>
               <tr>
-                <td><label id="emailLabel" class="label_align_table">Email</label></td>
+                <td><label id="emailLabel" class="label_align_table">Email<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="email" id="insertEmail" name="insertEmail" required autocomplete="off" /></td>
               </tr>
               <tr>
-                <td><label id="loginLabel" class="label_align_table">ログイン期限</label></td>
+                <td><label id="loginLabel" class="label_align_table">ログイン期限<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="date" id="insertStart" name="insertStart" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" required />~
                 <input type="date" id="insertExpire" name="insertExpire" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" />
                 </td>
@@ -387,7 +388,7 @@ if (isset($_SESSION["loginAccount"])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-          <button type="submit" class="btn btn-primary">保存する</button>
+          <button type="button" class="btn btn-primary" onclick="validateInsert();">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -531,8 +532,52 @@ if (isset($_SESSION["loginAccount"])) {
       alert("取引先が無効です");
       flag=false;
     }
+    if($("#insertPass").val()=="" || $("#insertPass").val()==null)
+    {
+      alert("パスワードを入力して下さい");
+      flag=false;
+    }
 
-    return flag;
+    if(flag==true)
+    {
+      $.ajax({
+      url: "../../include/user_functions/insertNewUser.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        insertPass : $("#insertPass").val(),
+        insertName : $("#insertName").val(),
+        insertAccount : $("#insertAccount").val(),
+        insertRole : $('#insertRole').val(),
+        insertStart : $("#insertStart").val(),
+        insertExpire : $("#insertExpire").val(),
+        insertCustomer : $("#insertCustomer").val(),
+        insertOffice : $("#insertOffice").val(),
+        insertEmail : $("#insertEmail").val(),
+        insertInvalid : $("#insertInvalid").prop('checked')
+      },
+      success: function(response) {
+        $("#insert").hide();
+        if(response.status=="success")
+        {
+          $("#alertSuccessText").text("詳細を更新しました");
+          $("#alertSuccess").modal('toggle');
+          $("#searchName").val($("#insertName").val());
+        }
+        else
+        {
+          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+          $("#alertFail").modal('toggle');
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+        $("#insert").hide();
+        $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+        $("#alertFail").modal('toggle');
+      }
+    });
+    }
   }
 
   function validateUpdate() {
@@ -556,7 +601,49 @@ if (isset($_SESSION["loginAccount"])) {
       alert("取引先が無効です");
       flag=false;
     }
-
-    return flag;
+    if(flag==true)
+    {
+      $.ajax({
+      url: "../../include/user_functions/updateUserDetails.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        inputId:  $("#inputId").val(),
+        inputName : $("#inputName").val(),
+        inputAccount : $("#inputAccount").val(),
+        inputPass : $("#inputPass").val(),
+        inputRole : $('#inputRole').val(),
+        inputStart : $("#inputStart").val(),
+        inputExpire : $("#inputExpire").val(),
+        inputCustomer : $("#inputCustomer").val(),
+        inputOffice : $("#inputOffice").val(),
+        inputEmail : $("#inputEmail").val(),
+        inputInvalid : $("#inputInvalid").prop('checked')
+      },
+      success: function(response) {
+        $("#details").hide();
+        if(response.status == "success")
+        {
+          $("#alertSuccessText").text("詳細を更新しました");
+          $("#alertSuccess").modal('toggle');
+          $("#searchName").val($("#inputName").val());
+        }
+        else
+        {
+          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+          $("#alertFail").modal('toggle');
+          $("#searchName").val($("#inputName").val());
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+          $("#details").hide();
+          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+          $("#alertFail").modal('toggle');
+          $("#searchName").val($("#inputName").val());
+      }
+    });
+    }
   }
+  
 </script>
