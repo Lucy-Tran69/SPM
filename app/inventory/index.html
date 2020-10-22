@@ -9,6 +9,17 @@ $url = "inventory";
 check_view_permission($url);
 ?>
 
+<?php
+  $maker = '';
+  $freeWord = '';
+
+  $queryParams = $_SERVER['QUERY_STRING'];
+  if(isset($queryParams) && !empty($queryParams)){
+    $maker = $_GET['maker'];
+    $freeWord = $_GET['freeWord'];
+  }
+?>
+
 <style>
   .title_nowrap_align_middle {
     white-space: nowrap;
@@ -37,7 +48,7 @@ check_view_permission($url);
                         if ($makerResultSet->num_rows > 0) {
                           while ($row = $makerResultSet->fetch_assoc()) {
                       ?>
-                      <option value="<?php echo $row['name']; ?>"><?php echo $row['name'];?>
+                      <option value="<?php echo $row['name']; ?>" <?php if ($maker == $row['name']) {echo 'selected';} ?>><?php echo $row['name'];?>
                       </option>
                       <?php
                             }
@@ -49,7 +60,7 @@ check_view_permission($url);
             <div class="form-group row">
                 <label for="freeword" class="col-sm-2 col-form-label text-right">フリーワード</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="freeword" placeholder="">
+                    <input type="text" class="form-control" id="freeword" placeholder="フリーワード" value="<?php echo $freeWord ?>">
                 </div>
             </div>
             <div class="row justify-content-center">
@@ -124,6 +135,10 @@ check_view_permission($url);
         });
 
         $('#searchCommodity').on('submit', function (e) {
+          var maker = $('#maker').val();
+          var freeWord = $('#freeword').val();
+          searchParams = '?maker=' + maker + '&freeWord=' + freeWord;
+          window.history.pushState(null, null, searchParams);
           e.preventDefault();
           $('#inventoryTable').DataTable().ajax.reload();
         });

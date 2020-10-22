@@ -14,7 +14,7 @@
        $sortOrder = isset($_POST["sortOrder"]) ? $_POST["sortOrder"] : '';
        $status = isset($_POST["status"]) ? $_POST["status"] : 0;
        $menu = isset($_POST["menu"]) ? $_POST["menu"] : '';
-       
+
        $insert_user = $_SESSION["loginUserId"];
 
        $checkOK = 1;
@@ -51,7 +51,7 @@
         }
 
         if (empty($sortOrder)) {
-            $getLastSortOrder = "select sort_order from role order by no desc limit 1";
+            $getLastSortOrder = "select sort_order from role order by sort_order desc limit 1";
             $lastSortOrder = mysqli_query($conn,$getLastSortOrder);
             $rowSortOrder = mysqli_fetch_assoc($lastSortOrder);
             $sortOrder = $rowSortOrder['sort_order'] + 1;

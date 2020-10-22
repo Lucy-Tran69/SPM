@@ -80,7 +80,7 @@
                                 foreach ($result as $value){ 
                                     if ($value['outside'] == 1) {  ?>
                                         <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" name="menuIn" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" <?php echo in_array($value['no'], $menu_arr) ? 'checked' : ''; ?>/>
+                                            <input type="checkbox" name="menuIn[]" class="menuIn custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" <?php echo in_array($value['no'], $menu_arr) ? 'checked' : ''; ?>/>
                                             <label class="custom-control-label font-weight-normal" for="menu<?php echo $value['no']; ?>"><?php echo $value['name']; ?></label>
                                         </div>
                                     <?php   }
@@ -104,7 +104,7 @@
                                 foreach ($result as $value){ 
                                     if ($value['outside'] == 2) {  ?>
                                         <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" name="menuOut" class="custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" <?php echo in_array($value['no'], $menu_arr) ? 'checked' : ''; ?>/>
+                                            <input type="checkbox" name="menuOut[]" class="menuOut custom-control-input" id="menu<?php echo $value['no']; ?>" value="<?php echo $value['no']; ?>" <?php echo in_array($value['no'], $menu_arr) ? 'checked' : ''; ?>/>
                                             <label class="custom-control-label font-weight-normal" for="menu<?php echo $value['no']; ?>"><?php echo $value['name']; ?></label>
                                         </div>
                                     <?php   }
@@ -123,6 +123,28 @@
             </form>
         </div>
     </div>
+</div>
+
+<!-- Modal -->
+<div id="confirmMenuEdit" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">メニュー確認</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessageEdit"></p>
+      </div>
+      <div class="modal-footer">
+         <button id="agreeEdit" type="button" class="btn btn-primary btn-modal-submit">はい</button>
+         <button type="button" class="btn btn-secondary" data-dismiss="modal">いいえ</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 

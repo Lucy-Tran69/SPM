@@ -371,8 +371,8 @@ check_view_permission($url);
                 success: function (response) {
                     //check response is blank if success 
                     if (!$.trim(response)) {
-                        
-                        window.location.href = "index.html";
+                        window.history.back();
+                        // window.location.href = "index.html";
                     }
                     // if error
                     else {

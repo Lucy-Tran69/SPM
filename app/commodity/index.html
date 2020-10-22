@@ -51,6 +51,7 @@ tr:nth-child(even) {
 }
 </style>
 <?php include "html/sidebar.inc" ?>
+<?php include "html/alerts.inc" ?>
 <?php include "commodity_functions/commodity.php" ?>
 <!-- <link rel="stylesheet" type="text/css" href="../../include/css/styles.css"> -->
 <?php
@@ -195,7 +196,7 @@ if (isset($_SESSION["loginAccount"])) {
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body align_form">
-          <form action="../../include/commodity_functions/updateCommodity.php" method="POST" class="form_style" onsubmit="return validateUpdate();">
+          <form action="" method="POST" class="form_style">
             <input type="hidden" id="inputId" name="inputId" />
             <table class="popup_table">
               <tr>
@@ -274,7 +275,7 @@ if (isset($_SESSION["loginAccount"])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-          <button type="Submit" class="btn btn-primary">保存する</button>
+          <button type="button" class="btn btn-primary" onclick="validateUpdate();">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -289,7 +290,7 @@ if (isset($_SESSION["loginAccount"])) {
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body align_form">
-          <form action="../../include/commodity_functions/copyCommodity.php" method="POST" class="form_style" onsubmit="return validateCopy();">
+          <form action="../../include/commodity_functions/copyCommodity.php" method="POST" class="form_style" >
             <table class="popup_table">
               <tr>
                 <td><label id="nameLabel" class="label_align_table">メーカ名<a style="color: red;">*</a>&nbsp;</label></td>
@@ -367,7 +368,7 @@ if (isset($_SESSION["loginAccount"])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-          <button type="Submit" class="btn btn-primary">保存する</button>
+          <button type="button" class="btn btn-primary" onclick="validateCopy();">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -382,7 +383,7 @@ if (isset($_SESSION["loginAccount"])) {
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body align_form">
-          <form action="../../include/commodity_functions/insertCommodity.php" method="POST" class="form_style" onsubmit="return validateInsert();">
+          <form action="" method="POST" class="form_style">
           <table class="popup_table">
               <tr>
                 <td><label id="nameLabel" class="label_align_table">メーカ名<a style="color: red;">*</a>&nbsp;</label></td>
@@ -460,7 +461,7 @@ if (isset($_SESSION["loginAccount"])) {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-          <button type="Submit" class="btn btn-primary">保存する</button>
+          <button type="button" class="btn btn-primary" onclick="validateInsert();">保存する</button>
         </div>
         </form>
       </div><!-- /.modal-content -->
@@ -657,7 +658,57 @@ function validateUpdate()
     }
   }
 
-  return flag;
+  if(flag==true)
+    {
+      var type; 
+      if($("#inputType1").prop('checked')==true)
+        type = 1;
+      else
+        type = 2;
+
+      $.ajax({
+      url: "../../include/commodity_functions/updateCommodity.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        inputId:  $("#inputId").val(),
+        inputMaker : $("#inputMaker").val(),
+        inputCode : $("#inputCode").val(),
+        inputName : $("#inputName").val(),
+        inputRole : $('#inputRole').val(),
+        inputType : type,
+        inputPrice : $("#inputPrice").val(),
+        inputPaid : $("#inputPaid").val(),
+        inputPrinters : $("#inputPrinters").val(),
+        inputNote : $("#inputNote").val(),
+        inputMemo : $("#inputMemo").val(),
+        inputGreen : $("#inputGreen").prop('checked'),
+        inputInvalid : $("#inputInvalid").prop('checked')
+      },
+      success: function(response) {
+        $("#details").hide();
+        if(response.status == "success")
+        {
+          $("#alertSuccessText").text("詳細を更新しました");
+          $("#alertSuccess").modal('toggle');
+          // $("#searchName").val($("#inputName").val());
+        }
+        else
+        {
+          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+          $("#alertFail").modal('toggle');
+          // $("#searchName").val($("#inputName").val());
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+          $("#details").hide();
+          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+          $("#alertFail").modal('toggle');
+          // $("#searchName").val($("#inputName").val());
+      }
+    });
+    }
 }
 
 function validateInsert()
@@ -739,7 +790,56 @@ function validateInsert()
     }
   }
 
-  return flag;
+  if(flag==true)
+    {
+      var type; 
+      if($("#insertType1").prop('checked')==true)
+        type = 1;
+      else
+        type = 2;
+        
+      $.ajax({
+      url: "../../include/commodity_functions/insertCommodity.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        insertMaker : $("#insertMaker").val(),
+        insertCode : $("#insertCode").val(),
+        insertName : $("#insertName").val(),
+        insertRole : $('#insertRole').val(),
+        insertType : type,
+        insertPrice : $("#insertPrice").val(),
+        insertPaid : $("#insertPaid").val(),
+        insertPrinters : $("#insertPrinters").val(),
+        insertNote : $("#insertNote").val(),
+        insertMemo : $("#insertMemo").val(),
+        insertGreen : $("#insertGreen").prop('checked'),
+        insertInvalid : $("#insertInvalid").prop('checked')
+      },
+      success: function(response) {
+        $("#insert").hide();
+        if(response.status == "success")
+        {
+          $("#alertSuccessText").text("詳細を更新しました");
+          $("#alertSuccess").modal('toggle');
+          // $("#searchName").val($("#insertName").val());
+        }
+        else
+        {
+          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+          $("#alertFail").modal('toggle');
+          // $("#searchName").val($("#insertName").val());
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+          $("#insert").hide();
+          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+          $("#alertFail").modal('toggle');
+          // $("#searchName").val($("#insertName").val());
+      }
+    });
+    }
 }
 
 function validateCopy()
@@ -821,7 +921,56 @@ function validateCopy()
     }
   }
 
-  return flag;
+  if(flag==true)
+    {
+      var type; 
+      if($("#copyType1").prop('checked')==true)
+        type = 1;
+      else
+        type = 2;
+        
+      $.ajax({
+      url: "../../include/commodity_functions/copyCommodity.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        copyMaker : $("#copyMaker").val(),
+        copyCode : $("#copyCode").val(),
+        copyName : $("#copyName").val(),
+        copyRole : $('#copyRole').val(),
+        copyType : type,
+        copyPrice : $("#copyPrice").val(),
+        copyPaid : $("#copyPaid").val(),
+        copyPrinters : $("#copyPrinters").val(),
+        copyNote : $("#copyNote").val(),
+        copyMemo : $("#copyMemo").val(),
+        copyGreen : $("#copyGreen").prop('checked'),
+        copyInvalid : $("#copyInvalid").prop('checked')
+      },
+      success: function(response) {
+        $("#copy").hide();
+        if(response.status == "success")
+        {
+          $("#alertSuccessText").text("詳細を更新しました");
+          $("#alertSuccess").modal('toggle');
+          // $("#searchName").val($("#copyName").val());
+        }
+        else
+        {
+          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+          $("#alertFail").modal('toggle');
+          // $("#searchName").val($("#copyName").val());
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.log(textStatus, errorThrown);
+          $("#copy").hide();
+          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
+          $("#alertFail").modal('toggle');
+          // $("#searchName").val($("#copyName").val());
+      }
+    });
+    }
 }
 
 function toggleInvalid()

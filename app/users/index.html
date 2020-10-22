@@ -562,7 +562,7 @@ if (isset($_SESSION["loginAccount"])) {
         {
           $("#alertSuccessText").text("詳細を更新しました");
           $("#alertSuccess").modal('toggle');
-          $("#searchName").val($("#insertName").val());
+          // $("#searchName").val($("#insertName").val());
         }
         else
         {
@@ -626,13 +626,13 @@ if (isset($_SESSION["loginAccount"])) {
         {
           $("#alertSuccessText").text("詳細を更新しました");
           $("#alertSuccess").modal('toggle');
-          $("#searchName").val($("#inputName").val());
+          // $("#searchName").val($("#inputName").val());
         }
         else
         {
           $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
           $("#alertFail").modal('toggle');
-          $("#searchName").val($("#inputName").val());
+          // $("#searchName").val($("#inputName").val());
         }
       },
       error: function(jqXHR, textStatus, errorThrown) {
@@ -640,7 +640,7 @@ if (isset($_SESSION["loginAccount"])) {
           $("#details").hide();
           $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
           $("#alertFail").modal('toggle');
-          $("#searchName").val($("#inputName").val());
+          // $("#searchName").val($("#inputName").val());
       }
     });
     }

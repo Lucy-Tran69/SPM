@@ -89,7 +89,7 @@
                                                                 INNER JOIN
                                                                     (SELECT commodity,inventory.inventory_mark, im.display 
                                                                     FROM inventory 
-                                                                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1) D	on D.commodity = C.no  WHERE C.invalid != 1 
+                                                                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no  WHERE C.invalid != 1 
                                                                 ".$searchQuery.") A");
     }else{
         $sel = mysqli_query($conn, "select count(*) as allcount from (select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
@@ -114,7 +114,7 @@
                                                                 INNER JOIN
                                                                     (SELECT commodity,inventory.inventory_mark, im.display 
                                                                     FROM inventory 
-                                                                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1) D	on D.commodity = C.no
+                                                                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no
                                                                 ".$searchQuery.") A");
     }
     
@@ -159,7 +159,7 @@
                 INNER JOIN
                     (SELECT commodity,inventory.inventory_mark, im.display 
                     FROM inventory 
-                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1) D	on D.commodity = C.no  WHERE C.invalid != 1
+                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no  WHERE C.invalid != 1
                 ".$searchQuery." ORDER BY maker, print_type, C.cd ASC LIMIT ".$rowa.",".$rowperpage;
     }else{
         $empQuery = "select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
@@ -184,7 +184,7 @@
                 INNER JOIN
                     (SELECT commodity,inventory.inventory_mark, im.display 
                     FROM inventory 
-                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1) D	on D.commodity = C.no  WHERE C.invalid != 1
+                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no  WHERE C.invalid != 1
                 ".$searchQuery." ORDER BY maker, print_type, C.cd ASC LIMIT ".$rowa.",".$rowperpage;   
     }
 

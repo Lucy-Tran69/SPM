@@ -146,9 +146,10 @@ if (isset($_SESSION["loginAccount"])) {
                   <tbody>
                     <?php
                     if ($resultSet->num_rows > 0) {
+                      $i=0;
                       while ($row = $resultSet->fetch_assoc()) {
                     ?>
-                        <tr id="<?php echo $i; ?>" style="<?php echo $row["mark"]==5?"background-color: yellow;":""?>">
+                        <tr id="<?php echo $i; ?>" style="<?php echo $row["mark"]==5?"background-color:  #ffd965;":""?>">
                           <td style="display: none;"><?php echo $row["id"]; ?></td>
                           <td><?php echo $row["mName"] ?></td>
                           <td><?php echo $row["cName"] == null ? $markNew : $row["cName"] ?></td>
@@ -170,6 +171,7 @@ if (isset($_SESSION["loginAccount"])) {
                           <td style="display: none;"><?php echo $row["mark"]; ?></td>
                         </tr>
                     <?php 
+                        $i++;
                       }
                     }
                     // $resultStmt->free_result();

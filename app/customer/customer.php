@@ -68,9 +68,6 @@
             }
             $searchQuery = "where ".$searchQuery;
         }
-        $_SESSION['cd'] = $cd;
-        $_SESSION['name'] = $name;
-        $_SESSION['status'] = $status;
     }
 
     $sel = mysqli_query($conn, "select count(*) as allcount from customer ".$searchQuery);

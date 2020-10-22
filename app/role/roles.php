@@ -118,8 +118,6 @@ if (!empty($searchQuery)) {
     $searchQuery = "where " . $searchQuery;
 }
 
-// print_r($searchQuery); die();
-
 $sql = " select role.no as no, role.name as name, role.sort_order as sort_order, outside.name as outside_name from role inner join outside on role.outside = outside.no " . $join . $searchQuery . "order by sort_order asc";
 
 $query = mysqli_query($conn, $sql) or die('エラーが発生しました。もう一度お試しください。');

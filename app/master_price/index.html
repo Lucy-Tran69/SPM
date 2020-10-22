@@ -203,13 +203,11 @@ if (isset($_SESSION["loginAccount"])) {
                   </thead>
                   <tbody>
                     <?php
-                    $disabled = "";
                     if(isset($resultSet))
                     {
                     if ($resultSet->num_rows > 0 && $display==TRUE) {
                       mysqli_data_seek($resultSet,0);
                       while ($row = $resultSet->fetch_assoc()) {
-                        $disabled = $row["sales"]!=$_SESSION["loginUserId"]?"disabled":"";
                         $rowOld = $oldresultSet->fetch_assoc();
                         $rowPrice = $priceresultSet->fetch_assoc();
                         if($row["sp"]!=$rowPrice["sp"]){
@@ -224,7 +222,7 @@ if (isset($_SESSION["loginAccount"])) {
                           <td><?php echo $row["code"];?></td>
                           <td><?php echo numfmt_format_currency($fmt,$row["original"], "JPY")?></td>
                           <td><?php echo !empty($row["sp"])?numfmt_format_currency($fmt,$row["sp"], "JPY"):"-"; ?></td>                          
-                          <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value="<?php echo trim($rowOld["sp"]); ?>" <?php echo $row["sales"]!=$_SESSION["loginUserId"]?"disabled":"" ?>></td>
+                          <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value="<?php echo trim($rowOld["sp"]); ?>" <?php echo $edit_disabled ?>></td>
                           <td style="text-align: center;"><?php echo trim($row["qty"]);?></td>
                           <td><?php echo $row["support"];?></td>
                           <td><?php echo $row["display"];?></td>
@@ -251,7 +249,7 @@ if (isset($_SESSION["loginAccount"])) {
                           <td><?php echo $row["code"];?></td>
                           <td><?php echo is_numeric($row["original"])?numfmt_format_currency($fmt,$row["original"], "JPY"):$row["original"];?></td>
                           <td><?php echo !empty($row["sp"])?numfmt_format_currency($fmt,$row["sp"], "JPY"):"-"; ?></td>
-                          <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value="" <?php echo $disabled ?>></td>
+                          <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value="" <?php echo $edit_disabled ?>></td>
                           <td style="text-align: center;"><?php echo $row["qty"];?></td>
                           <td><?php echo trim($row["support"]);?></td>
                           <td><?php echo $row["display"];?></td>
@@ -268,7 +266,7 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
             </div>
             <div class="card-footer" style="text-align: center;">
-                <input type="button" value="確認" id="confimBtn" class="btn btn-outline-success" style="width: 200px;" onclick="confirmValues();"/>
+                <input type="button" value="確認" id="confimBtn" class="btn btn-outline-success" style="width: 200px;" onclick="confirmValues();" <?php echo $edit_disabled ?>/>
             </div>
             <!-- /.card -->
           </div>

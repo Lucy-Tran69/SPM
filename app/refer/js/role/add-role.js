@@ -5,38 +5,25 @@ $(function () {
     }
 
     if ($('#outCompany').is(":checked")) {
-        $('#inSideCompany').hide();
+         $('#inSideCompany').hide();
         $('#outSideCompany').show();
     }
 
-    $(document).on('change', '.outSideCompany', function (e) {
-        e.preventDefault();
-        if ($('#inCompany').is(":checked")) {
+    $(document).on('change', '.outSideCompany', function() {
+        if($('#inCompany').is(":checked")) {
             $('#inSideCompany').show();
             $('#outSideCompany').hide();
+            $('.menuOut').removeClass('is-invalid');
+            $('#menuOut\\[\\]-error').html('');
         }
 
-        if ($('#outCompany').is(":checked")) {
+        if($('#outCompany').is(":checked")) {
             $('#inSideCompany').hide();
             $('#outSideCompany').show();
+            $('.menuIn').removeClass('is-invalid');
+            $('#menuIn\\[\\]-error').html('');
         }
     });
-
-    // $.validator.addMethod('menuIn', function (value, el, param) {
-    //     var menuIn = [];
-    //   $("input[name=menuIn]:checked").each ( function() {
-    //             menuIn.push($(this).val());
-    //         });
-    //   return menuIn.length < 0 && $('#inCompany').is(":checked");
-    // });
-
-    // $.validator.addMethod('menuOut', function (value, el, param) {
-    //     var menuIn = [];
-    //   $("input[name=menuOut]:checked").each ( function() {
-    //             menuIn.push($(this).val());
-    //         });
-    //   return menuIn.length < 0 && $('#outCompany').is(":checked");
-    // });
 
     var formAddRole = $('#addRole');
     formAddRole.validate({
@@ -44,7 +31,7 @@ $(function () {
             roleName: {
                 required: true,
             },
-            'menuIn[]': {
+             'menuIn[]': {
                 required: true,
                 minlength: 1
             },
@@ -52,19 +39,11 @@ $(function () {
                 required: true,
                 minlength: 1
             },
-            // menuCheck: {
-            //   required: true,
-            // },
-            // menuOut: {
-            //   required: true,
-            // }
         },
         messages: {
             roleName: "権限名を入力して下さい。",
-            // menuCheck: "Please select menu.",
-            // menuOut: "Please select menu."
-            'menuIn[]': "Please select at least one checkbox",
-            'menuOut[]': "Please select at least one checkbox",
+            'menuIn[]': "表示メニューを1つ以上選択してください。",
+            'menuOut[]': "表示メニューを1つ以上選択してください。",
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -76,11 +55,13 @@ $(function () {
             if ($(element).attr("name") == "menuIn[]") {
                 $('.menuIn').each(function () {
                     $(this).addClass('is-invalid');
+                    
                 });
             }
             if ($(element).attr("name") == "menuOut[]") {
                 $('.menuOut').each(function () {
                     $(this).addClass('is-invalid');
+                   
                 });
             }
         },
@@ -107,6 +88,7 @@ $(function () {
 
         var outSide = '';
         var menu = [];
+
         if ($('#inCompany').is(":checked")) {
             outSide = $('#inCompany').val();
             $(".menuIn:checked").each(function () {
@@ -121,13 +103,37 @@ $(function () {
                 menu.push($(this).val());
             });
         }
-        console.log(menu);
 
         if ($('#status').is(":checked")) {
             var status = $('#status').val();
         }
 
-        $.ajax({
+        var menuIn = [];
+        var menuOut = [];
+        var checkMenu = 0;
+        $(".menuIn:checked").each(function () {
+            menuIn.push($(this).val());
+         });
+         $(".menuOut:checked").each(function () {
+            menuOut.push($(this).val());
+         });
+
+         if ($('#inCompany').is(":checked") && menuOut.length > 0) {
+            var messages = 'Menu ngoài công ty thì không được lưu!';
+            $('#confirmMessageAdd').text(messages);
+
+            $('#confirmMenuAdd').modal('show');
+        }
+
+        if ($('#outCompany').is(":checked") && menuIn.length > 0) {
+            var messages = 'Menu trong công ty thì không được lưu!';
+            $('#confirmMessageAdd').text(messages);
+
+            $('#confirmMenuAdd').modal('show');
+        }
+
+        $('#agreeAdd').on('click', function () {
+         $.ajax({
             url: "addRole.php",
             type: "POST",
             data: {
@@ -154,6 +160,7 @@ $(function () {
                 console.log(errorThrown);
             },
         });
+     });
     });
 });
 

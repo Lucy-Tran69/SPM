@@ -46,11 +46,14 @@ $(function () {
 
         var duplicate = 0;
         for (var i = 0; i < data.length - 1; i++) {
-            for (var j = 0; j < data[i]['sortOrder']; j++) {
+            for (var j = i + 1; j < data.length; j++) {
                 if (data[j]['sortOrder'] == data[i]['sortOrder']) {
-                    alert('表示順は既に存在しています。もう一度お試しください。');
-                    duplicate = 1;
+                    var messages = '表示順は既に存在しています。もう一度お試しください。';
+                    $('#duplicateSortOrderMessage').text(messages);
+
+                    $('#duplicateSortOrder').modal('show');
                     return true;
+                    duplicate = 1;
                 }
             }
         }
@@ -70,6 +73,10 @@ $(function () {
                 },
             });
         }
+    });
+
+    $('#yes').on('click', function () {
+        $('#duplicateSortOrder').modal('hide');
     });
 });
 

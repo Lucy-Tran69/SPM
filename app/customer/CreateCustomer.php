@@ -117,22 +117,19 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
 		$stmt->execute();
 
   		if (!($stmt->error)) {
-		  //get parameter of url 
-		  // gans value into input search
-		  // reload table
 		  $msg->success('新規取引先の追加に成功しました。');
   		} else {
 			if($stmt->error){
 				$msg->error('新規取引先の追加時にエラーが発生しました。もう一度お試しください。');
 				$msg->display();
 			}
-  		}
+		  }
+		$stmt->close();
   	}else{
 	  $msg->display();
-    }
+	}
+	$conn->close();
 }
-
-$stmt->close();
 
 function removeWhitespaceAtBeginAndEndOfString($data) {
   $data = trim($data);

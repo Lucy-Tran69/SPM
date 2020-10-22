@@ -44,7 +44,7 @@ if($customerDisplaylimit == 1){
                                 INNER JOIN
                                     (SELECT commodity,inventory.inventory_mark, im.display 
                                     FROM inventory 
-                                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1) D	on D.commodity = C.no)T ON T.maker = m.name GROUP BY m.name") ;
+                                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no)T ON T.maker = m.name GROUP BY m.name") ;
 }else{
     $makerStmt = $conn-> prepare("SELECT m.name FROM maker m
                                 INNER JOIN
@@ -70,7 +70,7 @@ if($customerDisplaylimit == 1){
                                 INNER JOIN
                                     (SELECT commodity,inventory.inventory_mark, im.display 
                                     FROM inventory 
-                                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1) D	on D.commodity = C.no)T ON T.maker = m.name GROUP BY m.name") ;
+                                    INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no)T ON T.maker = m.name GROUP BY m.name") ;
 }
 
 $makerResult = execute($makerStmt,$conn);

@@ -132,13 +132,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 				$msg->error('取引先の更新時にエラーが発生しました。もう一度お試しください。');
 				$msg->display();
 			}
-	    }
+		}
+		$stmt->close();
   	}else{
 		  $msg->display();
-    }
+	}
+	$conn->close();
 }
-
-$stmt->close();
 
 function removeWhitespaceAtBeginAndEndOfString($data) {
   $data = trim($data);

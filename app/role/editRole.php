@@ -58,7 +58,7 @@
        
 
         if (empty($sortOrderNew)) {
-            $getLastSortOrder = "select sort_order from role order by no desc limit 1";
+            $getLastSortOrder = "select sort_order from role order by sort_order desc limit 1";
             $lastSortOrder = mysqli_query($conn,$getLastSortOrder);
             $rowSortOrder = mysqli_fetch_assoc($lastSortOrder);
             $sortOrder = $rowSortOrder['sort_order'] + 1;

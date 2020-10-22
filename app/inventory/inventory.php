@@ -55,7 +55,7 @@
                                                                     INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
                                                                     INNER JOIN (select I.commodity, im.display 
                                                                                 FROM inventory I
-                                                                                INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1)) inv ON inv.commodity = C.no 
+                                                                                INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1 OR im.no = 3) AND im.hidden != 1) inv ON inv.commodity = C.no 
                                                                     WHERE C.invalid = 0 ".$searchQuery.") A");
 
 
@@ -82,7 +82,7 @@
                     INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
                     INNER JOIN (select I.commodity, im.display 
                                 FROM inventory I
-                                INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1)) inv ON inv.commodity = C.no 
+                                INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1 OR im.no = 3)) inv ON inv.commodity = C.no 
                     WHERE C.invalid = 0 ".$searchQuery." ORDER BY maker, print_type, C.cd ASC LIMIT ".$rowa.",".$rowperpage;
 
     $empRecords = mysqli_query($conn, $empQuery);
