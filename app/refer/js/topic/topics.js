@@ -174,10 +174,12 @@ $(function () {
     });
 
     formAddTopic.submit(function (event) {
+        debugger
         event.preventDefault();
         if (!formAddTopic.valid()) {
             return false;
         }
+        var body = noscript($.trim($('#body').val()));
         var file_data = $('#imgFile').prop('files')[0];
         var form_data = new FormData();
         form_data.append('imgFile', file_data);
@@ -229,7 +231,14 @@ function onBtnclick() {
     var preLink = $('#urlImage').val();
 
     if (preTitle == '' && preBody == '') {
-        alert('Please input text before preview');
+     var messages = 'プレビューの前に、トピックス追加に出ている枠に情報を入力してください。';
+        $('#messagePreviewAdd').text(messages);
+
+        $('#confirmPreviewAdd').modal('show');
+
+        $('#previewAdd').on('click', function () {
+            $('#confirmPreviewAdd').modal('hide');
+        });
     } else {
         var opday = new Date(preOpenDay);
         var currentDate = new Date();
@@ -295,7 +304,14 @@ function fileValidation() {
     var filePath = fileInput.value;
     var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
     if (!allowedExtensions.exec(filePath)) {
-        alert('アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。');
+        var messages = 'アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。';
+         $('#messagePreviewAdd').text(messages);
+
+        $('#confirmPreviewAdd').modal('show');
+
+        $('#previewAdd').on('click', function () {
+            $('#confirmPreviewAdd').modal('hide');
+        });
         fileInput.value = '';
         return false;
     } else {

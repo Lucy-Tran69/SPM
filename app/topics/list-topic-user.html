@@ -33,7 +33,8 @@
 </div>
 
 <div class="modal fade bd-example-modal-lg" id="modal-detail-topic">
-        <div class="modal-dialog modal-lg">
+    <form id="topicUser">
+          <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">
@@ -68,6 +69,7 @@
             </div>
         </div>
     </div>
+    </form>
     <form id="pdfTopicForm" action="../printtopic/pdfTopic.php" method="POST" role="form" target='_blank'>
         <input type="hidden" name="id" value="" id="topic-id">
     </form>

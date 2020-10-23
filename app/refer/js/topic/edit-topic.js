@@ -96,6 +96,7 @@ $(function () {
     });
 
     formEditTopic.submit(function (event) {
+        debugger
         event.preventDefault();
         if (!formEditTopic.valid()) {
             return false;
@@ -164,6 +165,11 @@ $(function () {
             $('.check-delete-image').html(delImg);
         }
     });
+
+     $('#previewAdd').on('click', function () {
+        debugger
+            $('#confirmPreviewEdit').modal('hide');
+     });
 });
 
 function onBtnclick() {
@@ -175,7 +181,14 @@ function onBtnclick() {
     var preLink = $('#urlImage').val();
 
     if (preTitle == '' && preBody == '') {
-        alert('Please input text before preview');
+         var messages = 'プレビューの前に、トピックス変更に出ている枠に情報を入力してください。';
+        $('#messagePreviewEdit').text(messages);
+
+        $('#confirmPreviewEdit').modal('show');
+
+        $('#previewEdit').on('click', function () {
+            $('#confirmPreviewEdit').modal('hide');
+        });
     } else {
         var opday = new Date(preOpenDay);
         var currentDate = new Date();
@@ -252,7 +265,11 @@ function fileValidation() {
     var filePath = fileInput.value;
     var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
     if (!allowedExtensions.exec(filePath)) {
-        alert('アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。');
+         var messages = 'アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。';
+         $('#messagePreviewEdit').text(messages);
+
+        $('#confirmPreviewEdit').modal('show');
+       
         fileInput.value = '';
         return false;
     } else {

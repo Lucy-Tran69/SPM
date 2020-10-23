@@ -32,7 +32,7 @@ $(function () {
                     var currentDate = new Date();
                     if (result.length <= record_per_page) {
                         $.each(result, function (key, obj){
-                           html += '<tr data-id="'+obj.no+'" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">' +
+                           html += '<tr data-id="'+obj.no+'" class="item-topic">' +
                                         '<td><a href="javascript:void(0)">'+obj.open_day+'</a></td>' +
                                         '<td>';
 
@@ -49,7 +49,7 @@ $(function () {
                     } else {
                         $.each(result, function (key, obj){
                             if (key < result.length - 1){
-                                html += '<tr data-id="'+obj.no+'" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">' +
+                                html += '<tr data-id="'+obj.no+'" class="item-topic">' +
                                         '<td><a href="javascript:void(0)">'+obj.open_day+'</a></td>' +
                                         '<td>';
 
@@ -72,6 +72,8 @@ $(function () {
 
     $(document).on("click",".item-topic", function(e) {
         var id = $(this).attr("data-id");
+       
+        $('#topicUser').trigger("reset");
         $.ajax(
             {
                 type: 'post',
@@ -146,6 +148,8 @@ $(function () {
                     $('.body').val(result['body']);
                     $('.linkTitle').val(link_title);
                     $('.linkURL').val(link_url);
+
+                    $('#modal-detail-topic').modal('show');
                 },
                 error: function (XMLHttpRequest, textStatus, errorThrown) {
                     console.log('AJAX call failed.');

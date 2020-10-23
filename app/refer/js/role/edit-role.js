@@ -14,15 +14,15 @@ $(function () {
 		if($('#inCompany').is(":checked")) {
 			$('#inSideCompany').show();
 			$('#outSideCompany').hide();
-            $('.menuOut').removeClass('is-invalid');
-            $('#menuOut\\[\\]-error').html('');
+
+            $('.menuOut').prop('checked', false);
 		}
 
 		if($('#outCompany').is(":checked")) {
 			$('#inSideCompany').hide();
 			$('#outSideCompany').show();
-            $('.menuIn').removeClass('is-invalid');
-            $('#menuIn\\[\\]-error').html('');
+
+            $('.menuIn').prop('checked', false);
 		}
 	});
 
@@ -31,22 +31,10 @@ $(function () {
         rules: {
             roleName: {
                 required: true,
-            },
-            'menuIn[]': {
-                required: true,
-                minlength: 1
-            },
-            'menuOut[]': {
-                required: true,
-                minlength: 1
-            },
-         
+            }
         },
         messages: {
             roleName: "権限名を入力して下さい。",
-            'menuIn[]': "表示メニューを1つ以上選択してください。",
-            'menuOut[]': "表示メニューを1つ以上選択してください。",
-            
         },
         errorElement: 'span',
         errorPlacement: function (error, element) {
@@ -55,31 +43,9 @@ $(function () {
         },
         highlight: function (element, errorClass, validClass) {
             $(element).addClass('is-invalid');
-            if ($(element).attr("name") == "menuIn[]") {
-                $('.menuIn').each(function () {
-                    $(this).addClass('is-invalid');
-                    
-                });
-            }
-            if ($(element).attr("name") == "menuOut[]") {
-                $('.menuOut').each(function () {
-                    $(this).addClass('is-invalid');
-                   
-                });
-            }
         },
         unhighlight: function (element, errorClass, validClass) {
             $(element).removeClass('is-invalid');
-            if ($(element).attr("name") == "menuIn[]") {
-                $('.menuIn').each(function () {
-                    $(this).removeClass('is-invalid');
-                });
-            }
-            if ($(element).attr("name") == "menuOut[]") {
-                $('.menuOut').each(function () {
-                    $(this).removeClass('is-invalid');
-                });
-            }
         }
     });
 
@@ -115,31 +81,18 @@ $(function () {
                 menu.push($(this).val());
          });
 
-         var menuIn = [];
-         var menuOut = [];
-         var checkMenu = 0;
-         $(".menuIn:checked").each(function () {
-            menuIn.push($(this).val());
-        });
-         $(".menuOut:checked").each(function () {
-            menuOut.push($(this).val());
-        });
-
-         if ($('#inCompany').is(":checked") && menuOut.length > 0) {
-            var messages = 'Menu ngoài công ty thì không được lưu!';
+         if (menu == '') {
+            var messages = '表示メニューを1つ以上選択してください。';
             $('#confirmMessageEdit').text(messages);
 
             $('#confirmMenuEdit').modal('show');
-        }
 
-        if ($('#outCompany').is(":checked") && menuIn.length > 0) {
-            var messages = 'Menu trong công ty thì không được lưu!';
-            $('#confirmMessageEdit').text(messages);
-
-            $('#confirmMenuEdit').modal('show');
-        }
-
-        $('#agreeEdit').on('click', function () {
+            $('#agreeEdit').on('click', function () {
+                $('#confirmMenuEdit').modal('hide');
+            });
+         }
+        
+        if (menu != '') {
             $.ajax({
                 url: "editRole.php",
                 type: "POST",
@@ -168,8 +121,8 @@ $(function () {
             error: function (jqXHR, textStatus, errorThrown) {
                 console.log(errorThrown);
             },
-        });
-        });
+            });
+        }
     });
 });
 

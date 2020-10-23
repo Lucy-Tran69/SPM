@@ -39,7 +39,7 @@
         $total = count($result);
         for ($i = 0; $i < $total - 1; $i++)
         { ?>
-            <tr data-id="<?php echo $result[$i]['no']; ?>" class="item-topic" data-toggle="modal" data-target="#modal-detail-topic">
+            <tr data-id="<?php echo $result[$i]['no']; ?>" class="item-topic">
                 <td><a href="javascript:void(0)"><?php echo $result[$i]['open_day']; ?></a></td>
                 <td> <?php
                         $openDay = date('Y-m-d H:i:s', strtotime($result[$i]['open_day']. ' + 7 days'));
