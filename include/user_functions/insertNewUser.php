@@ -16,7 +16,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     $expire = $_POST["insertExpire"];
     $customer = $_POST["insertCustomer"]==""?NULL:$_POST["insertCustomer"];
     $office = $_POST["insertOffice"]==""?NULL:$_POST["insertOffice"];
-    $invalid = $_POST["insertInvalid"]==null? 0:1;
+    $invalid = $_POST["insertInvalid"]=='true'? 1:0;
     $password = password_hash($_POST["insertPass"],PASSWORD_DEFAULT);
     $insert_user = $_SESSION["loginUserId"];
 }
@@ -35,11 +35,15 @@ $stmt->bind_param('ssissiiissi',$name,$account,$role,$email,$expire,$customer,$o
 $result = execute($stmt,$conn);
 if($result)
 {
-    header("Location: ../../app/users/");  
+    echo json_encode(array(
+        "status"=>"success"
+    ));  
 }
 else
 {
-    echo "SQL Error";
+    echo json_encode(array(
+        "status"=>"fail"
+    ));
 }
 
 ?>

@@ -139,7 +139,7 @@ $stmt = $conn->prepare("select  commodity.no,
                         commodity.memo as memo,
                         commodity.print_type as type
                         from commodity 
-                        left join maker on commodity.maker=maker.no " . $searchQuery);
+                        left join maker on commodity.maker=maker.no " . $searchQuery." ORDER BY maker.name,commodity.print_type,commodity.cd");
 
 $result = execute($stmt, $conn);
 if ($result == TRUE) {

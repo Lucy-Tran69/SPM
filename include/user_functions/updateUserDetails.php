@@ -17,7 +17,7 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     $expire = $_POST["inputExpire"]==""?null:$_POST["inputExpire"];
     $customer = $_POST["inputCustomer"]==""?null:$_POST["inputCustomer"];
     $office = $_POST["inputOffice"]==""?null:$_POST["inputOffice"];
-    $invalid = $_POST["inputInvalid"]==null? 0:1;
+    $invalid = $_POST["inputInvalid"]=='true'? 1:0;
     $id = $_POST["inputId"];
     $upday = date('Y-m-d H:i:s');
     $upuser = $_SESSION["loginUserId"];
@@ -45,11 +45,15 @@ else
 $result = execute($stmt,$conn);
 if($result)
 {
-    header("Location: ../../app/users/");  
+    echo json_encode(array(
+        "status"=>"success"
+    ));
 }
 else
 {
-    echo "SQL Error";
+    echo json_encode(array(
+        "status"=>"fail"
+    ));
 }
 
 ?>

@@ -1,6 +1,6 @@
 <?php
 include "hader.inc";
-$menu = $_SESSION['roles'];
+// $menu = $_SESSION['roles'];
 ?>
 
 <?php if (isset($_SESSION['roles']) === false) {

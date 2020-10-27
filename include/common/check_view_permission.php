@@ -19,12 +19,12 @@ function check_view_permission($target_url)
     $menuResult = execute($menuStmt,$conn);
     if($menuResult==TRUE)
     {
-        $menuSet = $menuStmt->get_result();
+        $menuStmt->store_result();
     }
 
-    if($menuSet->num_rows>0)
+    if($menuStmt->num_rows>0)
     {
-        while($row=$menuSet->fetch_assoc())
+        while($row=fetchAssocStatement($menuStmt))
         {
             $menu_no=$row["no"];
         }
@@ -32,11 +32,12 @@ function check_view_permission($target_url)
 
     $roleStmt = $conn->prepare("select role,menu from role_menu order by role");
     execute($roleStmt,$conn);
-    $roles = $roleStmt->get_result();
+    $roleStmt->store_result();
     $map = array();
-    if($roles->num_rows>0)
+    $map = array_fill(0, 12, array_fill(0, 12, 0));
+    if($roleStmt->num_rows>0)
     {
-        while($row=$roles->fetch_assoc())
+        while($row=fetchAssocStatement($roleStmt))
         {
             $map[$row["role"]][$row["menu"]]=1;
         }

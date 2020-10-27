@@ -11,14 +11,14 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     $name = $_POST["copyName"];
     $code = $_POST["copyCode"];
     $print_type = $_POST["copyType"];
-    $num = $_POST["copyPaid"];
+    $num = $_POST["copyPaid"]==null?0:$_POST["copyPaid"];
     $price = $_POST["copyPrice"];
     $maker = $_POST["copyMaker"];
     $printer_support = $_POST["copyPrinters"];
     $note = $_POST["copyNote"];
     $memo = $_POST["copyMemo"];
-    $green = $_POST["copyGreen"]==null? 0:1;
-    $invalid = $_POST["copyInvalid"]==null? 0:1;
+    $green = $_POST["copyGreen"]=='true'? 1:0;
+    $invalid = $_POST["copyInvalid"]=='true'? 1:0;
     $insert_date = date('Y-m-d');
     $insert_user = $_SESSION["loginUserId"];
 }
@@ -35,12 +35,16 @@ $stmt->bind_param('ssiississsisi',$name,$code,$print_type,$num,$price,$maker,$gr
 
 $result = execute($stmt,$conn);
 if($result)
-{
-    header("Location: ../../app/commodity/");  
+{ 
+    echo json_encode(array(
+        "status"=>"success"
+    ));
 }
 else
 {
-    echo "SQL Error";
+    echo json_encode(array(
+        "status"=>"fail"
+    ));
 }
 
 ?>

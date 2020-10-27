@@ -99,4 +99,4 @@ if($customerResult==TRUE)
     $customerResult=$customerStmt->get_result();
     $customerResultSet = $customerResult;
 }
-?>?
+?>

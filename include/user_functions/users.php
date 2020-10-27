@@ -19,7 +19,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     $role = isset($_POST["selectedRole"])?$_POST["selectedRole"]:0;
     $cust = isset($_POST["searchCustomer"])?$_POST["searchCustomer"]:null;
     $name = isset($_POST["searchName"])?$_POST["searchName"]:null;
-    $invalid = isset($_POST["searchInvalid"])?$_POST["searchInvalid"]:0;
+    $invalid = isset($_POST["searchInvalid"])?1:0;
    // echo json_encode ($status);die();
     $searchQuery = "";
     if(!empty($cust)){
@@ -31,8 +31,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     if(!empty($role)){
         $searchRole = " users.role = ".$role;
     }
-     if($invalid == 0) {
-        $searchInvalid = " users.invalid = 0 ";
+     if($invalid === 0) {
+        $searchInvalid = " users.invalid = ".$invalid;
     }
     
    
@@ -90,7 +90,7 @@ $stmt = $conn->prepare("select users.no as no,
 $result = execute($stmt,$conn);
 if($result==TRUE)
 {
-    $result = $stmt->get_result();
+    $result = $stmt->store_result();
     $resultSet = $result;
 }
 
@@ -98,7 +98,7 @@ $roleStmt = $conn->prepare("select no,name from role where invalid=0 ORDER BY so
 $roleResult = execute($roleStmt,$conn);
 if($roleResult==TRUE)
 {
-    $roleResult=$roleStmt->get_result();
+    $roleResult=$roleStmt->store_result();
     $roleResultSet = $roleResult;
 }
 
@@ -106,7 +106,7 @@ $custStmt = $conn->prepare("select no,name from customer where invalid=0 ORDER B
 $custResult = execute($custStmt,$conn);
 if($custResult==TRUE)
 {
-    $custResult=$custStmt->get_result();
+    $custResult=$custStmt->store_result();
     $custResultSet = $custResult;
 }
 
@@ -114,7 +114,7 @@ $officeStmt = $conn->prepare("select no,name from office ORDER BY no ASC");
 $officeResult = execute($officeStmt,$conn);
 if($officeResult==TRUE)
 {
-    $officeResult=$officeStmt->get_result();
+    $officeResult=$officeStmt->store_result();
     $officeResultSet = $officeResult;
 }
 

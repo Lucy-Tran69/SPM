@@ -174,12 +174,10 @@ $(function () {
     });
 
     formAddTopic.submit(function (event) {
-        debugger
         event.preventDefault();
         if (!formAddTopic.valid()) {
             return false;
         }
-        var body = noscript($.trim($('#body').val()));
         var file_data = $('#imgFile').prop('files')[0];
         var form_data = new FormData();
         form_data.append('imgFile', file_data);
@@ -304,14 +302,7 @@ function fileValidation() {
     var filePath = fileInput.value;
     var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
     if (!allowedExtensions.exec(filePath)) {
-        var messages = 'アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。';
-         $('#messagePreviewAdd').text(messages);
-
-        $('#confirmPreviewAdd').modal('show');
-
-        $('#previewAdd').on('click', function () {
-            $('#confirmPreviewAdd').modal('hide');
-        });
+        alert('アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。');
         fileInput.value = '';
         return false;
     } else {

@@ -27,7 +27,7 @@ check_view_permission($url);
     text-align: center;
     }
   #inventoryTable_paginate{
-    margin-left: 425px;
+    margin-left: 400px;
   }
 </style>
 
@@ -60,7 +60,7 @@ check_view_permission($url);
             <div class="form-group row">
                 <label for="freeword" class="col-sm-2 col-form-label text-right">フリーワード</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="freeword" placeholder="フリーワード" value="<?php echo $freeWord ?>">
+                    <input type="text" class="form-control" id="freeword" placeholder="フリーワード" maxlength="100" value="<?php echo $freeWord ?>">
                 </div>
             </div>
             <div class="row justify-content-center">

@@ -97,9 +97,9 @@ if (isset($_SESSION["loginAccount"])) {
                         <select name="selectedRole" id="selectedRole" class="form-control">
                           <option value="">-</option>
                           <?php
-                          if ($roleResultSet->num_rows > 0) {
-                            mysqli_data_seek($roleResultSet, 0);
-                            while ($row = $roleResultSet->fetch_assoc()) {
+                          if ($roleStmt->num_rows > 0) {
+                            mysqli_data_seek($roleStmt, 0);
+                            while ($row = fetchAssocStatement($roleStmt)) {
                           ?>
                               <option value="<?php echo $row["no"]; ?>" <?php if(isset($_POST["selectedRole"]) && $_POST["selectedRole"]==$row["no"]){echo "selected='selected'";} ?> ><?php echo $row["name"]; ?></option>
                           <?php
@@ -164,8 +164,8 @@ if (isset($_SESSION["loginAccount"])) {
                 </thead>
                 <tbody>
                   <?php
-                  if ($resultSet->num_rows > 0) {
-                    while ($row = $resultSet->fetch_assoc()) {
+                  if ($stmt->num_rows > 0) {
+                    while ($row = fetchAssocStatement($stmt)) {
                   ?>
                       <tr>
                         <td style="display: none;"><?php echo $row["no"] ?></td>
@@ -229,9 +229,9 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><label id="roleLabel" class="label_align_table">権限<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><select id="inputRole" name="inputRole">
                     <?php
-                    if ($roleResultSet->num_rows > 0) {
-                      mysqli_data_seek($roleResultSet, 0);
-                      while ($row = $roleResultSet->fetch_assoc()) {
+                    if ($roleStmt->num_rows > 0) {
+                      mysqli_data_seek($roleStmt, 0);
+                      while ($row = fetchAssocStatement($roleStmt)) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
                     <?php
@@ -256,8 +256,8 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><select id="inputCustomer" name="inputCustomer">
                     <option value="">-</option>
                     <?php
-                    if ($custResultSet->num_rows > 0) {
-                      while ($row = $custResultSet->fetch_assoc()) {
+                    if ($custStmt->num_rows > 0) {
+                      while ($row = fetchAssocStatement($custStmt)) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
                     <?php
@@ -272,8 +272,8 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><select id="inputOffice" name="inputOffice">
                     <option value="">-</option>
                     <?php
-                    if ($officeResultSet->num_rows > 0) {
-                      while ($row = $officeResultSet->fetch_assoc()) {
+                    if ($officeStmt->num_rows > 0) {
+                      while ($row = fetchAssocStatement($officeStmt)) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
                     <?php
@@ -324,9 +324,9 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><label id="roleLabel" class="label_align_table">権限<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><select id="insertRole" name="insertRole">
                     <?php
-                    if ($roleResultSet->num_rows > 0) {
-                      mysqli_data_seek($roleResultSet, 0);
-                      while ($row = $roleResultSet->fetch_assoc()) {
+                    if ($roleStmt->num_rows > 0) {
+                      mysqli_data_seek($roleStmt, 0);
+                      while ($row = fetchAssocStatement($roleStmt)) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
                     <?php
@@ -351,9 +351,9 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><select id="insertCustomer" name="insertCustomer">
                     <option value="">-</option>
                     <?php
-                    if ($custResultSet->num_rows > 0) {
-                      mysqli_data_seek($custResultSet, 0);
-                      while ($row = $custResultSet->fetch_assoc()) {
+                    if ($custStmt->num_rows > 0) {
+                      mysqli_data_seek($custStmt, 0);
+                      while ($row = fetchAssocStatement($custStmt)) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
                     <?php
@@ -368,9 +368,9 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><select id="insertOffice" name="insertOffice">
                     <option value="">-</option>
                     <?php
-                    if ($officeResultSet->num_rows > 0) {
-                      mysqli_data_seek($officeResultSet, 0);
-                      while ($row = $officeResultSet->fetch_assoc()) {
+                    if ($officeStmt->num_rows > 0) {
+                      mysqli_data_seek($officeStmt, 0);
+                      while ($row = fetchAssocStatement($officeStmt)) {
                     ?>
                         <option value="<?php echo $row["no"]; ?>"><?php echo $row["name"]; ?></option>
                     <?php

@@ -42,10 +42,10 @@ if($invalid==null)
 {
     $stmt = $conn->prepare("select maker.name as mName,
                     commodity.name as cName,
-                    inventory_mark.display as display 
+                    coalesce(inventory_mark.display,'NEW') as display  
                     from maker 
                     LEFT JOIN commodity on maker.no=commodity.maker
-                    inner JOIN inventory on inventory.commodity=commodity.no
+                    LEFT JOIN inventory on inventory.commodity=commodity.no
                     LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
                     where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." order by commodity.cd ASC");
 }
@@ -53,10 +53,10 @@ else
 {
     $stmt = $conn->prepare("select maker.name as mName,
                     commodity.name as cName,
-                    inventory_mark.display as display 
+                    coalesce(inventory_mark.display,'NEW') as display 
                     from maker 
                     LEFT JOIN commodity on maker.no=commodity.maker
-                    inner JOIN inventory on inventory.commodity=commodity.no
+                    LEFT JOIN inventory on inventory.commodity=commodity.no
                     LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
                     where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery. " AND inventory.inventory_mark<>4 order by commodity.cd ASC");
 }
@@ -67,23 +67,23 @@ if($invalid==null)
 {
     $stmt = $conn->prepare("select maker.name as mName,
                     commodity.name as cName,
-                    inventory_mark.display as display 
+                    coalesce(inventory_mark.display,'NEW') as display 
                     from maker 
                     LEFT JOIN commodity on maker.no=commodity.maker
-                    inner JOIN inventory on inventory.commodity=commodity.no
+                    LEFT JOIN inventory on inventory.commodity=commodity.no
                     LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
-                    where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." order by commodity.cd ASC");
+                    where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." AND (inventory_mark.no=5 OR inventory_mark.no IS NULL) order by commodity.cd ASC");
 }
 else
 {
     $stmt = $conn->prepare("select maker.name as mName,
                     commodity.name as cName,
-                    inventory_mark.display as display  
+                    coalesce(inventory_mark.display,'NEW') as display   
                     from maker 
                     LEFT JOIN commodity on maker.no=commodity.maker
-                    inner JOIN inventory on inventory.commodity=commodity.no
+                    LEFT JOIN inventory on inventory.commodity=commodity.no
                     LEFT JOIN inventory_mark on inventory_mark.no=inventory.inventory_mark
-                    where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." AND inventory.inventory_mark<>4 order by commodity.cd ASC");
+                    where commodity.name IS NOT NULL AND maker.invalid=0 ".$searchQuery." AND (inventory_mark.no=5 OR inventory_mark.no IS NULL) order by commodity.cd ASC");
 }
 }
 // $stmt = $conn->prepare("select maker.name as mName,

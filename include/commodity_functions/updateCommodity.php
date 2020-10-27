@@ -18,8 +18,8 @@ if($_SERVER['REQUEST_METHOD']=='POST' && isset($_SESSION["loginAccount"]))
     $printer_support = $_POST["inputPrinters"];
     $note = $_POST["inputNote"];
     $memo = $_POST["inputMemo"];
-    $green = $_POST["inputGreen"]==null? 0:1;
-    $invalid = $_POST["insertInvalid"]==null? 0:1;
+    $green = $_POST["inputGreen"]=='true'? 1:0;
+    $invalid = $_POST["inputInvalid"]=='true'? 1:0;
     $update_date = date('Y-m-d');
     $update_user = $_SESSION["loginUserId"];
 }
@@ -36,11 +36,15 @@ $stmt->bind_param('ssiississsisii',$name,$code,$print_type,$num,$price,$maker,$g
 $result = execute($stmt,$conn);
 if($result)
 {
-    header("Location: ../../app/commodity/");  
+    echo json_encode(array(
+        "status"=>"success"
+    ));
 }
 else
 {
-    echo "SQL Error";
+    echo json_encode(array(
+        "status"=>"fail"
+    ));
 }
 
 ?>

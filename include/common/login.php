@@ -44,15 +44,16 @@ try
            
            if($result==TRUE)
            {
-               $result = $stmt->get_result();
+            //    $stmt->bind_result($result);
+               $stmt->store_result();
            }
            $passwd = "";
            $st_date;
            $en_date;
            $curr_date = date('Y-m-d');
-           if($result->num_rows>0)
+           if($stmt->num_rows()>0)
            {
-               while($row = $result->fetch_assoc())
+               while($row = fetchAssocStatement($stmt))
                {
                     if($row["account"]==$_POST["username"])
                     {
@@ -140,19 +141,19 @@ function setMenu($userid, $conn)
 
         if ($result == TRUE) 
         {
-            $result = $roleStmt->get_result();
+            $roleStmt->store_result();
         }
 
-        if ($result->num_rows > 0) 
-        {
-            while ($row = $result->fetch_assoc()) 
+        // if ($result->num_rows > 0) 
+        // {
+            while ($row = fetchAssocStatement($roleStmt)) 
             {
                 $keys[] = $row['name'];
                 $values[] = $row['url'];
             }
 
             $role_list = array_combine($keys, $values);
-        }
+        // }
 
         $_SESSION['roles'] = $role_list;
         $roleStmt->free_result();

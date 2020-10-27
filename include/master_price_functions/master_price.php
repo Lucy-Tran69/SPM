@@ -9,6 +9,7 @@ $err_msg = "";
 $conn  = getConnection();
 $display=FALSE;
 $searchQuery = "";
+$edit_disabled = "";
 if($conn->connect_error)
 {
     die("Failed to connect to database. ".$conn->connect_error);
@@ -57,9 +58,36 @@ if($conn->connect_error)
                 $searchQuery = $searchQuery.$searchSupport;
             }
         }
+
+        $findstmt;
+        $findresult;
+        
+        if(!empty($searchCustomer))
+        {
+            $findstmt = $conn->prepare("SELECT  customer.sales from customer where no=".$customer);
+            $findresult = execute($findstmt,$conn);
+
+            if($findresult==TRUE)
+            {
+                $findresult = $findstmt->get_result();
+                $findresultSet = $findresult;
+            }
+
+            if($findresultSet->num_rows>0)
+            {
+                while($row = $findresultSet->fetch_assoc())
+                {
+                    $edit_disabled = ($row["sales"]!=$_SESSION["loginUserId"] && $_SESSION["loginRole"]!=1)?"disabled":"";
+                }
+            }
+        }
+        
     }
+
+
+
 $stmt;
-$result;
+$result="";
 
             if(!empty($searchCustomer))
             {
@@ -77,7 +105,8 @@ $result;
                 inventory_mark.display as display,
                 a.approvalday,
                 inventory_mark.hidden as hidden,
-                date(a.upday) as LAST_UPDATE
+                date(a.upday) as LAST_UPDATE,
+                customer.sales as sales
                 from selling_price a
                 INNER JOIN commodity on a.commodity=commodity.no
                 INNER JOIN inventory on inventory.commodity=commodity.no
@@ -92,7 +121,7 @@ $result;
                 $result = execute($stmt,$conn);
             }
 
-if($result==TRUE)
+if($result===TRUE)
 {
     $result = $stmt->get_result();
     $resultSet = $result;

@@ -96,7 +96,6 @@ $(function () {
     });
 
     formEditTopic.submit(function (event) {
-        debugger
         event.preventDefault();
         if (!formEditTopic.valid()) {
             return false;
@@ -165,11 +164,6 @@ $(function () {
             $('.check-delete-image').html(delImg);
         }
     });
-
-     $('#previewAdd').on('click', function () {
-        debugger
-            $('#confirmPreviewEdit').modal('hide');
-     });
 });
 
 function onBtnclick() {
@@ -265,11 +259,7 @@ function fileValidation() {
     var filePath = fileInput.value;
     var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
     if (!allowedExtensions.exec(filePath)) {
-         var messages = 'アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。';
-         $('#messagePreviewEdit').text(messages);
-
-        $('#confirmPreviewEdit').modal('show');
-       
+        alert('アップロードできる画像形式はJPG、JPEG、PNG、GIFのみご入力ください。');
         fileInput.value = '';
         return false;
     } else {
