@@ -41,5 +41,6 @@
         }
     }
 
+    $stmtRoleMenu->close();
     $conn->close();
 ?>

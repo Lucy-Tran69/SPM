@@ -41,24 +41,32 @@
         }
     }
 
+    $invalid = 0;
     ## Total number of records without filtering
-    $sel = mysqli_query($conn, "select count(*) as allcount from topics where invalid = 0");
-    $records = mysqli_fetch_assoc($sel);
+    $sel = "select count(*) as allcount from topics where invalid = ?";
+    $stmSel = $conn->prepare($sel);
+    $stmSel->bind_param('i', $invalid);
+    $stmSel->execute();
+    $stmSel->store_result();
+    $records = fetchAssocStatement($stmSel);
     $totalRecords = $records['allcount'];
 
     ## Total number of records with filtering
-    $sel = mysqli_query($conn, "select count(*) as allcount from topics WHERE invalid = 0 " .$searchQuery);
-    $records = mysqli_fetch_assoc($sel);
+    $sel = "select count(*) as allcount from topics WHERE invalid = ? " .$searchQuery;
+    $stmSel = $conn->prepare($sel);
+    $stmSel->bind_param('i', $invalid);
+    $stmSel->execute();
+    $stmSel->store_result();
+    $records = fetchAssocStatement($stmSel);
     $totalRecordwithFilter = $records['allcount'];
 
     ## Fetch records
     $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = 0 ".$searchQuery." order by open_day desc limit ".$row.",".$rowperpage;
-    
-    // echo $empQuery;
+  
     $empRecords = mysqli_query($conn, $empQuery);
     $data = array();
 
-    while ($row = mysqli_fetch_assoc($empRecords)) {
+    while ($row = mysqli_fetch_array($empRecords)) {
         $data[] = array(
                 "no" => $row['no'],
                 "insert_day" => $row['insert_day'],

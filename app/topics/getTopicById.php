@@ -22,6 +22,7 @@ if (isset($_SESSION["loginAccount"])) {
             $row = fetchAssocStatement($stm);
         }
     }
+    $stm->close();
     $conn->close();
 }
 ?>

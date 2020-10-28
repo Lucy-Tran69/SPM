@@ -54,6 +54,7 @@
             $stmLastOrder->store_result();
             $rowSortOrder = fetchAssocStatement($stmLastOrder);
             $sortOrder = $rowSortOrder['sort_order'] + 1;
+            $stmLastOrder->close();
         }
 
         if ($checkOK == 1) {

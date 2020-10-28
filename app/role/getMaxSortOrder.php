@@ -14,5 +14,6 @@
     $rowSortOrder = fetchAssocStatement($stmLastOrder);
     $sortOrder = $rowSortOrder['sort_order'] + 1;
 
+    $stmLastOrder->close();
     $conn->close();
 ?>
