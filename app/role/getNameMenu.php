@@ -19,5 +19,27 @@
                                   'outside' => $row['outside']));
     }
 
+    if (isset($_SESSION["loginAccount"])) {
+        if(isset($_GET["no"]) && !empty(trim($_GET["no"])) && is_numeric($_GET['no'])){
+           $id = $_GET['no'];
+
+            $menuLst = array();
+            //get menu by role
+            $sqlRoleMenu = "select role, menu from role_menu where role=?";
+            $stmtRoleMenu = $conn->prepare($sqlRoleMenu);
+            $stmtRoleMenu->bind_param('i', $id);
+            $stmtRoleMenu->execute();
+            $stmtRoleMenu->store_result();
+           
+            if(!$stmtRoleMenu->error) {
+                while ($row = fetchAssocStatement($stmtRoleMenu))
+                {
+                    array_push($menuLst, array('role' => $row['role'], 
+                        'menu' => $row['menu']));
+                }
+            }
+        }
+    }
+
     $conn->close();
 ?>

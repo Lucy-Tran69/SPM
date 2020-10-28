@@ -41,13 +41,10 @@
 
           $stmtCheckDup->execute();
 
-          if(!$stmtCheckDup->error) {
-            $rs = $stmtCheckDup->get_result();
-            $row = $rs->fetch_array(MYSQLI_ASSOC);
-          }
-          
-          $num = $row['count_row'];
-          if($num > 0){
+          $stmtCheckDup->store_result();
+          $row = fetchAssocStatement($stmtCheckDup);
+          if($row["count_row"] > 0)
+          {
             $msg->error('表示順は既に存在しています。');
             $checkOK = 0;
           }
@@ -59,8 +56,10 @@
 
         if (empty($sortOrderNew)) {
             $getLastSortOrder = "select sort_order from role order by sort_order desc limit 1";
-            $lastSortOrder = mysqli_query($conn,$getLastSortOrder);
-            $rowSortOrder = mysqli_fetch_assoc($lastSortOrder);
+            $stmLastOrder = $conn->prepare($getLastSortOrder);
+            $stmLastOrder->execute();
+            $stmLastOrder->store_result();
+            $rowSortOrder = fetchAssocStatement($stmLastOrder);
             $sortOrder = $rowSortOrder['sort_order'] + 1;
         }
 

@@ -8,8 +8,10 @@
     }
 
     $getLastSortOrder = "select sort_order from role order by sort_order desc limit 1";
-    $lastSortOrder = mysqli_query($conn,$getLastSortOrder);
-    $rowSortOrder = mysqli_fetch_assoc($lastSortOrder);
+    $stmLastOrder = $conn->prepare($getLastSortOrder);
+    $stmLastOrder->execute();
+    $stmLastOrder->store_result();
+    $rowSortOrder = fetchAssocStatement($stmLastOrder);
     $sortOrder = $rowSortOrder['sort_order'] + 1;
 
     $conn->close();
