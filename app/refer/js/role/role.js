@@ -1,27 +1,32 @@
+
+function loadAjax(){
+    var menu = $('#menu').val();
+    var outSide = $('input[type="radio"]:checked').val();
+    var status = $('#status').is(':checked') ? $('#status').val() : 0;
+
+    $('#flash-message').remove();
+
+    $.ajax({
+        type: 'POST',
+        url: 'roles.php',
+        dataType: 'html',
+        data: {
+            menu: menu,
+            outSide: outSide,
+            status: status,
+        },
+        success: function (res) {
+            $('#roleList').html(res);
+            queryParams = '?menu=' + menu + '&outside=' + outSide + '&status=' + status;
+            history.pushState(null, null, queryParams);
+        },
+    });
+}
 $(function () {
+    loadAjax();
     $('#searchRole').submit(function (e) {
         e.preventDefault();
-        var menu = $('#menu').val();
-        var outSide = $('input[type="radio"]:checked').val();
-        var status = $('#status').is(':checked') ? $('#status').val() : 0;
-
-        $('#flash-message').remove();
-
-        $.ajax({
-            type: 'POST',
-            url: 'roles.php',
-            dataType: 'html',
-            data: {
-                menu: menu,
-                outSide: outSide,
-                status: status,
-            },
-            success: function (res) {
-                $('#roleList').html(res);
-                queryParams = '?menu=' + menu + '&outside=' + outSide + '&status=' + status;
-                history.pushState(null, null, queryParams);
-            },
-        });
+        loadAjax();
     });
 
     $('.sort').keypress(function (e) {

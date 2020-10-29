@@ -9,11 +9,12 @@ if ($conn->connect_error) {
 }
 
 ## Search 
-$searchQuery = "";
-$searchMenu = "";
-$searchOutSide = "";
 $status = 0;
 $join = "";
+$wheres = [];
+$wheresBind = [];
+$newsearchQuery= "";
+$newsearchLimit= "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $menu = isset($_POST["menu"]) ? $_POST["menu"] : '';
@@ -21,109 +22,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $status = isset($_POST["status"]) ? $_POST["status"] : 0;
     $sortOrder = isset($_POST["sortOrder"]) ? $_POST["sortOrder"] : '';
 
-    if (!empty($menu)) {
-        $searchMenu = "role_menu.menu = $menu ";
+    if ($menu) {
+        array_push($wheres, " role_menu.menu = ? ");
+        array_push($wheresBind, "$menu");
+        $newsearchLimit = $newsearchLimit +"i";
         $join = "inner join role_menu on role.no = role_menu.role ";
     }
 
-    if (!empty($outSide)) {
-        if ($outSide == 0) {
-            $searchOutSide = "";
-        } else {
-            $searchOutSide = "outside.no = $outSide ";
-        }
+    if ($outSide) {
+        array_push($wheres, " outside.no = ? ");
+        array_push($wheresBind, "$outSide");
+        $newsearchLimit = $newsearchLimit +"i";
     }
 
-    if (!empty($searchMenu) || !empty($searchOutSide)) {
-        if (!empty($searchMenu)) {
-            if (!empty($searchQuery)) {
-                $searchQuery = $searchQuery . " and ";
-            }
-            $searchQuery = $searchQuery . $searchMenu;
-        }
-
-        if (!empty($searchOutSide)) {
-            if (!empty($searchQuery)) {
-                $searchQuery = $searchQuery . " and ";
-            }
-            $searchQuery = $searchQuery . $searchOutSide;
-        }
+    if (!$status) {
+        array_push($wheres, " role.invalid = ? ");
+        array_push($wheresBind, "0");
+        $newsearchLimit = $newsearchLimit +"i";
+    } 
+    if (count($wheres) > 0) {
+        $newsearchQuery = " where ".implode(" and ", $wheres);
     }
-
-    if (!empty($sortOrder)) {
-        $empQuery = "update role set sort_order = ? where no = ?";
-        $stmSort = $conn->prepare($empQuery);
-        foreach ($sortOrder as $value) {
-            $sort = $value['sortOrder'];
-            $no = $value['no'];
-
-            $stmSort->bind_param('ii', $sort, $no);
-            $stmSort->execute();
-        }
-
-        if ($stmSort->error) {
-            $msg->error('表示順の更新に失敗しました。');
-        } else {
-            $msg->success('表示順の更新に成功しました。');
-        }
-
-        $stmSort->close();
-    }
+    
 }
 
-$param = $_SERVER['QUERY_STRING'];
-if (isset($param) && !empty($param)) {
-    $menu = isset($_GET["menu"]) ? $_GET["menu"] : '';
-    $outSide = isset($_GET["outside"]) ? $_GET["outside"] : '';
-    $status = isset($_GET["status"]) ? $_GET["status"] : 0;
+$sql = " select role.no as no, role.name as name, role.sort_order as sort_order, outside.name as outside_name from role inner join outside on role.outside = outside.no " . $join . $newsearchQuery . "order by sort_order asc";
 
-    if (!empty($menu)) {
-        $searchMenu = "role_menu.menu = $menu ";
-        $join = "inner join role_menu on role.no = role_menu.role ";
-    }
+$stmt = $conn->prepare($sql);
+if(count($wheresBind) == 0) {
+ $newsearchLimit = "";
+} else if(count($wheresBind) == 1) {
+ 
+ $stmt->bind_param("i",$wheresBind[0]);
+} 
+ else if(count($wheresBind) == 2) {
+ $stmt->bind_param("ii",$wheresBind[0],$wheresBind[1]);
+} 
+ else if(count($wheresBind) == 3) {
+  $stmt->bind_param("iii",$wheresBind[0],$wheresBind[1], $wheresBind[2]);
+} 
 
-    if (!empty($outSide)) {
-        if ($outSide == 0) {
-            $searchOutSide = "";
-        } else {
-            $searchOutSide = "outside.no = $outSide ";
-        }
-    }
-
-    if (!empty($searchMenu) || !empty($searchOutSide)) {
-        if (!empty($searchMenu)) {
-            if (!empty($searchQuery)) {
-                $searchQuery = $searchQuery . " and ";
-            }
-            $searchQuery = $searchQuery . $searchMenu;
-        }
-
-        if (!empty($searchOutSide)) {
-            if (!empty($searchQuery)) {
-                $searchQuery = $searchQuery . " and ";
-            }
-            $searchQuery = $searchQuery . $searchOutSide;
-        }
-    }
-}
-
-if ($status != 1) {
-    if (!empty($searchQuery)) {
-        $searchQuery = $searchQuery . " and ";
-    }
-    $searchQuery = $searchQuery . "role.invalid = $status ";
-}
-
-if (!empty($searchQuery)) {
-    $searchQuery = "where " . $searchQuery;
-}
-
-$sql = " select role.no as no, role.name as name, role.sort_order as sort_order, outside.name as outside_name from role inner join outside on role.outside = outside.no " . $join . $searchQuery . "order by sort_order asc";
-
-$query = mysqli_query($conn, $sql) or die('エラーが発生しました。もう一度お試しください。');
-
+$stmt->execute();
+$stmt->store_result();
 $data = array();
-while ($row = mysqli_fetch_array($query)) {
+
+while ($row = fetchAssocStatement($stmt)) {
     array_push($data, array(
         'no' => $row['no'],
         'name' => $row['name'],
@@ -131,6 +74,8 @@ while ($row = mysqli_fetch_array($query)) {
         'outside_name' => $row['outside_name']
     ));
 }
+
+$conn->close();
 
 if (!empty($data)) {
     foreach ($data as $value) { ?>
@@ -163,6 +108,4 @@ else {
    <row>
     <td class="text-center" colspan="4">データがありません。</td>
 </row>
-<?php } 
-$conn->close();
-?>
+<?php } ?>
