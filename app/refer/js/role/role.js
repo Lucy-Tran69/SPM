@@ -1,5 +1,5 @@
 
-function loadAjax(){
+function loadAjax(c){
     var menu = $('#menu').val();
     var outSide = $('input[type="radio"]:checked').val();
     var status = $('#status').is(':checked') ? $('#status').val() : 0;
@@ -17,16 +17,19 @@ function loadAjax(){
         },
         success: function (res) {
             $('#roleList').html(res);
-            queryParams = '?menu=' + menu + '&outside=' + outSide + '&status=' + status;
-            history.pushState(null, null, queryParams);
+            
+            if (c == false) {
+                queryParams = '?menu=' + menu + '&outside=' + outSide + '&status=' + status;
+                history.pushState(null, null, queryParams);
+            }
         },
     });
 }
 $(function () {
-    loadAjax();
+    loadAjax(true);
     $('#searchRole').submit(function (e) {
         e.preventDefault();
-        loadAjax();
+        loadAjax(false);
     });
 
     $('.sort').keypress(function (e) {
