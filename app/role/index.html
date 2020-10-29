@@ -45,6 +45,12 @@
     .min-width-100px {
         min-width: 100px;
     }
+
+    .custom-table {
+        margin-left: auto;
+        margin-right: auto;
+        width: 40% !important;
+    }
 </style>
 
 <input type="hidden" name="" id="page-name" value="権限管理">
@@ -92,7 +98,7 @@
                                 <div class="custom-control custom-checkbox">
                                      <input type="checkbox" name="status" class="custom-control-input" id="status"
                                      value="<?php echo !empty($status) ? $status : 1; ?>" <?php echo !empty($status) ? 'checked' : ''; ?> />
-                                    <label class="custom-control-label font-weight-normal" for="status">無効を含む</label>
+                                    <label class="custom-control-label" for="status">無効を含む</label>
                                 </div>
                             </div>
                         </div>
@@ -106,19 +112,21 @@
     </div>
 </div>
 <div class="card">
-    <div class="card-body table-responsive">
-        <div class="row justify-content-end" style="margin-bottom: 20px; margin-right: 10px">
-            <button type="button" class="btn btn-primary" onclick="redirectAddRole()"><i
-                    class="fas fa-plus mr-2"></i>追加</button>
+    <div class="card-body">
+       <div class="row justify-content-end" style="margin-bottom: 20px; margin-right: 10px">
+        <button type="button" class="btn btn-primary" onclick="redirectAddRole()"><i
+            class="fas fa-plus mr-2"></i>追加</button>
         </div>
-        <div class="table-responsive">
+    </div>
+    <div class="card-body table-responsive custom-table">
+        <div class="">
             <table id="topicsTable" class="table table-bordered table-striped">
                 <thead>
                     <tr class="text-center">
-                        <th class="min-width-400px">権限名</th>
-                        <th class="min-width-200px">所属</th>
-                        <th class="min-width-200px">表示順</th>
-                        <th class="min-width-100px"></th>
+                        <th class="text-nowrap">権限名</th>
+                        <th>所属</th>
+                        <th class="text-nowrap">表示順</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody id="roleList">

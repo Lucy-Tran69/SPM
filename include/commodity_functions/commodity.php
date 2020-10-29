@@ -143,7 +143,7 @@ $stmt = $conn->prepare("select  commodity.no,
 
 $result = execute($stmt, $conn);
 if ($result == TRUE) {
-    $result = $stmt->get_result();
+    $result = $stmt->store_result();
     $resultSet = $result;
 }
 
@@ -151,7 +151,7 @@ $makerStmt = $conn->prepare("select no,name from maker where invalid=0");
 $makerResult = execute($makerStmt,$conn);
 if($makerResult==TRUE)
 {
-    $makerResult=$makerStmt->get_result();
+    $makerResult=$makerStmt->store_result();
     $makerResultSet = $makerResult;
 }
 

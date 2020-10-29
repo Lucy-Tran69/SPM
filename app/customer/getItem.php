@@ -4,20 +4,22 @@ include_once "database/db.inc";
 
 $conn  = getConnection();
 
-$userStmt = $conn->prepare("select no,name from users where invalid=0 and role = 3 order by name ");
-$userResult = execute($userStmt,$conn);
-if($userResult==TRUE)
+$saleStmt = $conn->prepare("select no,name from users where invalid=0 and role = 3 order by name ");
+$saleResult = execute($saleStmt,$conn);
+if($saleResult==TRUE)
 {
-    $userResult=$userStmt->get_result();
-    $saleUserResultSet = $userResult;
+    // $userResult=$userStmt->get_result();
+    $saleResult=$saleStmt->store_result();
+    $saleUserResultSet = $saleResult;
 }
 
-$userStmt = $conn->prepare("select no,name from users where invalid=0 and role = 4 or role = 1 order by name");
-$userResult = execute($userStmt,$conn);
-if($userResult==TRUE)
+$approveUserStmt = $conn->prepare("select no,name from users where invalid=0 and role = 4 or role = 1 order by name");
+$approveUserResult = execute($approveUserStmt,$conn);
+if($approveUserResult==TRUE)
 {
-    $userResult=$userStmt->get_result();
-    $approveUserResultSet = $userResult;
+    // $approveUserResult=$approveUserStmt->get_result();
+    $approveUserResult=$approveUserStmt->store_result();
+    $approveUserResultSet = $approveUserResult;
 }
 
 $conn->close();

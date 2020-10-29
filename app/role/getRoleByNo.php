@@ -21,8 +21,8 @@
              $stmtRole->store_result();
              $role = fetchAssocStatement($stmtRole);
           }
+          $stmtRole->close();
         }
-        $stmtRole->close();
         $conn->close();
     }
    

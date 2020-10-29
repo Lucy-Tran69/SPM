@@ -66,8 +66,63 @@
         } 
     }
 
+    // if ($customerDisplaylimit == 1){
+    //     $sel = mysqli_query($conn, "select count(*) as allcount from (select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
+    //                                                             FROM commodity C
+    //                                                             LEFT JOIN print_type PT on C.print_type = PT.no    
+    //                                                             INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
+    //                                                             LEFT JOIN
+    //                                                                 (select SP.customer, SP.commodity, SP.seq, SP.price 
+    //                                                                 FROM selling_price SP
+    //                                                                 INNER JOIN 
+    //                                                                     (SELECT commodity, MAX(seq) as seq_last FROM selling_price WHERE approvalday IS NOT NULL GROUP BY commodity) A on SP.seq = A.seq_last and SP.commodity = A.commodity) B on B.commodity = C.no AND B.customer = ".$cusNo."
+    //                                                             LEFT JOIN
+    //                                                                 (select SP.customer, SP.commodity, SP.seq, SP.price 
+    //                                                                 FROM selling_price SP
+    //                                                                 INNER JOIN
+    //                                                                     (SELECT commodity, MAX(seq) as seq_last 
+    //                                                                     FROM selling_price SP3 
+    //                                                                     WHERE approvalday IS NOT NULL AND seq NOT IN (SELECT MAX(seq) 
+    //                                                                                                                                         FROM selling_price 
+    //                                                                                                                                         WHERE approvalday IS NOT NULL AND commodity = SP3.commodity)
+    //                                                                     GROUP BY commodity) D on SP.seq = D.seq_last and SP.commodity = D.commodity) E on E.commodity = C.no AND E.customer = ".$cusNo."
+    //                                                             INNER JOIN
+    //                                                                 (SELECT commodity,inventory.inventory_mark, im.display 
+    //                                                                 FROM inventory 
+    //                                                                 INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no  WHERE C.invalid != 1 
+    //                                                             ".$searchQuery.") A");
+    // }else{
+    //     $sel = mysqli_query($conn, "select count(*) as allcount from (select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
+    //                                                             FROM commodity C
+    //                                                             LEFT JOIN print_type PT on C.print_type = PT.no    
+    //                                                             INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
+    //                                                             INNER JOIN
+    //                                                                 (select SP.customer, SP.commodity, SP.seq, SP.price 
+    //                                                                 FROM selling_price SP
+    //                                                                 INNER JOIN 
+    //                                                                     (SELECT commodity, MAX(seq) as seq_last FROM selling_price WHERE approvalday IS NOT NULL GROUP BY commodity) A on SP.seq = A.seq_last and SP.commodity = A.commodity) B on B.commodity = C.no AND B.customer = ".$cusNo."
+    //                                                             INNER JOIN
+    //                                                                 (select SP.customer, SP.commodity, SP.seq, SP.price 
+    //                                                                 FROM selling_price SP
+    //                                                                 INNER JOIN
+    //                                                                     (SELECT commodity, MAX(seq) as seq_last 
+    //                                                                     FROM selling_price SP3 
+    //                                                                     WHERE approvalday IS NOT NULL AND seq NOT IN (SELECT MAX(seq) 
+    //                                                                                                                                         FROM selling_price 
+    //                                                                                                                                         WHERE approvalday IS NOT NULL AND commodity = SP3.commodity)
+    //                                                                     GROUP BY commodity) D on SP.seq = D.seq_last and SP.commodity = D.commodity) E on E.commodity = C.no AND E.customer = ".$cusNo."
+    //                                                             INNER JOIN
+    //                                                                 (SELECT commodity,inventory.inventory_mark, im.display 
+    //                                                                 FROM inventory 
+    //                                                                 INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no
+    //                                                             ".$searchQuery.") A");
+    // }
+    
+    // $records = mysqli_fetch_assoc($sel);
+    // $totalRecordwithFilter = $records['allcount'];
+
     if ($customerDisplaylimit == 1){
-        $sel = mysqli_query($conn, "select count(*) as allcount from (select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
+        $sel = "select count(*) as allcount from (select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
                                                                 FROM commodity C
                                                                 LEFT JOIN print_type PT on C.print_type = PT.no    
                                                                 INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
@@ -90,9 +145,9 @@
                                                                     (SELECT commodity,inventory.inventory_mark, im.display 
                                                                     FROM inventory 
                                                                     INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no  WHERE C.invalid != 1 
-                                                                ".$searchQuery.") A");
+                                                                ".$searchQuery.") A";
     }else{
-        $sel = mysqli_query($conn, "select count(*) as allcount from (select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
+        $sel = "select count(*) as allcount from (select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
                                                                 FROM commodity C
                                                                 LEFT JOIN print_type PT on C.print_type = PT.no    
                                                                 INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
@@ -115,11 +170,12 @@
                                                                     (SELECT commodity,inventory.inventory_mark, im.display 
                                                                     FROM inventory 
                                                                     INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no
-                                                                ".$searchQuery.") A");
+                                                                ".$searchQuery.") A";
     }
-    
-
-    $records = mysqli_fetch_assoc($sel);
+    $stmSel = $conn->prepare($sel);
+    $stmSel->execute();
+    $stmSel->store_result();
+    $records = fetchAssocStatement($stmSel);
     $totalRecordwithFilter = $records['allcount'];
 
     ## Get newestDate
@@ -131,8 +187,10 @@
                             END AS newestDate
                             FROM inventory i
                             INNER JOIN inventory_mark im ON im.no = i.inventory_mark AND im.hidden != 1) a";
-    $newestDateResult = mysqli_query($conn,$newestDateQuery);
-    $row = mysqli_fetch_assoc($newestDateResult);
+    $stmNewestDate = $conn->prepare($newestDateQuery);
+    $stmNewestDate->execute();
+    $stmNewestDate->store_result();
+    $row = fetchAssocStatement($stmNewestDate);
     $newestDate = $row['newestDate'];
 
     ## Fetch records
@@ -193,7 +251,7 @@
     
     $data = array();
     
-    while ($row = mysqli_fetch_assoc($empRecords)) {
+    while ($row = mysqli_fetch_array($empRecords)) {
         $data[] = array(
                 "print_type" => $row['print_type'],
                 "maker" => $row['maker'],

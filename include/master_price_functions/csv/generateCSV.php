@@ -113,7 +113,7 @@ $result;
 
 if($result==TRUE)
 {
-    $result = $stmt->get_result();
+    $result = $stmt->store_result();
     $resultSet = $result;
 }
 
@@ -122,7 +122,7 @@ header('Content-Encoding: UTF-8');
 header('Content-Type: application/csv; charset=UTF-8');
 header('Content-Disposition: attachment; filename='.$filename);
 fputcsv($fp, $header);
-while($row = mysqli_fetch_row($result)) {
+while($row = fetchAssocStatement($stmt)) {
 	fputcsv($fp, $row);
 }
 ?>?

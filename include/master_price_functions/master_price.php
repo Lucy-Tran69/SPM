@@ -69,13 +69,13 @@ if($conn->connect_error)
 
             if($findresult==TRUE)
             {
-                $findresult = $findstmt->get_result();
+                $findresult = $findstmt->store_result();
                 $findresultSet = $findresult;
             }
 
-            if($findresultSet->num_rows>0)
+            if($findstmt->num_rows>0)
             {
-                while($row = $findresultSet->fetch_assoc())
+                while($row = fetchAssocStatement($findstmt))
                 {
                     $edit_disabled = ($row["sales"]!=$_SESSION["loginUserId"] && $_SESSION["loginRole"]!=1)?"disabled":"";
                 }
@@ -123,7 +123,7 @@ $result="";
 
 if($result===TRUE)
 {
-    $result = $stmt->get_result();
+    $result = $stmt->store_result();
     $resultSet = $result;
 }
 
@@ -155,7 +155,7 @@ $oldstmt = $conn->prepare("SELECT  distinct print_type.name as type,
     $oldresult = execute($oldstmt,$conn);
     if($oldresult==TRUE)
     {
-        $oldresult = $oldstmt->get_result();
+        $oldresult = $oldstmt->store_result();
         $oldresultSet = $oldresult;
     }
 
@@ -187,7 +187,7 @@ $oldstmt = $conn->prepare("SELECT  distinct print_type.name as type,
     $priceresult = execute($pricestmt,$conn);
     if($priceresult==TRUE)
     {
-        $priceresult = $pricestmt->get_result();
+        $priceresult = $pricestmt->store_result();
         $priceresultSet = $priceresult;
     }
 
@@ -214,7 +214,7 @@ $oldstmt = $conn->prepare("SELECT  distinct print_type.name as type,
             $addresult = execute($addstmt,$conn);
             if($addresult==TRUE)
             {
-                $addresult = $addstmt->get_result();
+                $addresult = $addstmt->store_result();
                 $addresultSet = $addresult;
             }
     }
@@ -223,7 +223,7 @@ $makerStmt = $conn->prepare("select no,name from maker where invalid=0");
 $makerResult = execute($makerStmt,$conn);
 if($makerResult==TRUE)
 {
-    $makerResult=$makerStmt->get_result();
+    $makerResult=$makerStmt->store_result();
     $makerResultSet = $makerResult;
 }
 
@@ -231,7 +231,7 @@ $customerStmt = $conn->prepare("select no,name from customer where invalid=0");
 $customerResult = execute($customerStmt,$conn);
 if($customerResult==TRUE)
 {
-    $customerResult=$customerStmt->get_result();
+    $customerResult=$customerStmt->store_result();
     $customerResultSet = $customerResult;
 }
 
@@ -250,11 +250,11 @@ $dateStmt = $conn->prepare("SELECT  distinct
 $dateResult = execute($dateStmt,$conn);
 if($dateResult==true)
 {
-    $dateResult = $dateStmt->get_result();
+    $dateResult = $dateStmt->store_result();
     $dateResultSet = $dateResult;
 }
 $last_updated="";
-while($row = $dateResult->fetch_assoc())
+while($row = fetchAssocStatement($dateStmt))
 {
     $last_updated = !empty($row["LAST_UPDATE"])?$row["LAST_UPDATE"]:"まだ更新されていません";
 }

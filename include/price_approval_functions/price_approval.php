@@ -55,7 +55,7 @@ if($conn->connect_error)
     $result = execute($stmt,$conn);
     if($result==TRUE)
     {
-        $result = $stmt->get_result();
+        $result = $stmt->store_result();
         $resultSet = $result;
     }
 
@@ -87,7 +87,7 @@ if($conn->connect_error)
     $oldresult = execute($oldstmt,$conn);
     if($oldresult==TRUE)
     {
-        $oldresult = $oldstmt->get_result();
+        $oldresult = $oldstmt->store_result();
         $oldresultSet = $oldresult;
     }
 }
@@ -96,7 +96,7 @@ $customerStmt = $conn->prepare("select no,name from customer where invalid=0");
 $customerResult = execute($customerStmt,$conn);
 if($customerResult==TRUE)
 {
-    $customerResult=$customerStmt->get_result();
+    $customerResult=$customerStmt->store_result();
     $customerResultSet = $customerResult;
 }
 ?>

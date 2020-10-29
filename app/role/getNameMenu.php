@@ -38,9 +38,10 @@
                         'menu' => $row['menu']));
                 }
             }
+
+            $stmtRoleMenu->close();
         }
     }
 
-    $stmtRoleMenu->close();
     $conn->close();
 ?>

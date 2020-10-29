@@ -14,7 +14,9 @@
     $rowperpage = isset($_POST['length']) ? $_POST['length'] : 10; // Rows display per page
 
     ## Search 
-    $searchQuery = "";;
+    $searchQuery = "";
+     $title = "";
+     $status = "";
 
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $title = isset($_POST["title"]) ? check_keyword_search($_POST["title"]) : '';
@@ -25,21 +27,20 @@
         $currentDate = date("Y-m-d H:i:s");
         
         if(!empty($title) && empty($status)){
-            $title = mysqli_real_escape_string($conn, $title);
-            $searchQuery = " and title like '%$title%'";
+            $searchQuery = " and title like '%?%'";
         }
         if(empty($title) && !empty($status)){
-            $searchQuery = " and opday <= '$status' and (clday >= '$status' or clday is null) ";
+            $searchQuery = " and opday <= '?' and (clday >= '?' or clday is null) ";
         }
         if(!empty($title) && !empty($status)) {
-            $title = mysqli_real_escape_string($conn, $title);
-            $searchQuery = " and title like '%$title%' and opday <= '$status' and (clday >= '$status' or clday is null) ";
+            $searchQuery = " and title like '%?%' and opday <= '?' and (clday >= '?' or clday is null) ";
         }
         if(!empty($topicID)) {
             $empQuery = "UPDATE topics SET invalid = 1 WHERE no = $topicID";
             mysqli_query($conn, $empQuery);
         }
     }
+
 
     $invalid = 0;
     ## Total number of records without filtering
@@ -51,29 +52,70 @@
     $records = fetchAssocStatement($stmSel);
     $totalRecords = $records['allcount'];
 
-    ## Total number of records with filtering
-    $sel = "select count(*) as allcount from topics WHERE invalid = ? " .$searchQuery;
+     ## Total number of records with filtering
+    // $sel = "select count(*) as allcount from topics WHERE invalid = ? " .$searchQuery;
+    // $stmSel = $conn->prepare($sel);
+    if($title != "" && $status == ""){
+         $sel = "select count(*) as allcount from topics WHERE invalid = ? " .$searchQuery;
+         $stmSel = $conn->prepare($sel);
+      $stmSel->bind_param('is', $invalid, $title);
+    }
+    if(empty($title) && !empty($status)){
+        $stmSel->bind_param('iss', $invalid, $status, $status);
+    }
+    if(!empty($title) && !empty($status)) {
+        $stmSel->bind_param('isss', $invalid, $title, $status, $status);
+    }
+
+    if ($title == "" && $status == "") {
+         $sel = "select count(*) as allcount from topics WHERE invalid = ? " .$searchQuery;
     $stmSel = $conn->prepare($sel);
-    $stmSel->bind_param('i', $invalid);
+        $stmSel->bind_param('i', $invalid);
+    }
+    
     $stmSel->execute();
     $stmSel->store_result();
     $records = fetchAssocStatement($stmSel);
     $totalRecordwithFilter = $records['allcount'];
+    $stmSel->close();
 
     ## Fetch records
-    $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = 0 ".$searchQuery." order by open_day desc limit ".$row.",".$rowperpage;
-  
-    $empRecords = mysqli_query($conn, $empQuery);
-    $data = array();
+    // $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? ".$searchQuery." order by open_day desc limit ".$row.",".$rowperpage;
+    // $stmt = $conn->prepare($empQuery);
+    if($title != "" && $status == ""){
+        // $searchQuery = " and title like '%?%'";
+         $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? and title like '%?%' order by open_day desc limit ".$row.",".$rowperpage;
+         var_dump($empQuery); die();
+         $stmt = $conn->prepare($empQuery);
+      $stmt->bind_param('is', $invalid, $title);
+    
 
-    while ($row = mysqli_fetch_array($empRecords)) {
-        $data[] = array(
-                "no" => $row['no'],
-                "insert_day" => $row['insert_day'],
-                "open_day" => $row['open_day'],
-                "close_day" => $row['close_day'],
-                "title" => $row['title']
-            );
+    }
+    if(empty($title) && !empty($status)){
+        $stmt->bind_param('iss', $invalid, $status, $status);
+    }
+    if(!empty($title) && !empty($status)) {
+        $stmt->bind_param('iss', $invalid, $title, $status, $status);
+    }
+
+    if ($title == "" && $status == "") {
+          $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? ".$searchQuery." order by open_day desc limit ".$row.",".$rowperpage;
+    $stmt = $conn->prepare($empQuery);
+        $stmt->bind_param('i', $invalid);
+    }
+
+    $stmt->execute();
+    $stmt->store_result();
+     $data = array();
+     if(!$stmt->error) {
+        while ($row = fetchAssocStatement($stmt))
+        {
+            array_push($data, array( "no" => $row['no'],
+            "insert_day" => $row['insert_day'],
+            "open_day" => $row['open_day'],
+            "close_day" => $row['close_day'],
+            "title" => $row['title']));
+        }
     }
 
     ## Response
@@ -95,6 +137,8 @@
     $data = trim($data);
     $data = str_replace('_', '\\_', $data);
     $data = str_replace('%', '\\%', $data);
+    $data = str_replace("'", "\\'", $data);
+    $data = str_replace('"', '\\"', $data);
     return $data;
 }
 ?>

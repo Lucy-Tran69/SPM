@@ -21,11 +21,11 @@ $cust_name = "";
 $toEmail = "";
 if($custResult==true)
 {
-    $custResult = $custStmt->get_result();
+    $custResult = $custStmt->store_result();
     $custResultSet = $custResult;
-   if($custResultSet->num_rows > 0)
+   if($custStmt->num_rows > 0)
    {
-    while($row = $custResultSet->fetch_assoc())
+    while($row = fetchAssocStatement($custStmt))
     {
         $cust_name = $row["name"];
         $toEmail = $row["email"];

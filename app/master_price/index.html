@@ -97,9 +97,9 @@ if (isset($_SESSION["loginAccount"])) {
                         <select name="selectedCustomer" id="selectedCustomer" class="form-control" customName=0>
                           <option value="">-</option>
                           <?php
-                          if ($customerResultSet->num_rows > 0) {
-                            mysqli_data_seek($customerResultSet, 0);
-                            while ($row = $customerResultSet->fetch_assoc()) {
+                          if ($customerStmt->num_rows > 0) {
+                            mysqli_stmt_data_seek($customerStmt, 0);
+                            while ($row = fetchAssocStatement($customerStmt)) {
                           ?>
                               <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedCustomer"]) && $_POST["selectedCustomer"] == $row["no"]) {
                                                                           echo "selected='selected'";
@@ -133,9 +133,9 @@ if (isset($_SESSION["loginAccount"])) {
                         <select name="selectedMaker" id="selectedMaker" class="form-control" customName=1>
                           <option value="">-</option>
                           <?php
-                          if ($makerResultSet->num_rows > 0) {
-                            mysqli_data_seek($makerResultSet, 0);
-                            while ($row = $makerResultSet->fetch_assoc()) {
+                          if ($makerStmt->num_rows > 0) {
+                            mysqli_stmt_data_seek($makerStmt, 0);
+                            while ($row = fetchAssocStatement($makerStmt)) {
                           ?>
                               <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedMaker"]) && $_POST["selectedMaker"] == $row["no"]) {
                                                                           echo "selected='selected'";
@@ -205,11 +205,11 @@ if (isset($_SESSION["loginAccount"])) {
                     <?php
                     if(isset($resultSet))
                     {
-                    if ($resultSet->num_rows > 0 && $display==TRUE) {
-                      mysqli_data_seek($resultSet,0);
-                      while ($row = $resultSet->fetch_assoc()) {
-                        $rowOld = $oldresultSet->fetch_assoc();
-                        $rowPrice = $priceresultSet->fetch_assoc();
+                    if ($stmt->num_rows > 0 && $display==TRUE) {
+                      mysqli_stmt_data_seek($stmt,0);
+                      while ($row = fetchAssocStatement($stmt)) {
+                        $rowOld = fetchAssocStatement($oldstmt);
+                        $rowPrice = fetchAssocStatement($pricestmt);
                         if($row["sp"]!=$rowPrice["sp"]){
                           $row["sp"]=$rowPrice["sp"];
                         }
@@ -235,11 +235,11 @@ if (isset($_SESSION["loginAccount"])) {
                     // freeConnection($conn);
                     ?>
                     <?php
-                    if(isset($addresultSet))
+                    if(isset($addstmt))
                     {
-                    if ($addresultSet->num_rows > 0 && $display==TRUE) {
-                      mysqli_data_seek($addresultSet,0);
-                      while ($row = $addresultSet->fetch_assoc()) {
+                    if ($addstmt->num_rows > 0 && $display==TRUE) {
+                      mysqli_stmt_data_seek($addstmt,0);
+                      while ($row = fetchAssocStatement($addstmt)) {
                     ?>
                         <tr <?php echo isset($_POST['searchInvalid'])? 'style="display: none;"':'';?>>
                           <td style="display: none;"><?php echo "INSERT_TO_DB";?></td>
@@ -284,9 +284,9 @@ if (isset($_SESSION["loginAccount"])) {
     <select name="selectedCustomer" id="selectedCustomer" class="form-control">
       <option value="">-</option>
       <?php
-      if ($makerResultSet->num_rows > 0) {
-        mysqli_data_seek($customerResultSet, 0);
-        while ($row = $customerResultSet->fetch_assoc()) {
+      if ($customerStmt->num_rows > 0) {
+        mysqli_stmt_data_seek($customerStmt, 0);
+        while ($row = fetchAssocStatement($customerStmt)) {
       ?>
           <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedCustomer"]) && ($_POST["selectedCustomer"] == $row["no"])) {
                                                       echo "selected='selected'";
@@ -299,9 +299,9 @@ if (isset($_SESSION["loginAccount"])) {
     <select name="selectedMaker" id="selectedMaker" class="form-control">
       <option value="">-</option>
       <?php
-      if ($makerResultSet->num_rows > 0) {
-        mysqli_data_seek($makerResultSet, 0);
-        while ($row = $makerResultSet->fetch_assoc()) {
+      if ($makerStmt->num_rows > 0) {
+        mysqli_stmt_data_seek($makerStmt, 0);
+        while ($row = fetchAssocStatement($makerStmt)) {
       ?>
           <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedMaker"]) && $_POST["selectedMaker"] == $row["no"]) {
                                                       echo "selected='selected'";
@@ -320,9 +320,9 @@ if (isset($_SESSION["loginAccount"])) {
     <select name="selectedCustomer" id="selectedCustomer" class="form-control">
       <option value="">-</option>
       <?php
-      if ($makerResultSet->num_rows > 0) {
-        mysqli_data_seek($customerResultSet, 0);
-        while ($row = $customerResultSet->fetch_assoc()) {
+      if ($customerStmt->num_rows > 0) {
+        mysqli_stmt_data_seek($customerStmt, 0);
+        while ($row = fetchAssocStatement($customerStmt)) {
       ?>
           <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedCustomer"]) && ($_POST["selectedCustomer"] == $row["no"])) {
                                                       echo "selected='selected'";
@@ -335,9 +335,9 @@ if (isset($_SESSION["loginAccount"])) {
     <select name="selectedMaker" id="selectedMaker" class="form-control">
       <option value="">-</option>
       <?php
-      if ($makerResultSet->num_rows > 0) {
-        mysqli_data_seek($makerResultSet, 0);
-        while ($row = $makerResultSet->fetch_assoc()) {
+      if ($makerStmt->num_rows > 0) {
+        mysqli_stmt_data_seek($makerStmt, 0);
+        while ($row = fetchAssocStatement($makerStmt)) {
       ?>
           <option value="<?php echo $row["no"]; ?>" <?php if (isset($_POST["selectedMaker"]) && $_POST["selectedMaker"] == $row["no"]) {
                                                       echo "selected='selected'";

@@ -1,5 +1,9 @@
+.width-100px {
+	width: 100px;
+}
+
 .sidebar-dark-primary{
-    background-color: #001f3f;
+    background-color: #001f3f !important;
 }
 
 .logout-panel{
@@ -7,7 +11,10 @@
     padding: .5rem 1rem;
 }
 
-.width-100px {
-	width: 100px;
+table thead tr {
+    background-color: #bbd6fc;
 }
 
+.layout-navbar-fixed .wrapper .sidebar-dark-primary .brand-link:not([class*=navbar]) {
+    background-color: #001f3f;
+}

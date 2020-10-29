@@ -135,8 +135,8 @@ while ($row = mysqli_fetch_array($query)) {
 if (!empty($data)) {
     foreach ($data as $value) { ?>
         <tr data-id="<?php echo $value['no'] ?>">
-            <td class="text-center"><?php echo $value['name'] ?></td>
-            <td class="text-center"><?php echo $value['outside_name'] ?></td>
+            <td class="text-left text-nowrap"><?php echo $value['name'] ?></td>
+            <td class="text-left text-nowrap"><?php echo $value['outside_name'] ?></td>
             <td class="text-right sort" contenteditable='true'><?php echo $value['sort_order'] ?></td>
             <td class="width-100px">
                 <div class="row justify-content-center w-200px custom-button">

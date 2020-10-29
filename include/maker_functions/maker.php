@@ -24,32 +24,32 @@ else
 $result = execute($stmt,$conn);
 if($result==TRUE)
 {
-    $result = $stmt->get_result();
+    $stmt->store_result();
     $resultSet = $result;
 }
 
-$roleStmt = $conn->prepare("select no,name from role where invalid=0");
-$roleResult = execute($roleStmt,$conn);
-if($roleResult==TRUE)
-{
-    $roleResult=$roleStmt->get_result();
-    $roleResultSet = $roleResult;
-}
+// $roleStmt = $conn->prepare("select no,name from role where invalid=0");
+// $roleResult = execute($roleStmt,$conn);
+// if($roleResult==TRUE)
+// {
+//     $roleResult=$roleStmt->store_result();
+//     $roleResultSet = $roleResult;
+// }
 
-$custStmt = $conn->prepare("select no,name from customer where invalid=0");
-$custResult = execute($custStmt,$conn);
-if($custResult==TRUE)
-{
-    $custResult=$custStmt->get_result();
-    $custResultSet = $custResult;
-}
+// $custStmt = $conn->prepare("select no,name from customer where invalid=0");
+// $custResult = execute($custStmt,$conn);
+// if($custResult==TRUE)
+// {
+//     $custResult=$custStmt->store_result();
+//     $custResultSet = $custResult;
+// }
 
-$officeStmt = $conn->prepare("select no,name from office");
-$officeResult = execute($officeStmt,$conn);
-if($officeResult==TRUE)
-{
-    $officeResult=$officeStmt->get_result();
-    $officeResultSet = $officeResult;
-}
+// $officeStmt = $conn->prepare("select no,name from office");
+// $officeResult = execute($officeStmt,$conn);
+// if($officeResult==TRUE)
+// {
+//     $officeResult=$officeStmt->store_result();
+//     $officeResultSet = $officeResult;
+// }
 
 ?>?

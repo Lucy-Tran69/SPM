@@ -97,7 +97,7 @@ else
 $result = execute($stmt,$conn);
 if($result==TRUE)
 {
-    $result = $stmt->get_result();
+    $result = $stmt->store_result();
     $resultSet = $result;
 }
 
@@ -115,7 +115,7 @@ $officeStmt = $conn->prepare("select office,customer from users where no=?");
 $officeStmt->bind_param('i',$id);
 $officeResult = execute($officeStmt, $conn);
 if ($officeResult == TRUE) {
-    $officeResult = $officeStmt->get_result();
+    $officeResult = $officeStmt->store_result();
     $officeResultSet = $officeResult;
 }
 $office;
@@ -123,10 +123,10 @@ $customer;
 $tel;
 $name="";
 $fax="";
-if ($officeResultSet->num_rows > 0) 
+if ($officeStmt->num_rows > 0) 
 {
-    mysqli_data_seek($officeResultSet, 0);
-    while ($row = $officeResultSet->fetch_assoc()) 
+    mysqli_stmt_data_seek($officeStmt, 0);
+    while ($row = fetchAssocStatement($officeStmt)) 
     {
         $office = $row["office"];
         $customer = $row["customer"];
@@ -138,7 +138,7 @@ if ($officeResultSet->num_rows > 0)
         $Result = execute($Stmt, $conn);
         if ($Result == TRUE) 
         {
-            $Result = $Stmt->get_result();
+            $Result = $Stmt->store_result();
             $ResultSet = $Result;
         }
     }
@@ -148,12 +148,12 @@ if ($officeResultSet->num_rows > 0)
         $Result = execute($Stmt, $conn);
         if ($Result == TRUE) 
         {
-            $Result = $Stmt->get_result();
+            $Result = $Stmt->store_result();
             $ResultSet = $Result;
         }
     }
 
-    while($row = $ResultSet->fetch_assoc())
+    while($row = fetchAssocStatement($Stmt))
     {
         $tel = $row["tel"];
         $name = $row["NAME"];
@@ -252,7 +252,7 @@ $pdf->SetFont('SJIS','',14);
 // $pdf->Ln();
 
 //Fill data
-foreach ($result as $row) {
+while($row = fetchAssocStatement($stmt)) {
     $i=0;
     foreach($row as $column)
     {

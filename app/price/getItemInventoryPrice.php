@@ -76,7 +76,8 @@ if($customerDisplaylimit == 1){
 $makerResult = execute($makerStmt,$conn);
 if($makerResult==TRUE)
 {
-    $makerResult=$makerStmt->get_result();
+    // $makerResult=$makerStmt->get_result();
+    $makerResult=$makerStmt->store_result();
     $makerResultSet = $makerResult;
 }
 

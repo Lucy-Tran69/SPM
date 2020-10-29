@@ -181,8 +181,8 @@ check_view_permission($url);
                             <td><select id="sale" name="sale" class="form-control">
                                     <option value="">選択</option>
                                     <?php
-                                        if ($saleUserResultSet->num_rows > 0) {
-                                          while ($row = $saleUserResultSet->fetch_assoc()) {
+                                        if ($saleStmt->num_rows > 0) {
+                                          while ($row = fetchAssocStatement($saleStmt)) {
                                         ?>
                                     <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?>
                                     </option>
@@ -201,8 +201,8 @@ check_view_permission($url);
                             <td><select id="supervisor" name="supervisor" class="form-control">
                                     <option value="">選択</option>
                                     <?php
-                                        if ($approveUserResultSet->num_rows > 0) {
-                                          while ($row = $approveUserResultSet->fetch_assoc()) {
+                                        if ($approveUserStmt->num_rows > 0) {
+                                          while ($row = fetchAssocStatement($approveUserStmt)) {
                                         ?>
                                     <option value="<?php echo $row['no']; ?>"><?php echo $row['name']; ?>
                                     </option>

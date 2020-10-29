@@ -60,11 +60,11 @@ function getDetails($id)
     $result = execute($stmt,$conn);
 
     if($result==TRUE)
-        $result = $stmt->get_result();
+        $result = $stmt->store_result();
 
-    if($result->num_rows==1)
+    if($stmt->num_rows==1)
     {
-        $row = $result->fetch_assoc();
+        $row = fetchAssocStatement($stmt);
         return $row;
     }
     else

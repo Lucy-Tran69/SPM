@@ -49,17 +49,31 @@
         } 
     }
 
-    $sel = mysqli_query($conn, "select count(*) as allcount from (select PT.name AS print_type, M.name AS maker, C.name, inv.commodity, inv.display 
-                                                                    FROM commodity C 
-                                                                    LEFT JOIN print_type PT ON C.print_type = PT.no 
-                                                                    INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
-                                                                    INNER JOIN (select I.commodity, im.display 
-                                                                                FROM inventory I
-                                                                                INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1 OR im.no = 3) AND im.hidden != 1) inv ON inv.commodity = C.no 
-                                                                    WHERE C.invalid = 0 ".$searchQuery.") A");
+    // $sel = mysqli_query($conn, "select count(*) as allcount from (select PT.name AS print_type, M.name AS maker, C.name, inv.commodity, inv.display 
+    //                                                                 FROM commodity C 
+    //                                                                 LEFT JOIN print_type PT ON C.print_type = PT.no 
+    //                                                                 INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
+    //                                                                 INNER JOIN (select I.commodity, im.display 
+    //                                                                             FROM inventory I
+    //                                                                             INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1 OR im.no = 3) AND im.hidden != 1) inv ON inv.commodity = C.no 
+    //                                                                 WHERE C.invalid = 0 ".$searchQuery.") A");
 
 
-    $records = mysqli_fetch_assoc($sel);
+    // $records = mysqli_fetch_assoc($sel);
+    // $totalRecordwithFilter = $records['allcount'];
+
+    $sel = "select count(*) as allcount from (select PT.name AS print_type, M.name AS maker, C.name, inv.commodity, inv.display 
+                                                                     FROM commodity C 
+                                                                     LEFT JOIN print_type PT ON C.print_type = PT.no 
+                                                                     INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
+                                                                     INNER JOIN (select I.commodity, im.display 
+                                                                                 FROM inventory I
+                                                                                 INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1 OR im.no = 3) AND im.hidden != 1) inv ON inv.commodity = C.no 
+                                                                     WHERE C.invalid = 0 ".$searchQuery.") A";
+    $stmSel = $conn->prepare($sel);
+    $stmSel->execute();
+    $stmSel->store_result();
+    $records = fetchAssocStatement($stmSel);
     $totalRecordwithFilter = $records['allcount'];
 
     ## Get newestDate
@@ -71,8 +85,10 @@
                             END AS newestDate
                             FROM inventory i
                             INNER JOIN inventory_mark im ON im.no = i.inventory_mark AND im.hidden != 1) a";
-    $newestDateResult = mysqli_query($conn,$newestDateQuery);
-    $row = mysqli_fetch_assoc($newestDateResult);
+    $stmNewestDate = $conn->prepare($newestDateQuery);
+    $stmNewestDate->execute();
+    $stmNewestDate->store_result();
+    $row = fetchAssocStatement($stmNewestDate);
     $newestDate = $row['newestDate'];
 
     ## Fetch records
@@ -89,7 +105,7 @@
     
     $data = array();
     
-    while ($row = mysqli_fetch_assoc($empRecords)) {
+    while ($row = mysqli_fetch_array($empRecords)) {
         $data[] = array(
                 "print_type" => $row['print_type'],
                 "maker" => $row['maker'],

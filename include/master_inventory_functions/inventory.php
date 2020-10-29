@@ -104,7 +104,7 @@ else
 $result = execute($stmt,$conn);
 if($result==TRUE)
 {
-    $result = $stmt->get_result();
+    $result = $stmt->store_result();
     $resultSet = $result;
 }
 
@@ -112,7 +112,7 @@ $markStmt = $conn->prepare("select no,display from inventory_mark");
 $markResult = execute($markStmt,$conn);
 if($markResult==TRUE)
 {
-    $markResult=$markStmt->get_result();
+    $markResult=$markStmt->store_result();
     $markResultSet = $markResult;
 }
 
@@ -120,11 +120,11 @@ $newStmt = $conn->prepare("select no,display from inventory_mark where no=5");
 $newResult = execute($newStmt,$conn);
 if($newResult==TRUE)
 {
-    $newResult=$newStmt->get_result();
+    $newResult=$newStmt->store_result();
     $newResultSet = $newResult;
 }
 
-while($newrow = $newResultSet->fetch_assoc())
+while($newrow = fetchAssocStatement($newStmt))
 {
     $markNew = $newrow["display"];
 }
@@ -133,7 +133,7 @@ $makerStmt = $conn->prepare("select no,name from maker where invalid=0");
 $makerResult = execute($makerStmt,$conn);
 if($makerResult==TRUE)
 {
-    $makerResult=$makerStmt->get_result();
+    $makerResult=$makerStmt->store_result();
     $makerResultSet = $makerResult;
 }
 
@@ -141,11 +141,11 @@ $dateStmt = $conn->prepare("SELECT date(GREATEST(MAX(inday),MAX(upday))) as LAST
 $dateResult = execute($dateStmt,$conn);
 if($dateResult==true)
 {
-    $dateResult = $dateStmt->get_result();
+    $dateResult = $dateStmt->store_result();
     $dateResultSet = $dateResult;
 }
 $last_updated="";
-while($row = $dateResult->fetch_assoc())
+while($row = fetchAssocStatement($dateStmt))
 {
     $last_updated = $row["LAST_UPDATE"];
 }

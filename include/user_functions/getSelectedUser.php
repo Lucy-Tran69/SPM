@@ -53,11 +53,13 @@ function getDetails($id)
     $result = execute($stmt,$conn);
 
     if($result==TRUE)
-        $result = $stmt->get_result();
-
-    if($result->num_rows==1)
     {
-        $row = $result->fetch_assoc();
+        $stmt->store_result();
+    }
+
+    if($stmt->num_rows==1)
+    {
+        $row = fetchAssocStatement($stmt);
         return $row;
     }
     else

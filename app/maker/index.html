@@ -99,8 +99,8 @@ if (isset($_SESSION["loginAccount"])) {
                 </thead>
                 <tbody>
                   <?php
-                  if ($resultSet->num_rows > 0) {
-                    while ($row = $resultSet->fetch_assoc()) {
+                  if ($stmt->num_rows > 0) {
+                    while ($row = fetchAssocStatement($stmt)) {
                   ?>
                       <tr>
                         <td style="display: none;"><?php echo $row["no"] ?></td>

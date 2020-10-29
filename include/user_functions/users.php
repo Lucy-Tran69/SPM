@@ -86,7 +86,6 @@ $stmt = $conn->prepare("select users.no as no,
                                left join customer on users.customer=customer.no ".$searchQuery."
                                ORDER BY users.name ASC");
 
-
 $result = execute($stmt,$conn);
 if($result==TRUE)
 {

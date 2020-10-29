@@ -80,9 +80,9 @@ if (isset($_SESSION["loginAccount"])) {
                         <select name="selectedCustomer" id="selectedCustomer" class="form-control" onchange="document.getElementById('searchForm').submit();">
                           <option value="">-</option>
                           <?php
-                          if ($customerResultSet->num_rows > 0) {
-                            mysqli_data_seek($customerResultSet, 0);
-                            while ($row = $customerResultSet->fetch_assoc()) {
+                          if ($customerStmt->num_rows > 0) {
+                            mysqli_stmt_data_seek($customerStmt, 0);
+                            while ($row = fetchAssocStatement($customerStmt)) {
                               if(isPending($row["no"],$conn)==true)
                               {
                           ?>
@@ -121,11 +121,11 @@ if (isset($_SESSION["loginAccount"])) {
                   </thead>
                   <tbody>
                     <?php
-                    if(isset($resultSet))
+                    if(isset($stmt))
                     {
-                    if ($resultSet->num_rows > 0 && $display==TRUE) {
-                      while ($row = $resultSet->fetch_assoc()) {
-                        $rowOld = $oldresultSet->fetch_assoc();
+                    if ($stmt->num_rows > 0 && $display==TRUE) {
+                      while ($row = fetchAssocStatement($stmt)) {
+                        $rowOld = fetchAssocStatement($oldstmt);
                     ?>
                         <tr>
                           <td style="display: none;"><?php echo $row["customer"];?></td>

@@ -114,7 +114,7 @@ else if($invalid!==null && !empty($searchCustomer))
 
 if($result==TRUE)
 {
-$result = $stmt->get_result();
+$result = $stmt->store_result();
 $resultSet = $result;
 } 
 
@@ -134,7 +134,7 @@ $oldstmt = $conn->prepare("SELECT  distinct a.seq as SEQ,
     $oldresult = execute($oldstmt,$conn);
     if($oldresult==TRUE)
     {
-        $oldresult = $oldstmt->get_result();
+        $oldresult = $oldstmt->store_result();
         $oldresultSet = $oldresult;
     }
 
@@ -152,11 +152,11 @@ $fax;
 $customerStmt = $conn->prepare("select name,no,tel,cd,address,zip,fax from customer where no=".$cust);
 $customerResult = execute($customerStmt, $conn);
 if ($customerResult == TRUE) {
-    $customerResult = $customerStmt->get_result();
+    $customerResult = $customerStmt->store_result();
     $customerResultSet = $customerResult;
 }
 
-while($row = $customerResultSet->fetch_assoc())
+while($row = fetchAssocStatement($customerStmt))
 {
     $name=$row["name"];
     $no=$row["no"];
@@ -167,7 +167,7 @@ while($row = $customerResultSet->fetch_assoc())
     $fax=$row["fax"];
 }
 
-while($row = $oldresultSet->fetch_assoc())
+while($row = fetchAssocStatement($oldstmt))
 {
     $seq=$row["SEQ"];
     $appDay=$row["APDAY"];
@@ -489,7 +489,7 @@ $pdf->SetWidths(array(22,22,22,22,22,22,22,22,22));
 //Fill data
 if($result==true)
 {
-    foreach ($result as $row) {
+    while($row = fetchAssocStatement($result)) {
         // foreach($row as $column)
         // {
         //     $pdf->MultiCell(22, 15, mb_convert_encoding($column, 'SJIS'), 1, 'C');

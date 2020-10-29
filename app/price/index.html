@@ -63,8 +63,8 @@ check_view_permission($url);
                   <select id="maker" name="maker" class="form-control">
                       <option value="">選択</option>
                       <?php
-                        if ($makerResultSet->num_rows > 0) {
-                          while ($row = $makerResultSet->fetch_assoc()) {
+                        if ($makerStmt->num_rows > 0) {
+                          while ($row = fetchAssocStatement($makerStmt)) {
                       ?>
                       <option value="<?php echo $row['name']; ?>" <?php if ($maker == $row['name']) {echo 'selected';} ?>><?php echo $row['name'];?>
                       </option>

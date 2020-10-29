@@ -90,7 +90,7 @@ $searchMaker = "";
 $result = execute($stmt,$conn);
 if($result==TRUE)
 {
-    $result = $stmt->get_result();
+    $result = $stmt->store_result();
     $resultSet = $result;
 }
 $currentDate = array(date('Y-m-d'));
@@ -100,7 +100,7 @@ header('Content-Type: application/csv; charset=UTF-8');
 header('Content-Disposition: attachment; filename='.$filename);
 fputcsv($fp,$currentDate);
 fputcsv($fp, $header);
-while($row = mysqli_fetch_row($result)) {
+while($row = fetchAssocStatement($stmt)) {
 	fputcsv($fp, $row);
 }
 

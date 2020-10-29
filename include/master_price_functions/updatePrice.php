@@ -24,11 +24,11 @@ $cust_name = "";
 $toEmail = "";
 if($custResult==true)
 {
-    $custResult = $custStmt->get_result();
+    $custResult = $custStmt->store_result();
     $custResultSet = $custResult;
-   if($custResultSet->num_rows > 0)
+   if($custStmt->num_rows > 0)
    {
-    while($row = $custResultSet->fetch_assoc())
+    while($row = fetchAssocStatement($custStmt))
     {
         $cust_name = $row["name"];
         $toEmail = $row["email"];
@@ -44,8 +44,8 @@ for($i=0;$i<count($arr);$i++)
     $stmt;
     $seqStmt = $conn->prepare("select max(seq) as SEQ from selling_price WHERE approvalday IS NULL AND customer=".$temp->cust." AND commodity=".$temp->commodity);
     $seqResult = execute($seqStmt,$conn);
-    $seqResult = $seqStmt->get_result();
-    while($row = $seqResult->fetch_assoc())
+    $seqResult = $seqStmt->store_result();
+    while($row = fetchAssocStatement($seqStmt))
     {
         if($row["SEQ"]!=null)
             $sequence_no=$row["SEQ"];
@@ -53,9 +53,9 @@ for($i=0;$i<count($arr);$i++)
     
     $maxseqStmt = $conn->prepare("select max(seq) as SEQ from selling_price WHERE customer=".$temp->cust);
     $maxseqResult = execute($maxseqStmt,$conn);
-    $maxseqResult = $maxseqStmt->get_result();
+    $maxseqResult = $maxseqStmt->store_result();
     
-    while($row = $maxseqResult->fetch_assoc())
+    while($row = fetchAssocStatement($maxseqStmt))
     {
         if($row["SEQ"]!=null)
             $max_seq=$row["SEQ"];
@@ -66,10 +66,10 @@ for($i=0;$i<count($arr);$i++)
         if($seqStmt==true)
         {
             $seResult = execute($seStmt,$conn);
-            $seResult = $seStmt->get_result();
+            $seResult = $seStmt->store_result();
         }
         $seq_no=0;
-        while($row = $seResult->fetch_assoc())
+        while($row = fetchAssocStatement($seStmt))
         {
         if($row["SEQ"]!=null)
             $seq_no=$row["SEQ"];

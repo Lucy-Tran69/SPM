@@ -70,11 +70,17 @@
         }
     }
 
-    $sel = mysqli_query($conn, "select count(*) as allcount from customer ".$searchQuery);
+    // $sel = mysqli_query($conn, "select count(*) as allcount from customer ".$searchQuery);
 
-    $records = mysqli_fetch_assoc($sel);
+    // $records = mysqli_fetch_assoc($sel);
+    // $totalRecordwithFilter = $records['allcount'];
+
+    $sel = "select count(*) as allcount from customer ".$searchQuery;
+    $stmSel = $conn->prepare($sel);
+    $stmSel->execute();
+    $stmSel->store_result();
+    $records = fetchAssocStatement($stmSel);
     $totalRecordwithFilter = $records['allcount'];
-
 
     ## Fetch records
     $empQuery = "select customer.no, customer.cd, customer.name, customer.invalid, A.NumberCustomerRole5, B.NumberCustomerRole6, C.name AS DisplayLimit from customer
@@ -90,7 +96,7 @@
     $empRecords = mysqli_query($conn, $empQuery);
     $data = array();
 
-    while ($row = mysqli_fetch_assoc($empRecords)) {
+    while ($row = mysqli_fetch_array($empRecords)) {
         $data[] = array(
                 "no" => $row['no'],
                 "cd" => $row['cd'],

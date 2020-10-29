@@ -29,11 +29,11 @@ function isPending($cID,$conn)
     $result = execute($stmt,$conn);
     if($result==TRUE)
     {
-        $result = $stmt->get_result();
+        $result = $stmt->store_result();
         $resultSet = $result;
     }
 
-    if($resultSet->num_rows > 0){
+    if($stmt->num_rows > 0){
         return true;
     }
     else
