@@ -25,28 +25,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($menu) {
         array_push($wheres, " role_menu.menu = ? ");
         array_push($wheresBind, "$menu");
-        $newsearchLimit = $newsearchLimit +"i";
+        $newsearchLimit = $newsearchLimit . "i";
         $join = "inner join role_menu on role.no = role_menu.role ";
     }
 
     if ($outSide) {
         array_push($wheres, " outside.no = ? ");
         array_push($wheresBind, "$outSide");
-        $newsearchLimit = $newsearchLimit +"i";
+        $newsearchLimit = $newsearchLimit . "i";
     }
 
     if (!$status) {
         array_push($wheres, " role.invalid = ? ");
         array_push($wheresBind, "0");
-        $newsearchLimit = $newsearchLimit +"i";
+        $newsearchLimit = $newsearchLimit . "i";
     } 
     if (count($wheres) > 0) {
         $newsearchQuery = " where ".implode(" and ", $wheres);
     }
+
+    if (!empty($sortOrder)) {
+        $empQuery = "update role set sort_order = ? where no = ?";
+        $stmSort = $conn->prepare($empQuery);
+        foreach ($sortOrder as $value) {
+            $sort = $value['sortOrder'];
+            $no = $value['no'];
+
+            $stmSort->bind_param('ii', $sort, $no);
+            $stmSort->execute();
+        }
+
+        if ($stmSort->error) {
+            $msg->error('表示順の更新に失敗しました。');
+        } else {
+            $msg->success('表示順の更新に成功しました。');
+        }
+
+        $stmSort->close();
+    }
     
 }
 
-$sql = " select role.no as no, role.name as name, role.sort_order as sort_order, outside.name as outside_name from role inner join outside on role.outside = outside.no " . $join . $newsearchQuery . "order by sort_order asc";
+$sql = "select role.no as no, role.name as name, role.sort_order as sort_order, outside.name as outside_name from role inner join outside on role.outside = outside.no " . $join . $newsearchQuery . "order by sort_order asc";
 
 $stmt = $conn->prepare($sql);
 if(count($wheresBind) == 0) {

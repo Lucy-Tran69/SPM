@@ -1,10 +1,7 @@
-
-function loadAjax(c){
+function loadAjax(c) {
     var menu = $('#menu').val();
     var outSide = $('input[type="radio"]:checked').val();
     var status = $('#status').is(':checked') ? $('#status').val() : 0;
-
-    $('#flash-message').remove();
 
     $.ajax({
         type: 'POST',
@@ -15,36 +12,39 @@ function loadAjax(c){
             outSide: outSide,
             status: status,
         },
-        success: function (res) {
+        success: function(res) {
             $('#roleList').html(res);
-            
+
             if (c == false) {
                 queryParams = '?menu=' + menu + '&outside=' + outSide + '&status=' + status;
                 history.pushState(null, null, queryParams);
             }
         },
     });
+
 }
-$(function () {
+$(function() {
     loadAjax(true);
-    $('#searchRole').submit(function (e) {
+    $('#searchRole').submit(function(e) {
         e.preventDefault();
         loadAjax(false);
+        $('#flash-message').remove();
+
     });
 
-    $('.sort').keypress(function (e) {
+    $('.sort').keypress(function(e) {
         if (isNaN(String.fromCharCode(e.which))) {
             e.preventDefault();
         }
     });
 
-    $(document).on('click', '.change-sort-order', function (e) {
+    $(document).on('click', '.change-sort-order', function(e) {
         e.preventDefault();
         var data = [];
 
         $('#topicsTable > tbody  > tr td:nth-child(3)')
             .not(':last')
-            .each(function () {
+            .each(function() {
                 var $tr = $(this).closest('tr');
                 data.push({
                     no: $($tr).attr('data-id'),
@@ -58,7 +58,6 @@ $(function () {
                 if (data[j]['sortOrder'] == data[i]['sortOrder']) {
                     var messages = '表示順は既に存在しています。もう一度お試しください。';
                     $('#duplicateSortOrderMessage').text(messages);
-
                     $('#duplicateSortOrder').modal('show');
                     return true;
                     duplicate = 1;
@@ -74,7 +73,7 @@ $(function () {
                 data: {
                     sortOrder: data,
                 },
-                success: function (res) {
+                success: function(res) {
                     $('#roleList').html(res);
                     location.reload();
                     $(window).scrollTop(0);
@@ -83,7 +82,7 @@ $(function () {
         }
     });
 
-    $('#yes').on('click', function () {
+    $('#yes').on('click', function() {
         $('#duplicateSortOrder').modal('hide');
     });
 });
