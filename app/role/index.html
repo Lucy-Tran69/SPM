@@ -49,7 +49,7 @@
     .custom-table {
         margin-left: auto;
         margin-right: auto;
-        width: 40% !important;
+        /* width: 600px !important; */
     }
 </style>
 
@@ -96,8 +96,8 @@
                             </div>
                             <div class="col-sm-9">
                                 <div class="custom-control custom-checkbox">
-                                     <input type="checkbox" name="status" class="custom-control-input" id="status"
-                                     value="<?php echo !empty($status) ? $status : 1; ?>" <?php echo !empty($status) ? 'checked' : ''; ?> />
+                                     <input type="checkbox" name="status" class="custom-control-input status" id="status"
+                                     value="<?php echo !empty($status) ? $status : 0; ?>" <?php echo $status == 1 ? 'checked' : ''; ?> />
                                     <label class="custom-control-label" for="status">無効を含む</label>
                                 </div>
                             </div>
@@ -118,7 +118,7 @@
             class="fas fa-plus mr-2"></i>追加</button>
         </div>
     </div>
-    <div class="card-body table-responsive custom-table">
+    <div class="card-body table-responsive custom-table col-md-7 col-xs-12">
         <div class="">
             <table id="topicsTable" class="table table-bordered table-striped">
                 <thead>

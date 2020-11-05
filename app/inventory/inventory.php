@@ -18,51 +18,49 @@
     $searchQuery = "";
     $searchMaker = "";
     $searchFreeWord = "";
+    $types = "";
+    $countsss =[];
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $maker = isset($_POST["maker"]) ? $_POST["maker"] : '';
 
         $freeword = isset($_POST["freeword"]) ? $_POST["freeword"] : '';
         $freeword = removeWhitespaceAtBeginAndEndOfString($freeword);
+        $freeword1 = mb_convert_kana($freeword, "KVC");
+        $freeword2 = mb_convert_kana($freeword, "kVC");
+        $freeword3 = mb_convert_kana($freeword1, "kVC");
 
         $searchQuery = "";
         if(!empty($maker)){
-            $searchMaker = " AND M.name = '$maker' ";
+            $searchMaker = " AND M.no = ? ";
+            $types .= "s";
+            array_push($countsss,"$maker");
         }
 
         if(!empty($freeword)){
-            $freeword = mysqli_real_escape_string($conn, $freeword);
-            $searchFreeWord = "AND C.name LIKE '%$freeword%' ";
+            $searchFreeWord = " AND (C.name LIKE ?  OR C.name LIKE ? OR C.name LIKE ? OR C.name LIKE ?) ";
+            $types .= "ssss";
+            array_push($countsss,"%{$freeword}%");
+            array_push($countsss,"%{$freeword1}%");
+            array_push($countsss,"%{$freeword2}%");
+            array_push($countsss,"%{$freeword3}%");
         }
         if (!empty($searchMaker) || !empty($searchFreeWord)) {
             if (!empty($searchMaker)){
                 if (!empty($searchQuery)){
-                    $searchQuery = $searchQuery." AND ";
+                    $searchQuery = $searchQuery. " AND ";
                 }
                 $searchQuery = $searchQuery.$searchMaker ;
             }
             if (!empty($searchFreeWord)){
                 if (!empty($searchQuery)){
-                    $searchQuery = $searchQuery;
+                    $searchQuery = $searchQuery. " AND ";
                 }
                 $searchQuery = $searchQuery.$searchFreeWord ;
             }       
         } 
     }
 
-    // $sel = mysqli_query($conn, "select count(*) as allcount from (select PT.name AS print_type, M.name AS maker, C.name, inv.commodity, inv.display 
-    //                                                                 FROM commodity C 
-    //                                                                 LEFT JOIN print_type PT ON C.print_type = PT.no 
-    //                                                                 INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
-    //                                                                 INNER JOIN (select I.commodity, im.display 
-    //                                                                             FROM inventory I
-    //                                                                             INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1 OR im.no = 3) AND im.hidden != 1) inv ON inv.commodity = C.no 
-    //                                                                 WHERE C.invalid = 0 ".$searchQuery.") A");
-
-
-    // $records = mysqli_fetch_assoc($sel);
-    // $totalRecordwithFilter = $records['allcount'];
-
-    $sel = "select count(*) as allcount from (select PT.name AS print_type, M.name AS maker, C.name, inv.commodity, inv.display 
+    $sel = "select count(*) as allcount from (select PT.name AS print_type, M.no AS Mno, M.name AS maker, C.name, inv.commodity, inv.display 
                                                                      FROM commodity C 
                                                                      LEFT JOIN print_type PT ON C.print_type = PT.no 
                                                                      INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
@@ -71,10 +69,20 @@
                                                                                  INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1 OR im.no = 3) AND im.hidden != 1) inv ON inv.commodity = C.no 
                                                                      WHERE C.invalid = 0 ".$searchQuery.") A";
     $stmSel = $conn->prepare($sel);
+
+    if(!empty($freeword) && !empty($maker)){
+        $stmSel->bind_param($types, $countsss[0], $countsss[1], $countsss[2], $countsss[3], $countsss[4]);    
+    } elseif(!empty($maker)){
+        $stmSel->bind_param($types, $countsss[0]);
+    } elseif(!empty($freeword)){
+        $stmSel->bind_param($types, $countsss[0], $countsss[1], $countsss[2], $countsss[3]);
+    }
+
+
     $stmSel->execute();
     $stmSel->store_result();
     $records = fetchAssocStatement($stmSel);
-    $totalRecordwithFilter = $records['allcount'];
+    $totalRecordwithFilter = isset($records) ? $records['allcount'] : 0;
 
     ## Get newestDate
     $newestDateQuery = "select DATE_FORMAT(MAX(newestDate),'%Y/%m/%d') AS newestDate
@@ -92,7 +100,7 @@
     $newestDate = $row['newestDate'];
 
     ## Fetch records
-    $empQuery = "select PT.name AS print_type, M.name AS maker, C.name, inv.commodity, inv.display 
+    $empQuery = "select PT.name AS print_type, M.no AS Mno, M.name AS maker, C.name, inv.commodity, inv.display 
                     FROM commodity C 
                     LEFT JOIN print_type PT ON C.print_type = PT.no 
                     INNER JOIN maker M ON M.no = C.maker AND M.invalid != 1
@@ -101,17 +109,29 @@
                                 INNER JOIN inventory_mark im ON im.no = I.inventory_mark AND (im.no = 2 OR im.no = 1 OR im.no = 3)) inv ON inv.commodity = C.no 
                     WHERE C.invalid = 0 ".$searchQuery." ORDER BY maker, print_type, C.cd ASC LIMIT ".$rowa.",".$rowperpage;
 
-    $empRecords = mysqli_query($conn, $empQuery);
+    $stmSel = $conn->prepare($empQuery);
+
+    if(!empty($freeword) && !empty($maker)){
+        $stmSel->bind_param($types, $countsss[0], $countsss[1], $countsss[2], $countsss[3], $countsss[4]);    
+    } elseif(!empty($maker)){
+        $stmSel->bind_param($types, $countsss[0]);
+    } elseif(!empty($freeword)){
+        $stmSel->bind_param($types, $countsss[0], $countsss[1], $countsss[2], $countsss[3]);
+    }
+
     
+
+    $stmSel->execute();
+    $stmSel->store_result();
     $data = array();
     
-    while ($row = mysqli_fetch_array($empRecords)) {
-        $data[] = array(
+    while ($row = fetchAssocStatement($stmSel)) {
+        array_push($data, array(
                 "print_type" => $row['print_type'],
                 "maker" => $row['maker'],
                 "name" => $row['name'],
                 "display" => $row['display']
-            );
+            ));
     }
     
     ## Response
@@ -119,7 +139,8 @@
         "draw" => intval($draw),
         "iTotalDisplayRecords" => $totalRecordwithFilter,
         "aaData" => $data,
-        "newestDate" => $newestDate
+        "newestDate" => $newestDate,
+        "search" => ($countsss),
     );
 
     echo json_encode($response);

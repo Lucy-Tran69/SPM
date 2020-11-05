@@ -242,7 +242,7 @@ if (isset($_SESSION["loginAccount"])) {
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
-  <form id="pdfForm" style="display: none;" action="../../include/master_inventory_functions/pdf/pdf.php" method="POST" role="form" target='_blank'>
+  <form id="pdfForm" style="display: none;" action="pdf/pdf.php" method="POST" role="form" target='_blank'>
     <input type="checkbox" id="pdfInvalid" name="pdfInvalid" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>>
     <input type="checkbox" id="pdfInventory" name="pdfInventory" value="0" <?php if (isset($_POST['searchInventory'])) echo "checked='checked'"; ?>>
     <input type="hidden" name="UserId" id="UserId" value="<?php echo $_SESSION["loginUserId"];?>">
@@ -263,7 +263,7 @@ if (isset($_SESSION["loginAccount"])) {
     </select>
     <input type="text" id="searchCartridge" name="searchCartridge" value="<?php echo isset($_POST["searchCartridge"]) ? $_POST["searchCartridge"] : ""; ?>" class="form-control" />
   </form>
-  <form id="csvForm" style="display: none;" action="../../include/master_inventory_functions/csv/generateCSV.php" method="POST" role="form" target="_blank">
+  <form id="csvForm" style="display: none;" action="csv/generateCSV.php" method="POST" role="form" target="_blank">
     <input type="checkbox" id="csvInvalid" name="csvInvalid" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>>
     <input type="checkbox" id="csvInventory" name="csvInventory" value="0" <?php if (isset($_POST['searchInventory'])) echo "checked='checked'"; ?>>
     <select name="selectedMaker" id="selectedMaker" class="form-control">
@@ -346,7 +346,8 @@ if (isset($_SESSION["loginAccount"])) {
       }
     }
 
-    window.location.reload();
+    // window.location.reload();
+    $('#searchForm').submit();
   }
 
   function generatepdf() {

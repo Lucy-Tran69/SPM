@@ -30,7 +30,9 @@ if($conn->connect_error)
         $printName = isset($_POST["username"])?$_POST["username"]:null;
        // echo json_encode ($status);die();
         if(!empty($cart)){
-            $searchCd = " and commodity.cd like '%$cart%' ";
+            $zenkaku = mb_convert_kana($cart, "CKV");
+            $hankaku = mb_convert_kana($cart,"hkV");
+            $searchCd = " and (commodity.cd like '%$zenkaku%' or commodity.cd like '%$hankaku%') ";
         }
         if(!empty($maker)){
             $searchMaker = " and maker.no = ".$maker;
@@ -117,7 +119,7 @@ else if($invalid!==null && !empty($searchCustomer))
 
 if($result==TRUE)
 {
-$result = $stmt->get_result();
+$result = $stmt->store_result();
 $resultSet = $result;
 } 
 
@@ -137,7 +139,7 @@ $oldstmt = $conn->prepare("SELECT  distinct a.seq as SEQ,
     $oldresult = execute($oldstmt,$conn);
     if($oldresult==TRUE)
     {
-        $oldresult = $oldstmt->get_result();
+        $oldresult = $oldstmt->store_result();
         $oldresultSet = $oldresult;
     }
 
@@ -155,12 +157,12 @@ $fax="";
 $customerStmt = $conn->prepare("select name,no,tel,cd,address,zip from customer where no=".$cust);
 $customerResult = execute($customerStmt, $conn);
 if ($customerResult == TRUE) {
-    $customerResult = $customerStmt->get_result();
+    $customerResult = $customerStmt->store_result();
     $customerResultSet = $customerResult;
 }
 
 
-while($row = $customerResultSet->fetch_assoc())
+while($row = fetchAssocStatement($customerStmt))
 {
     $name=$row["name"];
     $no=$row["no"];
@@ -170,7 +172,7 @@ while($row = $customerResultSet->fetch_assoc())
     $zip=$row["zip"];
 }
 
-while($row = $oldresultSet->fetch_assoc())
+while($row = fetchAssocStatement($oldstmt))
 {
     $seq=$row["SEQ"];
     $appDay=$row["APDAY"];
@@ -187,12 +189,12 @@ $officeStmt = $conn->prepare("select office.name,
                                     where users.no=".$user);
 $officeResult = execute($officeStmt, $conn);
 if ($officeResult == TRUE) {
-    $officeResult = $officeStmt->get_result();
+    $officeResult = $officeStmt->store_result();
     $officeResultSet = $officeResult;
 }
 
 $oname="";
-while($row = $officeResultSet->fetch_assoc())
+while($row = fetchAssocStatement($officeStmt))
 {
     $oname=$row["name"];
     $tel=$row["tel"];
@@ -533,7 +535,7 @@ $pdf->SetWidths(array(22,22,11,15,15,14,48,47));
 //Fill data
 if($result==true)
 {
-    foreach ($result as $row) {
+    while($row = fetchAssocStatement($stmt)) {
         // foreach($row as $column)
         // {
         //     $pdf->MultiCell(22, 15, mb_convert_encoding($column, 'SJIS'), 1, 'C');
@@ -544,7 +546,7 @@ if($result==true)
     }
 }
 
-$pdf->Output();
+$pdf->Output('I','価格表.pdf',true);
 // readfile("filename.pdf");
 $pdf->Close();
 ?>

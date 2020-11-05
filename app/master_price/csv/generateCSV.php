@@ -1,11 +1,10 @@
 <?php
-echo "\xEF\xBB\xBF";/// Byte Order Mark
 include_once "database/db.inc";
 $invalid = isset($_POST["searchInvalid"])?$_POST["searchInvalid"]:null;
 $err_msg = "";
 $conn  = getConnection();
 $display=FALSE;
-$filename = "prices_csv.csv";
+$filename = "価格表.csv";
 $fp = fopen('php://output', 'w');
 if($conn->connect_error)
 {
@@ -23,7 +22,9 @@ if($conn->connect_error)
         $support = isset($_POST["searchSupport"])?$_POST["searchSupport"]:null;
        // echo json_encode ($status);die();
         if(!empty($cart)){
-            $searchCd = " and commodity.cd like '%$cart%' ";
+            $zenkaku = mb_convert_kana($cart, "CKV");
+            $hankaku = mb_convert_kana($cart,"hkV");
+            $searchCd = " and (commodity.cd like '%$zenkaku%' or commodity.cd like '%$hankaku%') ";
         }
         if(!empty($maker)){
             $searchMaker = " and maker.no = ".$maker;
@@ -113,16 +114,19 @@ $result;
 
 if($result==TRUE)
 {
-    $result = $stmt->get_result();
+    $result = $stmt->store_result();
     $resultSet = $result;
 }
-
+$currentDate = array(date('Y-m-d'));
 $header = array("区分","ﾒｰｶｰ名","弊社型番（商品名)","ｸﾞﾘｰﾝ購入法","-","純正品参考価格","再生価格","再生回数","対応ﾌﾟﾘﾝﾀｰ","備考","");
 header('Content-Encoding: UTF-8');
 header('Content-Type: application/csv; charset=UTF-8');
 header('Content-Disposition: attachment; filename='.$filename);
+ob_end_clean();
+echo "\xEF\xBB\xBF";
+fputcsv($fp,$currentDate);
 fputcsv($fp, $header);
-while($row = mysqli_fetch_row($result)) {
+while($row = fetchAssocStatement($stmt)) {
 	fputcsv($fp, $row);
 }
 ?>?

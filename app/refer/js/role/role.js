@@ -1,7 +1,17 @@
 function loadAjax(c) {
     var menu = $('#menu').val();
     var outSide = $('input[type="radio"]:checked').val();
-    var status = $('#status').is(':checked') ? $('#status').val() : 0;
+    var status = $('#status').val();
+
+    if ($('#status').is(':checked')) {
+        status = 1;
+    }
+
+    if (c == false) {
+          if (!$('#status').is(':checked')) {
+            status = 0;
+        }
+    }
 
     $.ajax({
         type: 'POST',
@@ -29,7 +39,6 @@ $(function() {
         e.preventDefault();
         loadAjax(false);
         $('#flash-message').remove();
-
     });
 
     $('.sort').keypress(function(e) {

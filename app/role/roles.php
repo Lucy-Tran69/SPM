@@ -19,8 +19,12 @@ $newsearchLimit= "";
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $menu = isset($_POST["menu"]) ? $_POST["menu"] : '';
     $outSide = isset($_POST["outSide"]) ? $_POST["outSide"] : '';
-    $status = isset($_POST["status"]) ? $_POST["status"] : 0;
+    $status = isset($_POST["status"]) ? $_POST["status"] : '';
     $sortOrder = isset($_POST["sortOrder"]) ? $_POST["sortOrder"] : '';
+
+    if (!is_numeric($status)) {
+        $status = 2;
+    }
 
     if ($menu) {
         array_push($wheres, " role_menu.menu = ? ");
@@ -35,11 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $newsearchLimit = $newsearchLimit . "i";
     }
 
-    if (!$status) {
+    if ($status != 1) {
         array_push($wheres, " role.invalid = ? ");
-        array_push($wheresBind, "0");
+        array_push($wheresBind, $status);
         $newsearchLimit = $newsearchLimit . "i";
     } 
+
     if (count($wheres) > 0) {
         $newsearchQuery = " where ".implode(" and ", $wheres);
     }
@@ -85,6 +90,7 @@ if(count($wheresBind) == 0) {
 $stmt->execute();
 $stmt->store_result();
 $data = array();
+
 
 while ($row = fetchAssocStatement($stmt)) {
     array_push($data, array(

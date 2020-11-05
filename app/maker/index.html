@@ -156,7 +156,15 @@ if (isset($_SESSION["loginAccount"])) {
 <script>
   function updateMaker(id) {
     var newName = document.getElementById(id + "Name").value;
-    if (newName != "" && newName != null) {
+    var flag = true;
+    if((new TextEncoder().encode(newName)).length>=1024)
+    {
+      alert("メーカ名が長すぎます");
+      flag=false;
+    }
+    if(flag==true)
+    {
+      if (newName != "" && newName != null) {
       $.ajax({
         url: "../../include/maker_functions/updateMaker.php",
         type: "POST",
@@ -183,10 +191,19 @@ if (isset($_SESSION["loginAccount"])) {
       $("#alertFail").modal('toggle');
     }
   }
+  }
 
   function addNew() {
     var newName = document.getElementById("newMakerName").value;
-    if (newName != "" && newName != null) {
+    var flag = true;
+    if((new TextEncoder().encode(newName)).length>=1024)
+    {
+      alert("メーカ名が長すぎます");
+      flag=false;
+    }
+    if(flag==true)
+    {
+      if (newName != "" && newName != null) {
       $.ajax({
         url: "../../include/maker_functions/addMaker.php",
         type: "POST",
@@ -211,6 +228,7 @@ if (isset($_SESSION["loginAccount"])) {
       $("#alertFailText").text("Name cannot be blank");
       $("#alertFail").modal('toggle');
     }
+  }
   }
 
   function invalidate(id) {

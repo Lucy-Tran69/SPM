@@ -45,6 +45,23 @@
     .w-100px {
         width: 100px;
     }
+   
+    @media only screen and (max-width: 640px) {
+        .custom-responsive {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .pagination {
+            font-size: .875rem;
+        }
+        .pagination .page-link {
+            padding: .25rem .5rem;
+            font-size: .875rem;
+            line-height: 1.5;
+        }
+    }
 </style>
 
 <input type="hidden" name="" id="page-name" value="トピックス一覧">
@@ -71,7 +88,7 @@
                            <div class="col-sm-9">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" name="status" class="custom-control-input" id="status"
-                                value="<?php echo !empty($status) ? $status : date('Y-m-d h:i:s', time()); ?>" <?php echo !empty($status) ? 'checked' : ''; ?> />
+                                value="<?php echo !empty($status) ? $status : 0 ?>" <?php echo $status == 1 ? 'checked' : ''; ?> />
                                 <label class="custom-control-label" for="status">公開中のみ</label>
                             </div>
                         </div>
@@ -86,18 +103,18 @@
     </div>
 </div>
 <div class="card">
-    <div class="card-body table-responsive">
+    <div class="card-body">
         <div class="row justify-content-end" style="margin-bottom: 20px; margin-right: 10px">
             <button type="button" class="btn btn-primary" onclick="redirectAddOrEditTopic()"><i class="fas fa-plus mr-2"></i>追加</button>
         </div>
-        <div class="table-responsive">
-           <table id="topicsTable" class="table table-bordered table-striped">
+        <div class="">
+           <table id="topicsTable" class="table table-bordered table-striped custom-responsive">
             <thead>
                 <tr class="text-center">
-                    <th class="w-100px">作成日</th>
-                    <th class="w-100px">公開日</th>
-                    <th class="w-100px">終了日</th>
-                    <th class="w-400px">タイトル</th>
+                    <th class="w-100px text-nowrap">作成日</th>
+                    <th class="w-100px text-nowrap">公開日</th>
+                    <th class="w-100px text-nowrap">終了日</th>
+                    <th class="w-400px text-nowrap">タイトル</th>
                     <th class="w-200px"></th>
                 </tr>
             </thead>

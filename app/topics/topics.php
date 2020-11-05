@@ -21,11 +21,14 @@ $status = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $title = isset($_POST["title"]) ? check_keyword_search($_POST["title"]) : '';
+    $title1 = mb_convert_kana($title, "KVC");
+    $title2 = mb_convert_kana($title, "kVC");
+    $title3 = mb_convert_kana($title1, "kVC");
     $status = isset($_POST["status"]) ? $_POST["status"] : '';
     $topicID = isset($_POST["topicID"]) ? $_POST["topicID"] : '';
     $topicTitle = isset($_POST["topicTitle"]) ? $_POST["topicTitle"] : '';
 
-    $currentDate = date("Y-m-d H:i:s");
+    $currentDate = date('Y-m-d h:i:s', time());
     $invalid = 0;
 
     if (empty($title) && empty($status)) {
@@ -39,15 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (!empty($title) && empty($status)) {
-        $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? and title like CONCAT('%',?,'%') order by open_day desc limit ?,?";
+        $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? and (title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%')) order by open_day desc limit ?,?";
         $stmt = $conn->prepare($empQuery);
-        $stmt->bind_param('isii', $invalid, $title, $row, $rowperpage);
+        $stmt->bind_param('issssii', $invalid, $title, $title1, $title2, $title3, $row, $rowperpage);
 
-        $sqlTotalFilter = "select count(*) as allcount from topics WHERE invalid = ? and title like CONCAT('%',?,'%')";
+        $sqlTotalFilter = "select count(*) as allcount from topics WHERE invalid = ? and (title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%'))";
         $stmSel = $conn->prepare($sqlTotalFilter);
-        $stmSel->bind_param('is', $invalid, $title);
+        $stmSel->bind_param('issss', $invalid, $title, $title1, $title2, $title3);
     }
-    if (empty($title) && !empty($status)) {
+    if (empty($title) && !empty($status) && $status == 1) {
+        $status = $currentDate;
         $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? and opday <= CONCAT(?) and (clday >= CONCAT(?) or clday is null) order by open_day desc limit ?,?";
         $stmt = $conn->prepare($empQuery);
         $stmt->bind_param('issii', $invalid, $status, $status, $row, $rowperpage);
@@ -56,15 +60,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmSel = $conn->prepare($sqlTotalFilter);
         $stmSel->bind_param('iss', $invalid, $status, $status);
     }
-    if (!empty($title) && !empty($status)) {
-        $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? and title like CONCAT('%',?,'%') and opday <= CONCAT(?) and (clday >= CONCAT(?) or clday is null) order by open_day desc limit ?,?";
+    if (!empty($title) && !empty($status) && $status == 1) {
+        $status = $currentDate;
+        $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? and (title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%')) and opday <= CONCAT(?) and (clday >= CONCAT(?) or clday is null) order by open_day desc limit ?,?";
         $stmt = $conn->prepare($empQuery);
-        $stmt->bind_param('isssii', $invalid, $title, $status, $status, $row, $rowperpage);
+        $stmt->bind_param('issssssii', $invalid, $title, $title1, $title2, $title3, $status, $status, $row, $rowperpage);
 
-        $sqlTotalFilter = "select count(*) as allcount from topics WHERE invalid = ? and title like CONCAT('%',?,'%') and opday <= CONCAT(?) and (clday >= CONCAT(?) or clday is null)";
+        $sqlTotalFilter = "select count(*) as allcount from topics WHERE invalid = ? and (title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%')) and opday <= CONCAT(?) and (clday >= CONCAT(?) or clday is null)";
         $stmSel = $conn->prepare($sqlTotalFilter);
-        $stmSel->bind_param('isss', $invalid, $title, $status, $status);
+        $stmSel->bind_param('issssss', $invalid, $title, $title1, $title2, $title3, $status, $status);
     }
+
+    if ((!empty($title) || empty($title)) && !empty($status) && !is_numeric($status) || ($status != 0 && $status != 1) {
+        $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = 2";
+        $stmt = $conn->prepare($empQuery);
+
+        $sqlTotalFilter = "select count(*) as allcount from topics WHERE invalid = 2";
+        $stmSel = $conn->prepare($sqlTotalFilter);
+    }
+
     if (!empty($topicID)) {
         $empQuery = "UPDATE topics SET invalid = 1 WHERE no = $topicID";
         mysqli_query($conn, $empQuery);

@@ -6,21 +6,26 @@ $conn  = getConnection();
 
 $cusAcc = $_SESSION["loginUserId"];
 
-$cusStmt = "SELECT customer FROM users WHERE users.no = ".$cusAcc;
-$cusResult = mysqli_query($conn,$cusStmt);
-$row = mysqli_fetch_assoc($cusResult);
+$customer = "SELECT customer FROM users WHERE users.no = ?";
+$stmtcustomer = $conn->prepare($customer);
+$stmtcustomer->bind_param('i', $cusAcc);
+$stmtcustomer->execute();
+$stmtcustomer->store_result();
+$row = fetchAssocStatement($stmtcustomer);
 $cusNo = $row['customer'];
 
 ## get displaylimit customer
-$customerDisplaylimit = $_SESSION["loginUserId"];
+$customerDisplaylimit = "SELECT customer.displaylimit FROM customer INNER JOIN (SELECT customer FROM users WHERE users.no = ? ) A WHERE A.customer = customer.no ";
 
-$customerDisplaylimitStmt = "SELECT customer.displaylimit FROM customer INNER JOIN (SELECT customer FROM users WHERE users.no = ".$customerDisplaylimit.") A WHERE A.customer = customer.no ";
-$customerDisplaylimitResult = mysqli_query($conn,$customerDisplaylimitStmt);
-$row = mysqli_fetch_assoc($customerDisplaylimitResult);
+$customerDisplaylimitStmt = $conn->prepare($customerDisplaylimit);
+$customerDisplaylimitStmt->bind_param('i', $cusAcc);
+$customerDisplaylimitStmt->execute();
+$customerDisplaylimitStmt->store_result();
+$row = fetchAssocStatement($customerDisplaylimitStmt);
 $customerDisplaylimit = $row['displaylimit'];
 
 if($customerDisplaylimit == 1){
-    $makerStmt = $conn-> prepare("SELECT m.name FROM maker m
+    $makerStmt = $conn-> prepare("SELECT m.no, m.name FROM maker m
                                 INNER JOIN
                                 (select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
                                 FROM commodity C
@@ -46,7 +51,7 @@ if($customerDisplaylimit == 1){
                                     FROM inventory 
                                     INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no)T ON T.maker = m.name GROUP BY m.name") ;
 }else{
-    $makerStmt = $conn-> prepare("SELECT m.name FROM maker m
+    $makerStmt = $conn-> prepare("SELECT m.no, m.name FROM maker m
                                 INNER JOIN
                                 (select C.no, C.cd ,PT.name AS print_type,  M.name AS maker, C.name, C.price AS price1, FORMAT(B.price, 0 ) As price2, FORMAT(E.price, 0 ) As price3, C.num, C.printer_support, D.display 
                                 FROM commodity C
@@ -73,12 +78,14 @@ if($customerDisplaylimit == 1){
                                     INNER JOIN inventory_mark im ON im.no = inventory.inventory_mark AND im.hidden != 1 AND (im.no = 2 OR im.no = 1 OR im.no = 3)) D	on D.commodity = C.no)T ON T.maker = m.name GROUP BY m.name") ;
 }
 
-$makerResult = execute($makerStmt,$conn);
-if($makerResult==TRUE)
-{
-    // $makerResult=$makerStmt->get_result();
-    $makerResult=$makerStmt->store_result();
-    $makerResultSet = $makerResult;
+$makerStmt->execute();
+$makerStmt->store_result();
+$makerdb = array();
+if(!$makerStmt->error) {
+    while ($row = fetchAssocStatement($makerStmt))
+    {
+        array_push($makerdb, array('no' => $row['no'], 'name' => $row['name']));
+    }
 }
 
 $conn->close();

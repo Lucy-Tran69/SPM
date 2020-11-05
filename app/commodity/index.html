@@ -264,7 +264,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="checkbox" id="inputGreen" name="inputGreen" /></td>
               </tr>
               <tr>
-                <td><label id="invalidLabel" class="label_align_table">停止</label></td>
+                <td><label id="invalidLabel" class="label_align_table">無効</label></td>
                 <td><input type="checkbox" id="inputInvalid" name="inputInvalid" /></td>
               </tr>
             </table>
@@ -357,7 +357,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="checkbox" id="copyGreen" name="copyGreen" /></td>
               </tr>
               <tr>
-                <td><label id="invalidLabel" class="label_align_table">停止</label></td>
+                <td><label id="invalidLabel" class="label_align_table">無効</label></td>
                 <td><input type="checkbox" id="copyInvalid" name="copyInvalid" /></td>
               </tr>
             </table>
@@ -450,7 +450,7 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="checkbox" id="insertGreen" name="insertGreen" /></td>
               </tr>
               <tr>
-                <td><label id="invalidLabel" class="label_align_table">停止</label></td>
+                <td><label id="invalidLabel" class="label_align_table">無効</label></td>
                 <td><input type="checkbox" id="insertInvalid" name="insertInvalid" /></td>
               </tr>
             </table>
@@ -964,9 +964,9 @@ function validateCopy()
       },
       error: function(jqXHR, textStatus, errorThrown) {
         console.log(textStatus, errorThrown);
-          $("#copy").hide();
-          $("#alertFailText").text("無効な詳細が入力されました。もう一度やり直してください");
-          $("#alertFail").modal('toggle');
+          // $("#copy").hide();
+          alert("コードを繰り返すことはできません。別のコードを入力してください。");
+          // $("#alertFail").modal('toggle');
           // $("#searchName").val($("#copyName").val());
       }
     });

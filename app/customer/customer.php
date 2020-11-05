@@ -26,16 +26,25 @@
 
         $name = isset($_POST["name"]) ? $_POST["name"] : '';
         $name =  removeWhitespaceAtBeginAndEndOfString($_POST["name"]);
+        $name1 = mb_convert_kana($name, "KVC");
+        $name2 = mb_convert_kana($name, "kVC");
+        $name3 = mb_convert_kana($name1, "kVC");
 
         $status = isset($_POST["status"]) ? $_POST["status"] : 0;
-        
+        $types = "";
+        $countsss =[];
         if(!empty($cd)){
-            $cd = mysqli_real_escape_string($conn, $cd);
-            $searchCd = " customer.cd like '%{$cd}%' ";
+            $searchCd = " customer.cd like ? ";
+            $types .= "s";
+            array_push($countsss,"%{$cd}%");
         }
         if(!empty($name)){
-            $name = mysqli_real_escape_string($conn, $name);
-            $searchName = " customer.name like '%$name%' ";
+            $searchName = " (customer.name like ? OR customer.name like ? OR customer.name like ? OR customer.name like ? ) ";
+            $types .= "ssss";
+            array_push($countsss,"%{$name}%");
+            array_push($countsss,"%{$name1}%");
+            array_push($countsss,"%{$name2}%");
+            array_push($countsss,"%{$name3}%");
         }
         if($status == 0) {
             $searchStatus = " customer.invalid = 0 ";
@@ -70,17 +79,19 @@
         }
     }
 
-    // $sel = mysqli_query($conn, "select count(*) as allcount from customer ".$searchQuery);
-
-    // $records = mysqli_fetch_assoc($sel);
-    // $totalRecordwithFilter = $records['allcount'];
-
     $sel = "select count(*) as allcount from customer ".$searchQuery;
     $stmSel = $conn->prepare($sel);
+    if (!empty($cd) && !empty($name)) {
+        $stmSel->bind_param($types, $countsss[0], $countsss[1], $countsss[2], $countsss[3], $countsss[4]);
+    } else if (!empty($cd)) {
+        $stmSel->bind_param($types, $countsss[0]);
+    } else if (!empty($name)){
+        $stmSel->bind_param($types, $countsss[0], $countsss[1], $countsss[2], $countsss[3]);
+    }
     $stmSel->execute();
     $stmSel->store_result();
     $records = fetchAssocStatement($stmSel);
-    $totalRecordwithFilter = $records['allcount'];
+    $totalRecordwithFilter = isset($records) ? $records['allcount'] : 0;
 
     ## Fetch records
     $empQuery = "select customer.no, customer.cd, customer.name, customer.invalid, A.NumberCustomerRole5, B.NumberCustomerRole6, C.name AS DisplayLimit from customer
@@ -92,11 +103,19 @@
                                 on  customer.no = B.customer
                                 LEFT JOIN displaylimit C on C.no = customer.displaylimit
                                 ".$searchQuery." ORDER BY customer.name ASC, customer.cd LIMIT ".$row.",".$rowperpage;
-    
-    $empRecords = mysqli_query($conn, $empQuery);
+     $stmSel = $conn->prepare($empQuery);
+    if (!empty($cd) && !empty($name)) {
+        $stmSel->bind_param($types, $countsss[0], $countsss[1], $countsss[2], $countsss[3], $countsss[4]);
+    } else if (!empty($cd)) {
+        $stmSel->bind_param($types, $countsss[0]);
+    } else if (!empty($name)){
+        $stmSel->bind_param($types, $countsss[0], $countsss[1], $countsss[2], $countsss[3]);
+    }
+    $stmSel->execute();
+    $stmSel->store_result();
     $data = array();
 
-    while ($row = mysqli_fetch_array($empRecords)) {
+    while ($row = fetchAssocStatement($stmSel)) {
         $data[] = array(
                 "no" => $row['no'],
                 "cd" => $row['cd'],

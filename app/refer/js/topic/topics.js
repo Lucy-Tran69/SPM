@@ -1,5 +1,6 @@
 $(function () {
     const topicTable = $('#topicsTable');
+    $.fn.DataTable.ext.pager.numbers_length = 4;
     var table = {
         processing: true,
         serverSide: true,
@@ -29,8 +30,7 @@ $(function () {
         type: 'POST',
         data: function (d) {
             d.title = $('#title').val();
-            d.status = $('#status').is(':checked') ? $('#status').val() : '';
-
+            d.status = $('#status').is(':checked') ? 1 : 0;
             delete d.columns;
         },
         datatype: 'json',
@@ -40,7 +40,7 @@ $(function () {
 
     $('#searchTopic').on('submit', function (e) {
         var title = $('#title').val();
-        var status = $('#status').is(':checked') ? $('#status').val() : '';
+        var status = $('#status').is(':checked') ? 1 : 0;
         queryParams = '?title=' + title + '&status=' + status;
         history.pushState(null, null, queryParams);
         e.preventDefault();

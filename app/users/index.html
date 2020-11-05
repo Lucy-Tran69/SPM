@@ -517,6 +517,14 @@ if (isset($_SESSION["loginAccount"])) {
     var o = $("#insertOffice").val();
     var r = $("#insertRole").val();
     var name = document.getElementById("insertName");
+    var account = document.getElementById("insertAccount");
+    var pass = document.getElementById("insertPass");
+    var email = document.getElementById("insertEmail");
+    if(o!="" && c!="")
+    {
+      alert("所属と取引先の両方を設定することはできません");
+      flag=false;
+    }
     if (regexJapaneseAlnum.test(name.value) == false) 
     {
       alert("氏名が無効です");
@@ -537,7 +545,29 @@ if (isset($_SESSION["loginAccount"])) {
       alert("パスワードを入力して下さい");
       flag=false;
     }
-
+    if((new TextEncoder().encode(name.value)).length>=256)
+    {
+      alert("名前が長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(account.value)).length>=128)
+    {
+      alert("アカウントが長すぎます");
+      flag=false;
+    }
+    if(pass.value!="" && pass.value!=null)
+    {
+      if((new TextEncoder().encode(pass.value)).length>=256)
+      {
+        alert("パスワードが長すぎます");
+        flag=false;
+      }
+    }
+    if((new TextEncoder().encode(email.value)).length>=512)
+    {
+      alert("メールが長すぎます");
+      flag=false;
+    }
     if(flag==true)
     {
       $.ajax({
@@ -586,6 +616,9 @@ if (isset($_SESSION["loginAccount"])) {
     var o = $("#inputOffice").val();
     var r = $("#inputRole").val();
     var name = document.getElementById("inputName");
+    var account = document.getElementById("inputAccount");
+    var pass = document.getElementById("inputPass");
+    var email = document.getElementById("inputEmail");
     if (regexJapaneseAlnum.test(name.value) == false) 
     {
       alert("氏名が無効です");
@@ -599,6 +632,29 @@ if (isset($_SESSION["loginAccount"])) {
     if(r>=5 && r<=6 && (c=="" || c==null))
     {
       alert("取引先が無効です");
+      flag=false;
+    }
+    if((new TextEncoder().encode(name.value)).length>=256)
+    {
+      alert("名前が長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(account.value)).length>=128)
+    {
+      alert("アカウントが長すぎます");
+      flag=false;
+    }
+    if(pass.value!="" && pass.value!=null)
+    {
+      if((new TextEncoder().encode(pass.value)).length>=256)
+      {
+        alert("パスワードが長すぎます");
+        flag=false;
+      }
+    }
+    if((new TextEncoder().encode(email.value)).length>=512)
+    {
+      alert("メールが長すぎます");
       flag=false;
     }
     if(flag==true)

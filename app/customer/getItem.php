@@ -5,22 +5,46 @@ include_once "database/db.inc";
 $conn  = getConnection();
 
 $saleStmt = $conn->prepare("select no,name from users where invalid=0 and role = 3 order by name ");
-$saleResult = execute($saleStmt,$conn);
-if($saleResult==TRUE)
-{
-    // $userResult=$userStmt->get_result();
-    $saleResult=$saleStmt->store_result();
-    $saleUserResultSet = $saleResult;
+$saleStmt->execute();
+$saleStmt->store_result();
+
+$sale = array();
+if(!$saleStmt->error) {
+    while ($row = fetchAssocStatement($saleStmt))
+    {
+        array_push($sale, array('name' => $row['name'], 'no' => $row['no']));
+    }
 }
 
-$approveUserStmt = $conn->prepare("select no,name from users where invalid=0 and role = 4 or role = 1 order by name");
-$approveUserResult = execute($approveUserStmt,$conn);
-if($approveUserResult==TRUE)
-{
-    // $approveUserResult=$approveUserStmt->get_result();
-    $approveUserResult=$approveUserStmt->store_result();
-    $approveUserResultSet = $approveUserResult;
+//$saleResult = execute($saleStmt,$conn);
+// if($saleResult==TRUE)
+// {
+//     $saleResult=$saleStmt->store_result();
+//     $saleUserResultSet = $saleResult;
+// }
+
+$approveUserStmt = $conn->prepare("select no,name from users where invalid=0 and (role = 4 or role = 1) order by name");
+$approveUserStmt->execute();
+$approveUserStmt->store_result();
+$approve = array();
+if(!$approveUserStmt->error) {
+    while ($row = fetchAssocStatement($approveUserStmt))
+    {
+        array_push($approve, array('name' => $row['name'], 'no' => $row['no']));
+    }
 }
+
+// $approveUserResult = execute($approveUserStmt,$conn);
+// if($approveUserResult==TRUE)
+// {
+//     $approveUserResult=$approveUserStmt->store_result();
+//     $approveUserResultSet = $approveUserResult;
+// }
+
+// $stmtRoleMenu = $conn->prepare($sqlRoleMenu);
+// $stmtRoleMenu->bind_param('i', $id);
+// $stmtRoleMenu->execute();
+// $stmtRoleMenu->store_result();
 
 $conn->close();
 ?>

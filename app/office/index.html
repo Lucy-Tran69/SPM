@@ -202,7 +202,7 @@ if (isset($_SESSION["loginAccount"])) {
             <input type="hidden" id="updateId" name="updateId" />
             <table class="popup_table">
               <tr>
-                <td><label id="nameLabel" class="label_align_table">Name<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><label id="nameLabel" class="label_align_table">名称<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="text" id="updateName" name="updateName" required autocomplete="off" /></td>
               </tr>
               <tr>
@@ -214,15 +214,15 @@ if (isset($_SESSION["loginAccount"])) {
                 <td><input type="text" id="updateFax" name="updateFax" required autocomplete="off" /></td>
               </tr>
               <tr>
-                <td><label id="zipLabel" class="label_align_table">Zip<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><label id="zipLabel" class="label_align_table">郵便番号<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><input type="text" id="updateZip" name="updateZip" required autocomplete="off"/></td>
               </tr>
               <tr>
-                <td><label id="addressLabel" class="label_align_table">Address<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><label id="addressLabel" class="label_align_table">住所<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><textarea id="updateAddress" name="updateAddress" required autocomplete="off" style="width: -webkit-fill-available;"></textarea></td>
               </tr>
               <tr>
-                <td><label id="titleLabel" class="label_align_table">Title<a style="color: red;">*</a>&nbsp;</label></td>
+                <td><label id="titleLabel" class="label_align_table">肩書<a style="color: red;">*</a>&nbsp;</label></td>
                 <td><textarea id="updateTitle" name="updateTitle" required autocomplete="off" style="width: -webkit-fill-available;"></textarea></td>
               </tr>
             </table>
@@ -289,11 +289,46 @@ if (isset($_SESSION["loginAccount"])) {
   function validateInsert() {
     var flag=true;
     var name = document.getElementById("inputName");
+    var tel = document.getElementById("inputTel");
+    var fax = document.getElementById("inputFax");
+    var zip = document.getElementById("inputZip");
+    var address = document.getElementById("inputAddress");
+    var title = document.getElementById("inputTitle");
     if (regexJapaneseAlnum.test(name.value) == false) 
     {
       alert("Name");
       flag=false;
     } 
+    if((new TextEncoder().encode(name.value)).length>=1024)
+    {
+      alert("名称が長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(tel.value)).length>=32)
+    {
+      alert("TELが長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(fax.value)).length>=32)
+    {
+      alert("FAXが長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(address.value)).length>=2048)
+    {
+      alert("住所が長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(zip.value)).length>=24)
+    {
+      alert("郵便番号が長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(title.value)).length>=2048)
+    {
+      alert("肩書が長すぎます");
+      flag=false;
+    }
 
     return flag;
   }
@@ -301,12 +336,46 @@ if (isset($_SESSION["loginAccount"])) {
   function validateUpdate() {
     var flag=true;
     var name = document.getElementById("updateName");
+    var tel = document.getElementById("updateTel");
+    var fax = document.getElementById("updateFax");
+    var zip = document.getElementById("updateZip");
+    var address = document.getElementById("updateAddress");
+    var title = document.getElementById("updateTitle");
     if (regexJapaneseAlnum.test(name.value) == false) 
     {
       alert("Name");
       flag=false;
     } 
-
+    if((new TextEncoder().encode(name.value)).length>=1024)
+    {
+      alert("名称が長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(tel.value)).length>=32)
+    {
+      alert("TELが長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(fax.value)).length>=32)
+    {
+      alert("FAXが長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(address.value)).length>=2048)
+    {
+      alert("住所が長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(zip.value)).length>=24)
+    {
+      alert("郵便番号が長すぎます");
+      flag=false;
+    }
+    if((new TextEncoder().encode(title.value)).length>=2048)
+    {
+      alert("肩書が長すぎます");
+      flag=false;
+    }
     return flag;
   }
 </script>

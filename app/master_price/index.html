@@ -185,6 +185,9 @@ if (isset($_SESSION["loginAccount"])) {
               </div>
             </div>
               <div class="card card-primary">
+              <div style="text-align: right; margin-right: 50px;">
+                  <label>現在の状態 : <?php echo $current_status ?></label>
+              </div>
               <div class="card-body d-flex justify-content-center">
               <div class="tableFixHead">
                 <table id="details_table" class="table table-bordered">
@@ -208,11 +211,17 @@ if (isset($_SESSION["loginAccount"])) {
                     if ($stmt->num_rows > 0 && $display==TRUE) {
                       mysqli_stmt_data_seek($stmt,0);
                       while ($row = fetchAssocStatement($stmt)) {
-                        $rowOld = fetchAssocStatement($oldstmt);
-                        $rowPrice = fetchAssocStatement($pricestmt);
-                        if($row["sp"]!=$rowPrice["sp"]){
-                          $row["sp"]=$rowPrice["sp"];
+                        $rowOld = fetchLatest($conn,$row["customer"],$row["commodity"]);
+                        $rowPrice = fetchCurrentSP($conn,$row["customer"],$row["commodity"]);
+                        if(empty($rowPrice["sp"]))
+                        {
+                          $row["sp"]="";
                         }
+                        else if($row["maker"]==$rowPrice["maker"] && $row["code"]==$rowPrice["code"]){
+                          if($row["sp"]!=$rowPrice["sp"]){
+                            $row["sp"]=$rowPrice["sp"];
+                        }
+                      }
                     ?>
                         <tr>
                           <td style="display: none;"><?php echo $row["customer"];?></td>
@@ -223,7 +232,7 @@ if (isset($_SESSION["loginAccount"])) {
                           <td><?php echo numfmt_format_currency($fmt,$row["original"], "JPY")?></td>
                           <td><?php echo !empty($row["sp"])?numfmt_format_currency($fmt,$row["sp"], "JPY"):"-"; ?></td>                          
                           <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value="<?php echo trim($rowOld["sp"]); ?>" <?php echo $edit_disabled ?>></td>
-                          <td style="text-align: center;"><?php echo trim($row["qty"]);?></td>
+                          <td style="text-align: center;"><?php echo empty($row["qty"])?"0":trim($row["qty"]);?></td>
                           <td><?php echo $row["support"];?></td>
                           <td><?php echo $row["display"];?></td>
                         </tr>
@@ -250,7 +259,7 @@ if (isset($_SESSION["loginAccount"])) {
                           <td><?php echo is_numeric($row["original"])?numfmt_format_currency($fmt,$row["original"], "JPY"):$row["original"];?></td>
                           <td><?php echo !empty($row["sp"])?numfmt_format_currency($fmt,$row["sp"], "JPY"):"-"; ?></td>
                           <td><input style="width: 100%;" type="number" name="revisedPrice" id="revisedPrice" value="" <?php echo $edit_disabled ?>></td>
-                          <td style="text-align: center;"><?php echo $row["qty"];?></td>
+                          <td style="text-align: center;"><?php echo empty($row["qty"])?"0":trim($row["qty"]);?></td>
                           <td><?php echo trim($row["support"]);?></td>
                           <td><?php echo $row["display"];?></td>
                         </tr>
@@ -314,7 +323,7 @@ if (isset($_SESSION["loginAccount"])) {
     <input type="text" id="searchCartridge" name="searchCartridge" value="<?php echo isset($_POST["searchCartridge"]) ? $_POST["searchCartridge"] : ""; ?>" class="form-control" />
     <input type="text" id="searchSupport" name="searchSupport" value="<?php echo isset($_POST["searchSupport"]) ? $_POST["searchSupport"] : ""; ?>" class="form-control" />
   </form>
-  <form id="csvForm" style="display: none;" action="../../include/master_price_functions/csv/generateCSV.php" method="POST" role="form" target='_blank'>
+  <form id="csvForm" style="display: none;" action="csv/generateCSV.php" method="POST" role="form" target='_blank'>
     <input type="checkbox" id="csvInvalid" name="searchInvalid" value="0" <?php if (isset($_POST['searchInvalid'])) echo "checked='checked'"; ?>>
     <input type="hidden" name="UserId" id="UserId" value="<?php echo $_SESSION["loginUserId"];?>">
     <select name="selectedCustomer" id="selectedCustomer" class="form-control">
@@ -414,7 +423,7 @@ function confirmSubmit()
       var item = $(this).find('td:eq(1)').html();
       var value = $(this).find('td:eq(7) input').val();
       
-      if(value!=0 && value!="" && value!=null)
+      if(value!="" && value!=null)
       {
         if(cust=="INSERT_TO_DB")
         {

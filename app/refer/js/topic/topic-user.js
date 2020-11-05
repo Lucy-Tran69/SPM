@@ -97,6 +97,10 @@ $(function () {
                     if (opday.setDate(opday.getDate() + 7) >= currentDate) {
                         $("#newTitle").text("New!");
                     }
+                    else
+                    {
+                        $("#newTitle").text("");
+                    }
 
                     if (!image_link.match("^http") && image_link != '') {
                         image_link = '//' + image_link;

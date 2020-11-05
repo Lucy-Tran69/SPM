@@ -25,10 +25,13 @@
     ## Fetch records
     $empQuery = "SELECT no, title, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day FROM topics WHERE invalid = 0 AND opday <= '$date' AND (clday >= '$date' OR clday is null) order by open_day desc limit  $start,".($limit + 1);
 
+    $stmEmpQuery = $conn->prepare($empQuery);
+    $stmEmpQuery->execute();
+    $stmEmpQuery->store_result();
     $query = mysqli_query($conn, $empQuery) or die ('エラーが発生しました。もう一度お試しください。');
     
     $result = array();
-    while ($row = mysqli_fetch_array($query))
+    while ($row = fetchAssocStatement($stmEmpQuery))
     {
         array_push($result, $row);
     }

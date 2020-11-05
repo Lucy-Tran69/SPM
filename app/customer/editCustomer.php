@@ -16,13 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 	$cd = $_POST["cd"];
 	$checkOK = 1;
 	$cd = removeWhitespaceAtBeginAndEndOfString($_POST["cd"]);
-	$cd = mysqli_real_escape_string($conn, $cd);
    	if (empty($cd)) {
 		   $msg->error('取引先コードを入力してください。');
     	$checkOK = 0;
   	}
-  	if (isset($cd) && mb_strlen(mb_convert_encoding($cd, "UTF-8")) >  8) {
-		  $msg->error('取引先コードは8文字以内で入力してください。');
+  	if (isset($cd) && mb_strlen(mb_convert_encoding($cd, "UTF-8")) > 16) {
+		  $msg->error('取引先コードは16文字以内で入力してください。');
     	$checkOK = 0;
   	} else {
 	    $cd = removeWhitespaceAtBeginAndEndOfString($_POST["cd"]);
@@ -35,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
 	$name = $_POST["name"];
 	$name = removeWhitespaceAtBeginAndEndOfString($_POST["name"]);
-	$name = mysqli_real_escape_string($conn, $name);
   	if (empty($name)) {
 		  $msg->error('取引先名を入力してください。');
     	$checkOK = 0;
@@ -46,7 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
 	$tel = $_POST["tel"];
 	$tel = removeWhitespaceAtBeginAndEndOfString($_POST["tel"]);
-	$tel = mysqli_real_escape_string($conn, $tel);
   	if (empty($tel)) {
 		  $msg->error('電話番号を入力してください。');
     	$checkOK = 0;
@@ -57,7 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
 	$zip = $_POST["zip"];
 	$zip = removeWhitespaceAtBeginAndEndOfString($_POST["zip"]);
-	$zip = mysqli_real_escape_string($conn, $zip);
   	if (empty($zip)) {
 		  $msg->error('郵便番号を入力してください。');
     	$checkOK = 0;
@@ -68,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
 	$address = $_POST["address"];
 	$address = removeWhitespaceAtBeginAndEndOfString($_POST["address"]);
-	$address = mysqli_real_escape_string($conn, $address);
   	if (empty($address)) {
 		  $msg->error('住所を入力してください。');
     	$checkOK = 0;
@@ -79,7 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
 	$charge = $_POST["charge"];
 	$charge = removeWhitespaceAtBeginAndEndOfString($_POST["charge"]);
-	$charge = mysqli_real_escape_string($conn, $charge);
   	if (empty($charge)) {
 		  $msg->error('担当者名を入力してください。');
     	$checkOK = 0;
@@ -104,10 +98,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION["loginAccount"])) {
 
   	$invalid = isset($_POST["invalid"]) ? $_POST["invalid"] : 0;
 
-    $checkDupCdInDb = "select count(*) as count_row from customer where cd = '$cd' and no != $id";
-    $NumDupCdInDb = mysqli_query($conn,$checkDupCdInDb);
-
-    $row = mysqli_fetch_assoc($NumDupCdInDb);
+	$checkDupCdInDb = "select count(*) as count_row from customer where cd = ? and no != ?";
+	$stmtCheckDupCdInDb = $conn->prepare($checkDupCdInDb);
+	$stmtCheckDupCdInDb->bind_param('si', $cd, $id);
+    $stmtCheckDupCdInDb->execute();
+    $stmtCheckDupCdInDb->store_result();
+    $row = fetchAssocStatement($stmtCheckDupCdInDb);
     $num = $row['count_row'];
     if($num > 0){
 		$msg->error('この取引先コードは既に存在しています。');
@@ -145,3 +141,5 @@ function removeWhitespaceAtBeginAndEndOfString($data) {
   $data = stripslashes($data);
   return $data;
 }
+
+?>

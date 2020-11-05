@@ -124,20 +124,7 @@
 </style>
 
 <?php
-    if(isset($_GET["id"]) && !empty(trim($_GET["id"])) && is_numeric($_GET['id'])){
-        include_once "database/db.inc";
-
-        $conn  = getConnection();
-
-        if($conn->connect_error) {
-            die("Failed to connect to database. ".$conn->connect_error);
-        }        
-
-        $id = $_GET['id'];
-        $sql = "SELECT no, cd, name, tel, zip, address, charge, sales, supervisor, invalid, displaylimit FROM customer WHERE no='$id'";
-        $getCustomer = mysqli_query($conn, $sql);
-        if(mysqli_num_rows($getCustomer) > 0){
-            $row = mysqli_fetch_assoc($getCustomer); 
+    include "getCustomerById.php" 
 ?>
 <input type="hidden" name="" id="page-name" value="取引先編集">
 <div id="d-message"></div>
@@ -200,15 +187,9 @@
                             <td><select id="sale" name="sale" class="form-control">
                                 <option value="">選択</option>
                                     <?php
-                                        if ($saleStmt->num_rows > 0) {
-                                          while ($row1 = fetchAssocStatement($saleStmt)) {
-                                        ?>
-                                    <option value="<?php echo $row1['no']; ?>"
-                                        <?php if ($row['sales'] == $row1['no']) {echo 'selected';} ?>>
-                                        <?php echo $row1['name']; ?></option>
-                                        <?php
-                                          }
-                                        }
+                                    foreach ($sale as $key => $value) { ?>
+                                        <option value="<?php echo $value["no"] ?>"   <?php if ($row['sales'] == $value['no']) {echo 'selected';} ?>  ><?php echo $value["name"] ?></option>
+                                    <?php }
                                         ?>
                                 </select>
                             </td>
@@ -220,33 +201,22 @@
                         <div class="col-md-6 col-sm-8">
                             <td><select id="supervisor" name="supervisor" class="form-control">
                                 <option value="">選択</option>
-                                    <?php
-                                        if ($approveUserStmt->num_rows > 0) {
-                                          while ($row1 = fetchAssocStatement($approveUserStmt)) {
-                                        ?>
-                                    <option value="<?php echo $row1['no']; ?>"
-                                        <?php if ($row['supervisor'] == $row1['no']) {echo 'selected';} ?>>
-                                        <?php echo $row1['name']; ?></option>
-                                        
-                                        <?php
-                                          }
-                                        }
-                                        ?>
+                                <?php foreach ($approve as $key => $value) { ?>
+                                        <option value="<?php echo $value["no"] ?>"   <?php if ($row['supervisor'] == $value['no']) {echo 'selected';} ?>  ><?php echo $value["name"] ?></option>
+                                    <?php } ?>
+
                                 </select>
                             </td>
                         </div>
                     </div>
                     <div class="form-group row mb-0">
                         <label for="displaylimit"
-                            class="col-md-2 col-sm-3 col-form-label-sm text-right">在庫表示※</label>
+                            class="col-md-2 col-sm-3 col-form-label-sm text-right">在庫・価格表</label>
                         <div class="col-md-6 col-sm-8">
-                            <label class="switch">
-                                <input type="checkbox" id="displaylimit" <?php if ($row['displaylimit'] == 1) {echo 'checked';} ?>>
-                                <div class="slider round">
-                                    <span class="on">ON</span>
-                                    <span class="off">OFF</span>
-                                  </div>
-                            </label>
+                            <input type="radio" name="displaylimit" id="displaylimitOn" value="1" <?php echo $row['displaylimit'] == 1 ? 'checked' : '' ; ?>>
+                            <label class="font-weight-normal" for="displaylimitOn">すべて表示</label><br>
+                            <input type="radio" name="displaylimit" id="displaylimitOff" value="2" <?php echo $row['displaylimit'] == 2 ? 'checked' : '' ; ?>>
+                            <label class="font-weight-normal" for="displaylimitOff">承認済み価格</label>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -254,8 +224,10 @@
                             <label id="invalidLabel" class="label_align_table" for="invalid">無効</label>
                         </div>
                         <div class="col-md-2 col-sm-8 text-left">
-                            <input type="checkbox" id="invalid" name="invalid"
-                                <?php if ($row['invalid'] == 1) {echo 'checked';} ?>>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" id="invalid" class="custom-control-input" name="invalid" <?php if ($row['invalid'] == 1) {echo 'checked';} ?> />
+                                <label class="custom-control-label font-weight-normal" for="invalid"></label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -280,18 +252,6 @@
 <!-- /.row -->
 
 <?php
-    }else{
-        // set header response code
-        http_response_code(404);
-        echo "<h1>404 Page Not Found!</h1>";
-    }
-
-    }else{
-    // set header response code
-    http_response_code(404);
-    echo "<h1>404 Page Not Found!</h1>";
-    }
-
 include "../../include/html/foot.inc"
 ?>
 
@@ -303,7 +263,7 @@ include "../../include/html/foot.inc"
                 cd: {
                     required: true,
                     checkAlphabetAndNumber: true,
-                    maxlength: 8
+                    maxlength: 16
                 },
                 name: {
                     required: true,
@@ -338,7 +298,7 @@ include "../../include/html/foot.inc"
                 cd: {
                     required: "取引先コードを入力してください。",
                     checkAlphabetAndNumber: "数字・文字のみ（特殊文字を含めない）を入力してください。",
-                    maxlength: "取引先コードは8文字以内で入力してください。"
+                    maxlength: "取引先コードは16文字以内で入力してください。"
                 },
                 name: {
                     required: "取引先名を入力してください。",
@@ -374,13 +334,7 @@ include "../../include/html/foot.inc"
             if (!form.valid()) {
                 return false;
             }
-            var displaylimit = 1;
-            if (document.getElementById("displaylimit").checked) {
-                displaylimit = 1;
-            }
-            else{
-                displaylimit = 2;
-            }
+            var displaylimit = $('input[type="radio"]:checked').val();
             var invalid = 0;
             if (document.getElementById("invalid").checked) {
                 invalid = 1;

@@ -1,6 +1,9 @@
 <?php
 include "html/hader.inc";
 include "common/login.php";
+if (isset($_SESSION[AUTH])) {
+  header("Location: ../home/");
+}
 ?>
 
 <!-- <link rel="stylesheet" type="text/css" href="../include/css/styles.css"/> -->

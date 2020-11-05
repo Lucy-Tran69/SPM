@@ -15,18 +15,18 @@ $(function () {
 			$('#inSideCompany').show();
 			$('#outSideCompany').hide();
 
-            $('.menuOut').prop('checked', false);
+            //$('.menuOut').prop('checked', false);
 		}
 
 		if($('#outCompany').is(":checked")) {
 			$('#inSideCompany').hide();
 			$('#outSideCompany').show();
 
-            $('.menuIn').prop('checked', false);
+            //$('.menuIn').prop('checked', false);
 		}
 	});
 
-	 var formEditRole = $('#editRole');
+	var formEditRole = $('#editRole');
     formEditRole.validate({
         rules: {
             roleName: {

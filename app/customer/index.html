@@ -34,8 +34,23 @@ if(isset($param) && !empty($param)){
     min-width: 100px;
   }
   #customerTable_paginate{
-    margin-left: 545px;
+    margin-top: 10px;
   }
+  @media only screen and (max-width: 1266px) {
+        .custom-responsive {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .pagination {
+            font-size: .875rem;
+            }
+            .pagination .page-link {
+            padding: .25rem .5rem;
+            font-size: .875rem;
+            line-height: 1.5;
+            }
+    }
 </style>
 
 <?php include "html/menu.inc";?>
@@ -83,14 +98,14 @@ if(isset($param) && !empty($param)){
           <button type="button" class="btn btn-primary" onclick="redirectAddOrEditCustomer()" style="min-width: 80px;"><i class="fas fa-plus mr-2"></i>追加</button>
         </div>
         <div class="table-responsive">
-          <table id="customerTable" class="table table-bordered table-striped w-100">
+          <table id="customerTable" class="table table-bordered table-striped custom-responsive">
             <thead>
               <tr>
                 <th class="title_nowrap_align_middle">取引先コード</th>
                 <th class="title_nowrap_align_middle">取引先名</th>
                 <th class="title_nowrap_align_middle text-center">在庫閲覧ユーザ数</th>
                 <th class="title_nowrap_align_middle text-center">在庫・価格表閲覧ユーザ数</th>
-                <th class="title_nowrap_align_middle text-center">在庫表示</th>
+                <th class="title_nowrap_align_middle text-center">在庫・価格表</th>
                 <th class="title_nowrap_align_middle">ステータス</th>
                 <th class="title_nowrap_align_middle"></th>
               </tr>
@@ -109,6 +124,8 @@ if(isset($param) && !empty($param)){
 
 <script type="text/javascript">
   $(function () {
+    $.fn.DataTable.ext.pager.numbers_length = 4;
+    
     const customerTable = $('#customerTable');
     
     var table = {
@@ -120,6 +137,7 @@ if(isset($param) && !empty($param)){
       'deferRender': true,
       'info': false,
       'lengthChange': false,
+      'autoWidth': false,
       'columns': [
         { data: 'cd', "defaultContent": "", "title": '取引先コード'},
         { data: 'name', "defaultContent": "", "title": '取引先名',
@@ -129,7 +147,7 @@ if(isset($param) && !empty($param)){
         },
         { data: 'NumberCustomerRole5', "defaultContent": "", "title": '在庫閲覧ユーザ数', className: "text-right" },
         { data: 'NumberCustomerRole6', "defaultContent": "", "title": '在庫・価格表閲覧ユーザ数', className: "text-right" },
-        { data: 'DisplayLimit', "defaultContent": "", "title": '在庫表示' },
+        { data: 'DisplayLimit', "defaultContent": "", "title": '在庫・価格表' },
         { data: 'invalid', "defaultContent": "", "title": 'ステータス' },
         {
           data: 'no',
@@ -137,9 +155,7 @@ if(isset($param) && !empty($param)){
             return '<div class="row justify-content-center"><a href="edit-customer.html?id=' + data + '" class="btn btn-success" style="margin-right: 5px; min-width: 85px;"><i class="fas fa-pencil-alt mr-2"></i>変更</a></div>';
           }
         },
-      ],
-      'drawCallback': function(settings) {
-      }
+      ]
     };
 
     table.ajax ={
@@ -162,8 +178,6 @@ if(isset($param) && !empty($param)){
       var name = $('#name').val();
       var status = $('#status').is(':checked') ? $('#status').val() : '';
       searchParams = '?cd=' + cd + '&name=' + name + '&status=' + status;
-      // var res = encodeURIComponent(searchParams);
-      // var res = decodeURIComponent(res);
       history.pushState(null, null, searchParams);
       e.preventDefault();
       $('#flash-message').remove();
