@@ -1,6 +1,10 @@
 $(function () {
+            debugger
+
     const topicTable = $('#topicsTable');
     $.fn.DataTable.ext.pager.numbers_length = 4;
+     var status = $('#status').val();
+      
     var table = {
         processing: true,
         serverSide: true,
@@ -28,9 +32,18 @@ $(function () {
     table.ajax = {
         url: 'topics.php',
         type: 'POST',
+        data: { 'title': title, 'status': status },
         data: function (d) {
             d.title = $('#title').val();
-            d.status = $('#status').is(':checked') ? 1 : 0;
+            d.status = $('#status').val();
+            if ($('#status').is(':checked')) {
+                d.status = 1;
+            } 
+            else {
+                d.status = 0;
+            }
+            // d.status = $('#status').is(':checked') ? 1 : $('#status').val();
+
             delete d.columns;
         },
         datatype: 'json',
@@ -40,7 +53,13 @@ $(function () {
 
     $('#searchTopic').on('submit', function (e) {
         var title = $('#title').val();
-        var status = $('#status').is(':checked') ? 1 : 0;
+        var status = $('#status').val();
+        if ($('#status').is(':checked')) {
+            status = 1;
+        } 
+        else {
+            status = 0;
+        }
         queryParams = '?title=' + title + '&status=' + status;
         history.pushState(null, null, queryParams);
         e.preventDefault();
