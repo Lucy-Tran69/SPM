@@ -2,12 +2,24 @@
     include_once "common/session.php";
     include_once "database/db.inc";
 
+   /**
+     * This is used to edit a role.
+     *
+     * If sort order is duplicate, then error.
+     *
+     * If sort order is null, default max sort order.
+     *
+     * Check input condition, if invalid then error.
+     *
+     * If valid, update to database.
+     */
+
     $conn  = getConnection();
 
     if($conn->connect_error) {
         die("Failed to connect to database. ".$conn->connect_error);
     }
-
+   
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
        $no = isset($_POST["no"]) ? (int)$_POST["no"] : '';
        $roleName = isset($_POST["roleName"]) ? trim(strip_tags(preg_replace('#<script(.*?)>(.*?)</script>#is', '', $_POST["roleName"]))) : '';

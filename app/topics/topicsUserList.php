@@ -1,6 +1,14 @@
 <?php
     include_once "database/db.inc";
 
+    /**
+     * Get a list of topic user in open day descending.
+     *
+     * The first, just take 5 topics.
+     *
+     * Then load more, each button press will load 5 more topics.
+     */
+
     $conn  = getConnection();
 
     if($conn->connect_error) {

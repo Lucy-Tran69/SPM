@@ -2,6 +2,14 @@
 include_once "common/session.php";
 include_once "database/db.inc";
 
+/**
+ * Get a list of all roles in ascending sort order.
+ *
+ * Search role according to menu, outside and status.
+ *
+ * Update the sort order if there is a change in sequence.
+ */
+
 $conn  = getConnection();
 
 if ($conn->connect_error) {
@@ -49,6 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $newsearchQuery = " where ".implode(" and ", $wheres);
     }
 
+     /**
+     * Update sort order
+     */
     if (!empty($sortOrder)) {
         $empQuery = "update role set sort_order = ? where no = ?";
         $stmSort = $conn->prepare($empQuery);

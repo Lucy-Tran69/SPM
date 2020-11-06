@@ -2,11 +2,16 @@
 include_once "common/session.php";
 include_once "database/db.inc";
 
+/**
+ * Get all information of a topic with a specific id.
+ */
+
 $conn  = getConnection();
 
 if ($conn->connect_error) {
     die("Failed to connect to database. " . $conn->connect_error);
 }
+
 if (isset($_SESSION["loginAccount"])) {
     if(isset($_GET["id"]) && !empty(trim($_GET["id"])) && is_numeric($_GET['id'])){
 
@@ -21,8 +26,10 @@ if (isset($_SESSION["loginAccount"])) {
         {
             $row = fetchAssocStatement($stm);
         }
+
+        $stm->close();
     }
-    $stm->close();
+    
     $conn->close();
 }
 ?>

@@ -2,6 +2,14 @@
 include_once "common/session.php";
 include_once "database/db.inc";
 
+/**
+ * This is used to add a new topic.
+ *
+ * Check input condition, if invalid then error.
+ *
+ * If valid, insert to database.
+ */
+
 define('UPLOAD_DIR', '../../app/refer/images/topics/');
 
 $conn  = getConnection();
@@ -81,11 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 			$checkOK = 0;
 		}
 	}
-
-		// if ($uploadOk == 0) {
-		// 	$msg->error('指定されたファイルはアップロードできません。');
-		// 	$checkOK = 0;
-		// }
 	
 	if ($checkOK == 1) {
 
@@ -137,6 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$conn->close();
 }
 
+/**
+ * This is a function to remove special character for url link.
+ */
 function remove_special_character($string) {
 	$t = $string;
 
@@ -161,7 +167,13 @@ function remove_special_character($string) {
 	return $t;
 }
 
-// function to rename file
+/**
+ * This is a function to rename file.
+ *
+ * New filename is defined as topic + no.
+ *
+ * return new file name
+ */
 function update_file_name($file, $no)  {
 	$pos = strrpos($file,'.');
 	$ext = substr($file,$pos); 

@@ -25,38 +25,41 @@ $(function() {
         ],
     };
 
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+    };
 
     table.ajax = {
         url: 'topics.php',
         type: 'POST',
-        cache: false,
-        // data: { 'title': title, 'status': status },
         data: function(d) {
-            var title = $('#title').val();
-            var status = $('#status').val();
-            if (status != '') {
-                status = status;
-            } else if ($('#status').is(':checked')) {
-                status = 1;
-            } else {
-                status = 0;
-            }
-            console.log(status);
-            // queryParams = '?title=' + title + '&status=' + status;
-            // history.pushState(null, null, queryParams);
-            d.title = title;
+            var status = getUrlParameter('status');
+            
+            d.title = $('#title').val();
             d.status = status;
-            // d.status = $('#status').is(':checked') ? 1 : $('#status').val();
-            // 
 
             delete d.columns;
         },
+      
         datatype: 'json',
     };
 
     topicTable.DataTable(table);
 
     $('#searchTopic').on('submit', function(e) {
+        e.preventDefault();
+
         var title = $('#title').val();
         var status = $('#status').val();
         if ($('#status').is(':checked')) {
@@ -66,7 +69,6 @@ $(function() {
         }
         queryParams = '?title=' + title + '&status=' + status;
         history.pushState(null, null, queryParams);
-        e.preventDefault();
         $('#flash-message').remove();
         topicTable.DataTable().ajax.reload();
     });

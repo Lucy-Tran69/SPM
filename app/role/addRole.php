@@ -2,6 +2,18 @@
     include_once "common/session.php";
     include_once "database/db.inc";
 
+    /**
+     * This is used to add a new role.
+     *
+     * If sort order is duplicate, then error.
+     *
+     * If sort order is null, default max sort order.
+     *
+     * Check input condition, if invalid then error.
+     *
+     * If valid, insert to database.
+     */
+
     $conn  = getConnection();
 
     if($conn->connect_error) {

@@ -7,6 +7,9 @@
         die("Failed to connect to database. ".$conn->connect_error);
     }
 
+    /**
+     * Get a information list of menu with invalid = 0 and sort in ascending sort order.
+     */
     $sql = "SELECT no, name, outside FROM menu WHERE invalid = 0 ORDER BY sort_order ASC";
 
     $query = mysqli_query($conn, $sql) or die ('エラーが発生しました。もう一度お試しください。');
@@ -19,12 +22,14 @@
                                   'outside' => $row['outside']));
     }
 
+    /**
+     * Get a list of role according to the menu with a specific role.
+     */
     if (isset($_SESSION["loginAccount"])) {
         if(isset($_GET["no"]) && !empty(trim($_GET["no"])) && is_numeric($_GET['no'])){
            $id = $_GET['no'];
 
             $menuLst = array();
-            //get menu by role
             $sqlRoleMenu = "select role, menu from role_menu where role=?";
             $stmtRoleMenu = $conn->prepare($sqlRoleMenu);
             $stmtRoleMenu->bind_param('i', $id);

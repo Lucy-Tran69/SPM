@@ -2,6 +2,14 @@
 include_once "common/session.php";
 include_once "database/db.inc";
 
+/**
+ * This is used to edit a topic.
+ *
+ * Check input condition, if invalid then error.
+ *
+ * If valid, update to database.
+ */
+
 define('UPLOAD_DIR', '../../app/refer/images/topics/');
 
 $conn  = getConnection();
@@ -9,6 +17,7 @@ $conn  = getConnection();
 if ($conn->connect_error) {
 	die("Failed to connect to database. " . $conn->connect_error);
 }
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$no = isset($_POST["no"]) ? (int)$_POST["no"] : '';
 	$title = isset($_POST["title"]) ? trim(strip_tags($_POST["title"])) : '';
@@ -144,6 +153,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$conn->close();
 }
 
+/**
+ * This is a function to remove special character for url link.
+ */
 function remove_special_character($string) {
 	$t = $string;
 
@@ -168,7 +180,13 @@ function remove_special_character($string) {
 	return $t;
 }
 
-// function to rename file
+/**
+ * This is a function to rename file.
+ *
+ * New filename is defined as topic + no.
+ *
+ * return new file name
+ */
 function update_file_name($file, $no)  {
 	$pos = strrpos($file,'.');
 	$ext = substr($file,$pos); 

@@ -2,6 +2,16 @@
 include_once "common/session.php";
 include_once "database/db.inc";
 
+/**
+* Get a list of all topics in open day descending.
+*
+* First, just take 10 topics.
+*
+* Then paging, every 10 topics in one page.
+*
+* Search topic according to title and status.
+*/
+
 $conn  = getConnection();
 
 if ($conn->connect_error) {
@@ -31,7 +41,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $currentDate = date('Y-m-d h:i:s', time());
     $invalid = 0;
 
-   
+    if (!empty($status) && is_string($status)) {
+        $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = 2";
+        $stmt = $conn->prepare($empQuery);
+
+        $sqlTotalFilter = "select count(*) as allcount from topics WHERE invalid = 2";
+        $stmSel = $conn->prepare($sqlTotalFilter);
+    }
+
+     if (!empty($status) && $status != 0 && $status != 1) {
+        $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = 2";
+        $stmt = $conn->prepare($empQuery);
+
+        $sqlTotalFilter = "select count(*) as allcount from topics WHERE invalid = 2";
+        $stmSel = $conn->prepare($sqlTotalFilter);
+    }
+
     if (empty($title) && empty($status)) {
         $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? order by open_day desc limit ?,?";
         $stmt = $conn->prepare($empQuery);
@@ -51,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmSel = $conn->prepare($sqlTotalFilter);
         $stmSel->bind_param('issss', $invalid, $title, $title1, $title2, $title3);
     }
+
     if (empty($title) && !empty($status) && $status == 1) {
         $status = $currentDate;
         $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? and opday <= CONCAT(?) and (clday >= CONCAT(?) or clday is null) order by open_day desc limit ?,?";
@@ -61,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmSel = $conn->prepare($sqlTotalFilter);
         $stmSel->bind_param('iss', $invalid, $status, $status);
     }
+
     if (!empty($title) && !empty($status) && $status == 1) {
         $status = $currentDate;
         $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = ? and (title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%')) and opday <= CONCAT(?) and (clday >= CONCAT(?) or clday is null) order by open_day desc limit ?,?";
@@ -70,15 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $sqlTotalFilter = "select count(*) as allcount from topics WHERE invalid = ? and (title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%') or title like CONCAT('%',?,'%')) and opday <= CONCAT(?) and (clday >= CONCAT(?) or clday is null)";
         $stmSel = $conn->prepare($sqlTotalFilter);
         $stmSel->bind_param('issssss', $invalid, $title, $title1, $title2, $title3, $status, $status);
-    }
-
-    if (!empty($status) && (is_string($status) || (is_numeric($status) && $status != 0 && $status != 1))) {
-        die();
-        $empQuery = "select no, title, DATE_FORMAT(inday, '%Y/%m/%d') AS insert_day, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, DATE_FORMAT(clday, '%Y/%m/%d') AS close_day from topics WHERE invalid = 2";
-        $stmt = $conn->prepare($empQuery);
-
-        $sqlTotalFilter = "select count(*) as allcount from topics WHERE invalid = 2";
-        $stmSel = $conn->prepare($sqlTotalFilter);
     }
     
     if (!empty($topicID)) {
@@ -130,8 +148,13 @@ $response = array(
 );
 
 echo json_encode($response);
+$stmt->close();
 $conn->close();
 
+
+/**
+* This is a function to replace special character from search input.
+*/
 function check_keyword_search($data)
 {
     mb_internal_encoding('UTF-8');

@@ -1,7 +1,9 @@
 <?php
     include_once "database/db.inc";
 
-    $err_msg = "";
+    /**
+     * Get all information of a topic with a specific id.
+     */
     $conn  = getConnection();
 
     if($conn->connect_error) {
@@ -15,9 +17,8 @@
     if(!empty($id)) {
         $sql = "SELECT title, DATE_FORMAT(opday, '%Y/%m/%d') AS open_day, image, image_link, body, link_title, link_url FROM topics WHERE no=$id";
 
-        $query = mysqli_query($conn, $sql) or die ('Error');
+        $query = mysqli_query($conn, $sql);
 
-        $result = array();
         while ($row = mysqli_fetch_array($query))
         {
             $data = array(

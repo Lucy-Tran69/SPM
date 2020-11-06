@@ -81,6 +81,7 @@ $(function () {
                 url: '../topics/topicDetail.php',
                 data: { id: id },
                 success: function (result) {
+                    debugger
                     let link_title = result['link_title'];
                     let link_url = result['link_url'];
                     let image_link = result['image_link'];
