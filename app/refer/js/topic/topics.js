@@ -1,10 +1,6 @@
-$(function () {
-            debugger
-
+$(function() {
     const topicTable = $('#topicsTable');
     $.fn.DataTable.ext.pager.numbers_length = 4;
-     var status = $('#status').val();
-      
     var table = {
         processing: true,
         serverSide: true,
@@ -14,7 +10,7 @@ $(function () {
         autoWidth: false,
         deferRender: true,
         lengthChange: false,
-        serverMethod: 'post',
+        serverMethod: 'POST',
         columns: [
             { data: 'insert_day', defaultContent: '', title: '作成日' },
             { data: 'open_day', defaultContent: '', title: '公開日' },
@@ -22,27 +18,36 @@ $(function () {
             { data: 'title', defaultContent: '', title: 'タイトル' },
             {
                 data: 'no',
-                render: function (data, type, row) {
+                render: function(data, type, row) {
                     return '<div class="row justify-content-center w-200px"><a href=edit-topic.html?id=' + data + ' class="btn btn-success m-b-5px m-r-0 m-b-0" style="margin-right: 5px;"><i class="fas fa-pencil-alt mr-2"></i> 変更</a><a href="" class="btn btn-danger js-deleteTopic m-l-5 m-b-5px res-button-del"><i class="fas fa-trash mr-2"></i> 削除</a></div>';
                 },
             },
         ],
     };
 
+
     table.ajax = {
         url: 'topics.php',
         type: 'POST',
-        data: { 'title': title, 'status': status },
-        data: function (d) {
-            d.title = $('#title').val();
-            d.status = $('#status').val();
-            if ($('#status').is(':checked')) {
-                d.status = 1;
-            } 
-            else {
-                d.status = 0;
+        cache: false,
+        // data: { 'title': title, 'status': status },
+        data: function(d) {
+            var title = $('#title').val();
+            var status = $('#status').val();
+            if (status != '') {
+                status = status;
+            } else if ($('#status').is(':checked')) {
+                status = 1;
+            } else {
+                status = 0;
             }
+            console.log(status);
+            // queryParams = '?title=' + title + '&status=' + status;
+            // history.pushState(null, null, queryParams);
+            d.title = title;
+            d.status = status;
             // d.status = $('#status').is(':checked') ? 1 : $('#status').val();
+            // 
 
             delete d.columns;
         },
@@ -51,13 +56,12 @@ $(function () {
 
     topicTable.DataTable(table);
 
-    $('#searchTopic').on('submit', function (e) {
+    $('#searchTopic').on('submit', function(e) {
         var title = $('#title').val();
         var status = $('#status').val();
         if ($('#status').is(':checked')) {
             status = 1;
-        } 
-        else {
+        } else {
             status = 0;
         }
         queryParams = '?title=' + title + '&status=' + status;
@@ -67,7 +71,7 @@ $(function () {
         topicTable.DataTable().ajax.reload();
     });
 
-    $('#topicsTable tbody').on('click', '.js-deleteTopic', function (e) {
+    $('#topicsTable tbody').on('click', '.js-deleteTopic', function(e) {
         e.preventDefault();
         var row = $(this).closest('tr');
 
@@ -80,9 +84,9 @@ $(function () {
 
         $('#confirmDelete').modal('show');
 
-        $('#agreeDelete').on('click', function () {
+        $('#agreeDelete').on('click', function() {
             $(topicTable).DataTable().row(row).remove().draw(false);
-            $.post('topics.php', { topicID: topicID, topicTitle: topicTitle }, function (data, response) {
+            $.post('topics.php', { topicID: topicID, topicTitle: topicTitle }, function(data, response) {
                 var html = '';
                 if (response == 'success') {
                     html += '<div class="alert dismissable alert-success"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>「' + topicTitle + '」トピックスの削除に成功しました。</div>';
@@ -111,16 +115,16 @@ $(function () {
         format: 'YYYY/MM/DD',
     });
 
-    $('#openDay').on('change.datetimepicker', function (e) {
+    $('#openDay').on('change.datetimepicker', function(e) {
         $('#closeDay').datetimepicker('minDate', e.date);
     });
-    $('#closeDay').on('change.datetimepicker', function (e) {
+    $('#closeDay').on('change.datetimepicker', function(e) {
         $('#openDay').datetimepicker('maxDate', e.date);
     });
 
     $.validator.addMethod(
         'accept',
-        function (value, element, param) {
+        function(value, element, param) {
             var typeParam = typeof param === 'string' ? param.replace(/\s/g, '') : 'image/*',
                 optionalValue = this.optional(element),
                 i,
@@ -175,24 +179,24 @@ $(function () {
             },
         },
         errorElement: 'span',
-        errorPlacement: function (error, element) {
+        errorPlacement: function(error, element) {
             error.addClass('invalid-feedback');
             element.closest('.form-group').append(error);
         },
-        highlight: function (element, errorClass, validClass) {
+        highlight: function(element, errorClass, validClass) {
             $(element).addClass('is-invalid');
         },
-        unhighlight: function (element, errorClass, validClass) {
+        unhighlight: function(element, errorClass, validClass) {
             $(element).removeClass('is-invalid');
         },
     });
 
-    $('.btn-modal-submit').click(function () {
+    $('.btn-modal-submit').click(function() {
         formAddTopic.submit();
         $('#previewTopic').modal('hide');
     });
 
-    formAddTopic.submit(function (event) {
+    formAddTopic.submit(function(event) {
         event.preventDefault();
         if (!formAddTopic.valid()) {
             return false;
@@ -216,10 +220,10 @@ $(function () {
             processData: false,
             data: form_data,
             dataType: 'html',
-            success: function (response) {
+            success: function(response) {
                 //check response is blank if success
                 if (!$.trim(response)) {
-                     window.history.back();
+                    window.history.back();
                     $(window).scrollTop(0);
                 }
                 // if error
@@ -228,7 +232,7 @@ $(function () {
                     $(window).scrollTop(0);
                 }
             },
-            error: function (jqXHR, textStatus, errorThrown) {
+            error: function(jqXHR, textStatus, errorThrown) {
                 console.log(errorThrown);
             },
         });
@@ -248,12 +252,12 @@ function onBtnclick() {
     var preLink = $('#urlImage').val();
 
     if (preTitle == '' && preBody == '') {
-     var messages = 'プレビューの前に、トピックス追加に出ている枠に情報を入力してください。';
+        var messages = 'プレビューの前に、トピックス追加に出ている枠に情報を入力してください。';
         $('#messagePreviewAdd').text(messages);
 
         $('#confirmPreviewAdd').modal('show');
 
-        $('#previewAdd').on('click', function () {
+        $('#previewAdd').on('click', function() {
             $('#confirmPreviewAdd').modal('hide');
         });
     } else {
@@ -328,7 +332,7 @@ function fileValidation() {
         //Image preview
         if (fileInput.files && fileInput.files[0]) {
             var reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 var output = document.getElementById('output_image');
                 output.src = e.target.result;
             };
