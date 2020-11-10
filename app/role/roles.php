@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $status = 2;
     }
 
-    if ($menu) {
+    if (!empty($menu) || $menu == 0 && $menu != '') {
         array_push($wheres, " role_menu.menu = ? ");
         array_push($wheresBind, "$menu");
         $newsearchLimit = $newsearchLimit . "i";

@@ -1,6 +1,11 @@
 function loadAjax(c) {
     var menu = $('#menu').val();
     var outSide = $('input[type="radio"]:checked').val();
+    
+    if (menu == '' && c == true) {
+        menu = getUrlParameter('menu');
+        outSide = getUrlParameter('outside');
+    }
     var status = $('#status').val();
 
     if ($('#status').is(':checked')) {
@@ -99,3 +104,18 @@ $(function() {
 function redirectAddRole() {
     window.location.href = 'add-role.html';
 }
+
+function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+};

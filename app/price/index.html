@@ -75,7 +75,7 @@ include "getItemInventoryPrice.php";
                   <select id="maker" name="maker" class="form-control">
                       <option value="">選択</option>
                       <?php
-                        foreach ($makerdb as $key => $value) { ?>
+                        foreach ($makerdb as $value) { ?>
                           <option value="<?php echo $value['no']; ?>" <?php if ($maker == $value['no']) {echo 'selected';} ?>><?php echo $value['name'];?>
                           </option>
                       <?php

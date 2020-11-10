@@ -67,11 +67,17 @@
                             </div>
                             <div class="col-sm-9">
                                 <select name="menu" id="menu" class="form-control">
-                                    <option value="">選択</option>
-                                    <?php foreach ($result as $value){ ?>
-                                    <option value="<?php echo $value['no']; ?>" <?php echo $menu === $value['no'] ? 'selected' : '' ?>><?php echo $value['name']; ?></option>
-                                    <?php }?>
-                                </select>
+                                    <?php 
+                                    if (is_string($menu) || $menu == 0 || $menu != '') {
+                                        ?>
+                                        <option value="" selected></option>
+                                    <?php } ?>
+                                        <option value="">選択</option>
+                                    <?php foreach ($result as $value){ 
+                                     ?>
+                                        <option value="<?php echo $value['no']; ?>" <?php echo $menu === $value['no'] ? 'selected' : '' ?>><?php echo $value['name']; ?></option>
+                                 <?php } ?>
+                             </select>
                             </div>
                         </div>
                     </div>
